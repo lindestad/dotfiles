@@ -148,7 +148,8 @@ disabled = false
 disabled = false
 
 [os.symbols]
-
+Ubuntu = " "
+Linux = " "
 Windows = " "
 
 [cmd_duration]
