@@ -148,9 +148,25 @@ disabled = false
 disabled = false
 
 [os.symbols]
-Ubuntu = " "
-Linux = " "
-Windows = " "
+Ubuntu = ""
+Linux = ""
+Windows = ""
+SUSE = ""
+Raspbian = "󰐿"
+Mint = "󰣭"
+Macos = " "
+Manjaro = ""
+Gentoo = "󰣨"
+Fedora = "󰣛"
+Alpine = ""
+Amazon = ""
+Android = ""
+Arch = "󰣇"
+Artix = "󰣇"
+CentOS = ""
+Debian = "󰣚"
+Redhat = "󱄛"
+RedHatEnterprise = "󱄛"
 
 [cmd_duration]
 format = "[]($style) [$duration]($style) "
