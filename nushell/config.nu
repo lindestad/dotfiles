@@ -5,7 +5,10 @@ starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.n
 alias gs = git status
 alias ga = git add .
 alias gf = git fetch
-alias gp = git pull
+alias pull = git pull
+alias push = git push
+alias gm = git merge
+alias gcm = git commit -m
 
 def gc [...msg_parts: string] {
   let msg = $msg_parts | str join " " | str trim
