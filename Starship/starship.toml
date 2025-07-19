@@ -115,6 +115,14 @@ use_os_path_sep = false
 home_symbol = "~"
 format = '  [$path]($style) '
 
+[directory.substitutions]
+"Documents" = "󰈙"
+"Downloads" = ""
+"Music" = "󰝚"
+"Pictures" = ""
+"Developer" = "󰲋"
+"dev" = "󰲋"
+
 [time]
 disabled = false
 format = '[\[ $time \]]($style) '
