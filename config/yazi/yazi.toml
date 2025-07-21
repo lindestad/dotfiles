@@ -30,7 +30,9 @@ ueberzug_offset = [0, 0, 0, 0]
 
 [opener]
 edit = [
+    { run = '${EDITOR:-hx} "$@"', desc = "$EDITOR", block = true, for = "unix" },
     { run = '${EDITOR:-vi} "$@"', desc = "$EDITOR", block = true, for = "unix" },
+    { run = 'hx %*', orphan = true, desc = "hx", for = "windows" },
     { run = 'code %*', orphan = true, desc = "code", for = "windows" },
     { run = 'code -w %*', block = true, desc = "code (block)", for = "windows" },
 ]
@@ -122,8 +124,8 @@ fetchers = [
 spotters = [
     { name = "*/", run = "folder" },
     # Code
-    { mime = "text/*", run = "code" },
-    { mime = "application/{mbox,javascript,wine-extension-ini}", run = "code" },
+    { mime = "text/*", run = "hx" },
+    { mime = "application/{mbox,javascript,wine-extension-ini}", run = "hx" },
     # Image
     { mime = "image/{avif,hei?,jxl}", run = "magick" },
     { mime = "image/svg+xml", run = "svg" },
@@ -149,7 +151,7 @@ preloaders = [
 previewers = [
     { name = "*/", run = "folder" },
     # Code
-    { mime = "text/*", run = "code" },
+    { mime = "text/*", run = "hx" },
     { mime = "application/{mbox,javascript,wine-extension-ini}", run = "code" },
     # JSON
     { mime = "application/{json,ndjson}", run = "json" },

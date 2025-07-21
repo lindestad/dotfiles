@@ -9,7 +9,7 @@ $Links = @(
     @{ Src = "$Dotfiles\shells\config.nu"; Dst = Join-Path $Roaming "nushell\config.nu" },
     @{ Src = "$Dotfiles\config\starship\starship.toml"; Dst = Join-Path $Local "clink\starship.lua" },       # For CMD/Clink
     @{ Src = "$Dotfiles\config\starship\starship.toml"; Dst = Join-Path $Roaming "starship\config.toml" },   # For Starship in PowerShell
-    @{ Src = "$Dotfiles\config\yazi"; Dst = Join-Path $Roaming "yazi" }
+    @{ Src = "$Dotfiles\config\yazi"; Dst = Join-Path $Roaming "yazi\config" }
     # @{ Src = "$Dotfiles\shells\.zshrc";                 Dst = Join-Path $UserHome ".zshrc" },
     # @{ Src = "$Dotfiles\shells\.bashrc";                Dst = Join-Path $UserHome ".bashrc" }
 )
@@ -28,5 +28,5 @@ foreach ($item in $Links) {
     }
 
     New-Item -ItemType SymbolicLink -Path $dst -Target $src | Out-Null
-    Write-Host "Linked $dst ← $src"
+    Write-Host "Linked $src --> $dst"
 }
