@@ -1,0 +1,10 @@
+use_nerdfont = true
+hide_display_names = true
+
+[keybindings]
+"Shift+d" = "noop"
+"d" = "noop"
+"w" = "seek +10000"
+"b" = "seek -10000"
+"Shift+j" = "move down 5"
+"Shift+k" = "move up 5"
