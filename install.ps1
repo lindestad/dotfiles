@@ -1,6 +1,7 @@
 $apps = @(
     "Helix.Helix",           # or custom install if not in winget
     "Starship.Starship",
+    "eza-community.eza",
     "BurntSushi.ripgrep.MSVC",
     "sharkdp.fd",
     "Gyan.FFmpeg",
