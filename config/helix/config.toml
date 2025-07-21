@@ -1,0 +1,13 @@
+theme = "ayu_mirage"
+
+[editor]
+line-number = "relative"
+
+[editor.cursor-shape]
+normal = "block"
+insert = "bar"
+select = "block"
+
+[keys.normal]
+"{" = "goto_prev_paragraph"
+"}" = "goto_next_paragraph"
