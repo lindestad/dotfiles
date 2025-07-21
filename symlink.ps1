@@ -5,8 +5,7 @@ $Local = [Environment]::GetFolderPath('LocalApplicationData')      # %LocalAppDa
 
 # Use array of objects to allow duplicate sources with different destinations
 $Links = @(
-    @{ Src = "$Dotfiles\config\helix\config.toml"; Dst = Join-Path $Roaming "helix\config.toml" },
-    @{ Src = "$Dotfiles\config\helix\themes"; Dst = Join-Path $Roaming "helix\themes" },
+    @{ Src = "$Dotfiles\config\helix"; Dst = Join-Path $Roaming "helix" },
     @{ Src = "$Dotfiles\shells\config.nu"; Dst = Join-Path $Roaming "nushell\config.nu" },
     @{ Src = "$Dotfiles\config\starship\starship.toml"; Dst = Join-Path $Local "clink\starship.lua" },       # For CMD/Clink
     @{ Src = "$Dotfiles\config\starship\starship.toml"; Dst = Join-Path $Roaming "starship\config.toml" },   # For Starship in PowerShell
