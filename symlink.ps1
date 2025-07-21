@@ -1,24 +1,33 @@
 $Dotfiles = Split-Path -Parent $MyInvocation.MyCommand.Definition
-# $Home = [Environment]::GetFolderPath('UserProfile')
-$Roaming = [Environment]::GetFolderPath('ApplicationData')     # %AppData%
-$Local = [Environment]::GetFolderPath('LocalApplicationData') # %LocalAppData%
+$UserHome = [Environment]::GetFolderPath('UserProfile')
+$Roaming = [Environment]::GetFolderPath('ApplicationData')         # %AppData%
+$Local = [Environment]::GetFolderPath('LocalApplicationData')      # %LocalAppData%
 
-$Links = @{
-    "$Dotfiles\config\helix\config.toml"      = Join-Path $Roaming "helix\config.toml"
-    "$Dotfiles\config\helix\themes"           = Join-Path $Roaming "helix\themes"
-    "$Dotfiles\shells\config.nu"              = Join-Path $Roaming "nushell\config.nu"
-    "$Dotfiles\config\starship\starship.toml" = Join-Path $Local "clink\starship.lua"  # For cmd
-    "$Dotfiles\config\starship\starship.toml" = Join-Path $Roaming "starship\config.toml"
-    "$Dotfiles\config\yazi"                   = Join-Path $Roaming "yazi"
-    # "$Dotfiles\shells\.zshrc"                 = Join-Path $Home ".zshrc"
-    # "$Dotfiles\shells\.bashrc"                = Join-Path $Home ".bashrc"
-}
+# Use array of objects to allow duplicate sources with different destinations
+$Links = @(
+    @{ Src = "$Dotfiles\config\helix\config.toml"; Dst = Join-Path $Roaming "helix\config.toml" },
+    @{ Src = "$Dotfiles\config\helix\themes"; Dst = Join-Path $Roaming "helix\themes" },
+    @{ Src = "$Dotfiles\shells\config.nu"; Dst = Join-Path $Roaming "nushell\config.nu" },
+    @{ Src = "$Dotfiles\config\starship\starship.toml"; Dst = Join-Path $Local "clink\starship.lua" },       # For CMD/Clink
+    @{ Src = "$Dotfiles\config\starship\starship.toml"; Dst = Join-Path $Roaming "starship\config.toml" },   # For Starship in PowerShell
+    @{ Src = "$Dotfiles\config\yazi"; Dst = Join-Path $Roaming "yazi" }
+    # @{ Src = "$Dotfiles\shells\.zshrc";                 Dst = Join-Path $UserHome ".zshrc" },
+    # @{ Src = "$Dotfiles\shells\.bashrc";                Dst = Join-Path $UserHome ".bashrc" }
+)
 
-foreach ($src in $Links.Keys) {
-    $dst = $Links[$src]
-    $dir = Split-Path $dst
-    if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
-    if (Test-Path $dst) { Remove-Item $dst -Force }
+foreach ($item in $Links) {
+    $src = $item.Src
+    $dst = $item.Dst
+    $dstDir = Split-Path $dst
+
+    if (-not (Test-Path $dstDir)) {
+        New-Item -ItemType Directory -Path $dstDir -Force | Out-Null
+    }
+
+    if (Test-Path $dst) {
+        Remove-Item $dst -Force
+    }
+
     New-Item -ItemType SymbolicLink -Path $dst -Target $src | Out-Null
-    Write-Host "Linked $dst --> $src"
+    Write-Host "Linked $dst ← $src"
 }
