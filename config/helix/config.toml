@@ -9,5 +9,16 @@ insert = "bar"
 select = "block"
 
 [keys.normal]
+"C-s" = [":format", ":w"]
+"S-esc" = ":quit"
 "{" = "goto_prev_paragraph"
 "}" = "goto_next_paragraph"
+"C-j" = "save_selection"
+
+[keys.insert]
+"C-s" = [":format", ":w"]
+"S-esc" = ":quit"
+
+[keys.select]
+"C-s" = [":format", ":w"]
+"S-esc" = ":quit"
