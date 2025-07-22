@@ -44,3 +44,30 @@ alias lzt = eza --tree --long --icons --group-directories-first --git-ignore --g
 alias b = bat --style numbers,grid
 alias cat = bat --plain
 
+
+# AUTOCOMPLETIONS
+# Check the path is correct
+let autocompletions_path = "~/dev/dotfiles/config/nushell/custom-completions"
+if not ($autocompletions_path | path exists) {
+  print "\n\n    WARNING: Custom completions not loaded:"
+  print "    Custom completions path does not exist, make sure dotfiles is installed at ~/dev/dotfiles\n\n"
+  print "    Error below can be safely ignored, cause by early return workaround to exit script early.\n\n"
+  return
+}
+
+# Load custom completions
+source ~/dev/dotfiles/config/nushell/custom-completions/bat/bat-completions.nu
+source ~/dev/dotfiles/config/nushell/custom-completions/cargo/cargo-completions.nu
+source ~/dev/dotfiles/config/nushell/custom-completions/docker/docker-completions.nu
+source ~/dev/dotfiles/config/nushell/custom-completions/eza/eza-completions.nu
+source ~/dev/dotfiles/config/nushell/custom-completions/git/git-completions.nu
+source ~/dev/dotfiles/config/nushell/custom-completions/pytest/pytest-completions.nu
+source ~/dev/dotfiles/config/nushell/custom-completions/rg/rg-completions.nu
+source ~/dev/dotfiles/config/nushell/custom-completions/rustup/rustup-completions.nu
+source ~/dev/dotfiles/config/nushell/custom-completions/ssh/ssh-completions.nu
+source ~/dev/dotfiles/config/nushell/custom-completions/tar/tar-completions.nu
+source ~/dev/dotfiles/config/nushell/custom-completions/typst/typst-completions.nu
+source ~/dev/dotfiles/config/nushell/custom-completions/uv/uv-completions.nu
+source ~/dev/dotfiles/config/nushell/custom-completions/vscode/vscode-completions.nu
+source ~/dev/dotfiles/config/nushell/custom-completions/zellij/zellij-completions.nu
+source ~/dev/dotfiles/config/nushell/custom-completions/zoxide/zoxide-completions.nu
