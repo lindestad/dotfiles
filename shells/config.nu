@@ -11,6 +11,9 @@ starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.n
 alias gs = git status
 alias ga = git add
 alias ga. = git add .
+alias gb = git branch
+alias gba = git branch --all
+alias gbr = git branch --remote
 alias gf = git fetch
 alias pull = git pull
 alias push = git push
@@ -32,9 +35,12 @@ def gc [...msg_parts: string] {
   git commit -m $msg
 }
 
-# Other
+# Eza
 alias tree = eza --tree --level=5
 alias lz = eza --grid --long --icons --group-directories-first --git-ignore
 alias lzt = eza --tree --long --icons --group-directories-first --git-ignore --git --level=3
 
+# Bat
+alias b = bat --style numbers,grid
+alias cat = bat --plain
 
