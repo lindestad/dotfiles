@@ -5,6 +5,7 @@ $env.config.buffer_editor = "hx"
 mkdir ($nu.data-dir | path join "vendor/autoload")
 starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.nu")
 
+
 # ALIASES
 
 # git
@@ -71,3 +72,7 @@ source ~/dev/dotfiles/config/nushell/custom-completions/uv/uv-completions.nu
 source ~/dev/dotfiles/config/nushell/custom-completions/vscode/vscode-completions.nu
 source ~/dev/dotfiles/config/nushell/custom-completions/zellij/zellij-completions.nu
 source ~/dev/dotfiles/config/nushell/custom-completions/zoxide/zoxide-completions.nu
+
+
+# THEME
+source ~/dev/dotfiles/config/nushell/nu-themes/humanoid-dark.nu
