@@ -16,6 +16,7 @@ alias gb = git branch
 alias gba = git branch --all
 alias gbr = git branch --remote
 alias gf = git fetch
+alias gl = git log --oneline --graph
 alias pull = git pull
 alias push = git push
 alias gm = git merge
