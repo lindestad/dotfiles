@@ -1,4 +1,4 @@
-use_nerdfont = true
+use_nerdfont = false
 hide_display_names = true
 
 [keybindings]
@@ -8,3 +8,26 @@ hide_display_names = true
 "b" = "seek -10000"
 "Shift+j" = "move down 5"
 "Shift+k" = "move up 5"
+"Space" = "playpause"
+"p" = "play"
+"-" = "voldown 5"
+"=" = "volup 5"
+"_" = "voldown 1"
+"+" = "volup 1"
+
+[theme]
+background = "#263545"
+primary = "light white"
+secondary = "light black"
+title = "green"
+playing = "green"
+playing_bg = "#263545"
+highlight = "light white"
+highlight_bg = "dark green"
+error = "light white"
+error_bg = "red"
+statusbar = "black"
+statusbar_progress = "green"
+statusbar_bg = "green"
+cmdline = "light white"
+cmdline_bg = "black"
