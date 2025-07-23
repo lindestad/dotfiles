@@ -1,0 +1,80 @@
+name: Lint
+
+on:
+  push:
+    paths:
+      - '**.sh'
+      - '**.ps1'
+      - '**.nu'
+      - '**.toml'
+      - '**.yaml'
+      - '**.yml'
+  pull_request:
+    paths:
+      - '**.sh'
+      - '**.ps1'
+      - '**.nu'
+      - '**.toml'
+      - '**.yaml'
+      - '**.yml'
+
+jobs:
+  lint-shell:
+    name: ShellCheck (Bash)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ShellCheck
+        run: sudo apt-get install -y shellcheck
+
+      - name: Run ShellCheck
+        run: |
+          find . -type f -name '*.sh' -exec shellcheck {} +
+
+  lint-powershell:
+    name: PowerShell (PSScriptAnalyzer)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install PSScriptAnalyzer
+        shell: pwsh
+        run: Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
+
+      - name: Run PowerShell Analysis
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem -Recurse -Include *.ps1
+          foreach ($file in $files) {
+            Invoke-ScriptAnalyzer -Path $file.FullName -Recurse -Severity Warning,Error
+          }
+
+  lint-toml:
+    name: Lint TOML files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install taplo CLI
+        run: |
+          curl -sSf https://taplo.tamasfe.dev/install.sh | sh -s -- --bin-dir ~/.cargo/bin
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Run taplo lint
+        run: |
+          find . -type f -name '*.toml' -exec taplo lint {} +
+
+  # Nushell linting (no official tool yet)
+  # Can run basic syntax check using nushell itself:
+  # lint-nushell:
+  #   name: Nushell Syntax Check
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Check Nushell scripts
+  #       run: |
+  #         for f in $(find . -name '*.nu'); do
+  #           echo "Checking $f"
+  #           nu -c "source $f"
+  #         done
