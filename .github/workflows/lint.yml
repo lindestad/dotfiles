@@ -51,19 +51,13 @@ jobs:
           }
 
   lint-toml:
-    name: Lint TOML files
+    name: Taplo (TOML)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install taplo CLI
-        run: |
-          curl -sSf https://taplo.tamasfe.dev/install.sh | sh -s -- --bin-dir ~/.cargo/bin
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-
-      - name: Run taplo lint
-        run: |
-          find . -type f -name '*.toml' -exec taplo lint {} +
+      - uses: docker://docker.io/tamasfe/taplo:latest
+        with:
+          args: lint --no-config .
 
   # Nushell linting (no official tool yet)
   # Can run basic syntax check using nushell itself:
