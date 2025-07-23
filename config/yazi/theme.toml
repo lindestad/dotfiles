@@ -1,3 +1,4 @@
 [flavor]
-use = "tokyo-night"
-dark = "tokyo-night"
+dark = "flexoki-dark"
+light = "monokai-vibrant"
+

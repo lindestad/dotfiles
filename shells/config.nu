@@ -77,3 +77,16 @@ source ~/dev/dotfiles/config/nushell/custom-completions/zoxide/zoxide-completion
 
 # THEME
 source ~/dev/dotfiles/config/nushell/nu-themes/humanoid-dark.nu
+
+# Yazi binding allowing cd to working directory on exit
+
+def --env y [...args] {
+	let tmp = (mktemp -t "yazi-cwd.XXXXXX")
+	yazi ...$args --cwd-file $tmp
+	let cwd = (open $tmp)
+	if $cwd != "" and $cwd != $env.PWD {
+		cd $cwd
+	}
+	rm -fp $tmp
+}
+
