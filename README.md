@@ -1,20 +1,36 @@
-# Dotfiles
+<h1 align="center">
+  <img align="left" width="140" height="140" src="https://www.svgrepo.com/show/361365/terminal-bash.svg">
+  <a name="top">~/.dotfiles</a><br/><br/>
+  <sup>Cross-platform, cross-shell configuration</sup><br/><sub><br/></sub>
+</h1>
+<div align="center">
+  <a href="https://github.com/lindestad/dotfiles/blob/main/LICENSE">
+    <img alt="License: MIT" src="https://img.shields.io/github/license/lindestad/dotfiles?style=flat-square">
+  </a>
+  <a href="https://github.com/lindestad/dotfiles/stargazers">
+    <img alt="Stars" src="https://img.shields.io/github/stars/lindestad/dotfiles?style=flat-square">
+  </a>
+  <a href="https://github.com/lindestad/dotfiles/actions">
+    <img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/lindestad/dotfiles/lint.yml?branch=main&style=flat-square">
+  </a>
+</div>
 
-This repository contains my personal configuration files for tools I use regularly across Linux and Windows systems. The goal is to maintain a consistent development environment with minimal manual setup.
+---
 
-## Overview
+This repository provides a unified development environment across **Linux**, **Windows**, and **WSL**, with version-controlled configuration for editors, terminals, shells, and CLI tools.
 
-The repository includes configurations for:
+## Contents
 
-* **Helix** (text editor)
-* **Starship** (shell prompt)
-* **Yazi** (file manager, with custom themes)
-* **Ncspot** (Spotify TUI)
-* **Zellij** (terminal multiplexer)
-* **Nushell** and other shell environments
-* Patched **Nerd Fonts** (MesloLGS NF)
+- Configuration for:
+  - **Helix** – Modal code editor
+  - **Starship** – Cross-shell prompt
+  - **Yazi** – TUI file manager
+  - **Ncspot** – Terminal-based Spotify client
+  - **Zellij** – Terminal multiplexer
+  - **Nushell** – Structured shell (with Bash/Zsh/Pwsh fallbacks)
+  - **Patched Nerd Fonts** – (MesloLGS NF)
 
-## Setup
+## Installation
 
 ### Linux / WSL
 
@@ -22,7 +38,7 @@ The repository includes configurations for:
 git clone https://github.com/lindestad/dotfiles ~/.dotfiles
 cd ~/.dotfiles
 ./install.sh
-```
+````
 
 ### Windows (PowerShell)
 
@@ -32,4 +48,34 @@ cd $HOME\.dotfiles
 .\install.ps1
 ```
 
-These scripts install utilities and symlink config files into place. Use `symlink.sh` or `symlink.ps1` directly if you want to skip other setup steps.
+The installation scripts install required packages and symlink configuration files. You may also run `symlink.ps1` or `symlink.sh` directly to skip system configuration.
+
+---
+
+## Compatibility
+
+This dotfiles setup is designed to support:
+
+* 🐧 Linux (Ubuntu, Arch-based)
+* 🪟 Windows
+* 🧊 WSL2
+
+Shells tested:
+
+* [x] Nushell
+* [x] PowerShell
+* [x] Zsh
+* [x] Bash
+
+---
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](./LICENSE) for details.
+
+---
+
+<p align="center">
+  <a href="#top">Back to top ↑</a>
+</p>
+
