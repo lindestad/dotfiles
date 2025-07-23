@@ -14,10 +14,15 @@ select = "block"
 "{" = "goto_prev_paragraph"
 "}" = "goto_next_paragraph"
 "C-j" = "save_selection"
+"C-left" = "move_prev_word_start"
+"C-right" = "move_next_word_end"
 
 [keys.insert]
 "C-s" = [":format", ":w"]
 "S-esc" = ":quit"
+"C-left" = "move_prev_word_start"
+"C-right" = "move_next_word_end"
+"j" = { "k" = "normal_mode" }
 
 [keys.select]
 "C-s" = [":format", ":w"]
