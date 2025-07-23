@@ -8,5 +8,10 @@ use = "yazi-rs/plugins:git"
 rev = "1ab21d4"
 hash = "e65e6528de15012b5ccdead4ed26b8bd"
 
+[[plugin.deps]]
+use = "yazi-rs/plugins:mime-ext"
+rev = "1ab21d4"
+hash = "4ef4a397532572dfbe4e3138c2d5a4b2"
+
 [flavor]
 deps = []
