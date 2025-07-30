@@ -44,7 +44,9 @@ def gc [...msg_parts: string] {
 # Eza
 alias tree = eza --tree --level=5
 alias lz = eza --grid --long --icons --group-directories-first --git-ignore
+alias lza = eza --grid --long --icons --group-directories-first
 alias lzt = eza --tree --long --icons --group-directories-first --git-ignore --git --level=3
+alias lzta = eza --tree --long --icons --group-directories-first --git --level=3
 
 # Bat
 alias b = bat --style numbers,grid
