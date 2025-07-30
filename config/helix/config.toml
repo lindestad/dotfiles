@@ -8,6 +8,9 @@ normal = "block"
 insert = "bar"
 select = "block"
 
+[editor.soft-wrap]
+enable = true
+
 [keys.normal]
 "C-s" = [":format", ":w"]
 "S-esc" = ":quit"
