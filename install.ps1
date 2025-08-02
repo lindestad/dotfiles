@@ -17,7 +17,8 @@ $apps = @(
     "Git.Git",
     "Microsoft.PowerShell",
     "uutils.coreutils",
-    "hrkfdn.ncspot"
+    "hrkfdn.ncspot",
+    "jtroo.kanata_gui"
 )
 
 foreach ($app in $apps) {

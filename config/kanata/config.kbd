@@ -1,0 +1,15 @@
+(defcfg
+  process-unmapped-keys no
+)
+
+(defsrc
+  caps
+)
+
+(defalias
+  escctrl (tap-hold 100 100 esc lctrl)
+)
+
+(deflayer base
+  @escctrl
+)
