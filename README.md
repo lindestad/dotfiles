@@ -25,12 +25,13 @@ This repository provides a unified development environment across **Linux**, **W
 ## Contents
 
 - Configuration for:
-  - **Helix** – Modal code editor
-  - **Starship** – Cross-shell prompt
-  - **Yazi** – TUI file manager
-  - **Ncspot** – Terminal-based Spotify client
-  - **Zellij** – Terminal multiplexer
-  - **Nushell** – Structured shell (with Bash/Zsh/Pwsh fallbacks)
+  - **[Helix](https://github.com/helix-editor/helix)** – Modal code editor
+  - **[Starship](https://github.com/starship/starship)** – Cross-shell prompt
+  - **[Yazi](https://github.com/sxyazi/yazi)** – TUI file manager
+  - **[Ncspot](https://github.com/hrkfdn/ncspot)** – Terminal-based Spotify client
+  - **[Zellij](https://github.com/zellij-org/zellij)** – Terminal multiplexer
+  - **[Nushell](https://github.com/nushell/nushell)** – Structured shell (with Bash/Zsh/Pwsh fallbacks)
+  - **[Kanata](https://github.com/jtroo/kanata)** - Key remapping (Caps lock --> Tap: Esc, Hold: LCTRL) 
   - **Patched Nerd Fonts** – (MesloLGS NF)
 
 ## Installation
