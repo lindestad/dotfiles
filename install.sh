@@ -46,6 +46,7 @@ LINKS=(
   "$DOTFILES_DIR/config/starship/starship.toml|$HOME/.config/starship.toml"
   "$DOTFILES_DIR/config/yazi|$HOME/.config/yazi"
   "$DOTFILES_DIR/config/ncspot/config.toml|$HOME/.config/ncspot/config.toml"
+  "$DOTFILES_DIR/config/kanata|$HOME/.config/kanata"
   "$DOTFILES_DIR/config/niri|$HOME/.config/niri"
   "$DOTFILES_DIR/config/waybar|$HOME/.config/waybar"
   "$DOTFILES_DIR/config/fuzzel/fuzzel.ini|$HOME/.config/fuzzel/fuzzel.ini"
