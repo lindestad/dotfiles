@@ -1,0 +1,123 @@
+{
+  "layer": "top",
+  "position": "top",
+  "reload_style_on_change": true,
+
+  "modules-left": [
+    "custom/logo", "clock", "disk", "memory", "cpu",
+    "temperature"
+  ],
+  "modules-center": [ "niri/workspaces" ],
+  "modules-right": [
+    "tray", "custom/clipboard", "backlight", "idle_inhibitor",
+    "custom/colorpicker", "bluetooth", "pulseaudio", "network", "battery"
+  ],
+
+  "custom/logo": { "format": "", "tooltip": false },
+
+  // ——— Workspaces (Niri) ———
+  "niri/workspaces": {
+    "all-outputs": true,
+    "format": "{icon}",
+    "format-icons": {
+      // match by NAME
+      "a": "", "b": "", "c": "", "d": "", "e": "", "f": "", "g": "",
+      // states (fallbacks)
+      "active": "",
+      // "focused": "",
+      // "empty": "",
+      "default": ""
+    }
+    // click to switch is enabled by default; set "disable-click": true to turn off
+  },
+
+    "idle_inhibitor": {
+    "format": "<span font='12'>{icon} </span>",
+    "format-icons": { "activated": "󰈈", "deactivated": "󰈉" }
+  },
+
+  "custom/clipboard": {
+    "format": "",
+    "on-click": "cliphist list | fuzzel --dmenu | cliphist decode | wl-copy",
+    "interval": 86400
+  },
+
+  "clock": {
+    "format": "{:%I:%M:%S %p}",
+    "interval": 1,
+    "tooltip-format": "\n<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+    "calendar-weeks-pos": "right",
+    "today-format": "<span color='#7645AD'><b><u>{}</u></b></span>",
+    "format-calendar": "<span color='#aeaeae'><b>{}</b></span>",
+    "format-calendar-weeks": "<span color='#aeaeae'><b>W{:%V}</b></span>",
+    "format-calendar-weekdays": "<span color='#aeaeae'><b>{}</b></span>"
+  },
+
+  "bluetooth": {
+    "format-on": "", "format-off": "", "format-disabled": "󰂲",
+    "format-connected": "󰂴",
+    "format-connected-battery": "{device_battery_percentage}% 󰂴",
+    "tooltip-format": "{controller_alias}\t{controller_address}\n\n{num_connections} connected",
+    "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{num_connections} connected\n\n{device_enumerate}",
+    "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
+    "tooltip-format-enumerate-connected-battery": "{device_alias}\t{device_address}\t{device_battery_percentage}%",
+    "on-click": "blueman-manager"
+  },
+
+  "network": {
+    "format-wifi": " ",
+    "format-ethernet": " ",
+    "format-disconnected": "",
+    "tooltip-format": "{ipaddr}",
+    "tooltip-format-wifi": "{essid} ({signalStrength}%)  | {ipaddr}",
+    "tooltip-format-ethernet": "{ifname} 🖧 | {ipaddr}",
+    "on-click": "nm-connection-editor"
+  },
+
+  "battery": {
+    "interval": 1,
+    "states": { "good": 95, "warning": 30, "critical": 20 },
+    "format": "{capacity}%  {icon} ",
+    "format-charging": "{capacity}% 󰂄 ",
+    "format-plugged": "{capacity}% 󰂄 ",
+    "format-alt": "{time} {icon}",
+    "format-icons": ["󰁻","󰁼","󰁾","󰂀","󰂂","󰁹"]
+  },
+
+  "backlight": {
+    "format": " {percent}%",
+    "on-scroll-up":   "brightnessctl set +5%",
+    "on-scroll-down": "brightnessctl set 5%-",
+    "smooth-scrolling-threshold": 1
+  },
+
+  "disk": { "interval": 30, "format": "  {percentage_used}%", "path": "/" },
+
+  "cpu": { "interval": 1, "format": " {usage}%", "min-length": 6, "max-length": 6 },
+  "memory":{ "format": " {percentage}%" },
+
+  "temperature": {
+    "format": " {temperatureC}°C",
+    "format-critical": " {temperatureC}°C",
+    "interval": 2,
+    "critical-threshold": 80,
+    "on-click": "alacritty -e btop"
+  },
+
+  "pulseaudio": {
+    "format": "{volume}% {icon}",
+    "format-bluetooth": "󰂰",
+    "format-muted": "<span font='12'></span>",
+    "format-icons": {
+      "headphones": "", "bluetooth": "󰥰", "handsfree": "",
+      "headset": "󱡬", "phone": "", "portable": "", "car": "",
+      "default": ["🕨","🕩","🕪"]
+    },
+    "justify": "center",
+    "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
+    "on-click-right": "pavucontrol",
+    "tooltip-format": "{icon}  {volume}%"
+  },
+
+  "tray": { "icon-size": 14, "spacing": 10 }
+}
