@@ -1,6 +1,7 @@
 spawn-at-startup "gnome-keyring-daemon" "--start" "--components=pkcs11,secrets,ssh,gpg"
 spawn-at-startup "nm-applet"
 spawn-at-startup "swaybg" "-i" "/home/dan/Pictures/wp/dark_circle.png" "-m" "fill"
+spawn-at-startup "swayidle" "-w" "before-sleep" "swaylock" "-f" "-c" "000000"
 
 // Persistent/named workspaces
 workspace "a"
@@ -231,6 +232,7 @@ window-rule {
 binds {
     // shows a list of important hotkeys.
     Mod+Shift+Slash { show-hotkey-overlay; }
+    Mod+Shift+X hotkey-overlay-title="Power menu" { spawn "~/.local/bin/power-menu"; }     
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+T hotkey-overlay-title="Open a Terminal: alacritty" { spawn "alacritty"; }

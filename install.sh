@@ -48,6 +48,7 @@ LINKS=(
   "$DOTFILES_DIR/config/ncspot/config.toml|$HOME/.config/ncspot/config.toml"
   "$DOTFILES_DIR/config/niri|$HOME/.config/niri"
   "$DOTFILES_DIR/config/waybar|$HOME/.config/waybar"
+  "$DOTFILES_DIR/config/fuzzel/fuzzel.ini|$HOME/.config/fuzzel/fuzzel.ini"
 )
 
 # --- Helpers ------------------------------------------------------------------
