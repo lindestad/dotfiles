@@ -122,6 +122,12 @@ for pair in "${LINKS[@]}"; do
   backup_then_link "$SRC" "$DST"
 done
 
+# Ensure ~/.local/bin exists
+mkdir -p "$HOME/.local/bin"
+# Symlink
+ln -sf "$DOTFILES_DIR/bin/git-remote-icon" "$HOME/.local/bin/git-remote-icon"
+chmod +x "$HOME/.local/bin/git-remote-icon"
+
 echo "==> Done."
 echo "Notes:"
 echo " - Run 'sudo sensors-detect' once for temperature readings."

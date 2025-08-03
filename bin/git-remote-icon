@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+# Prints an icon based on the current repo's remote URL
+url="$(git ls-remote --get-url 2>/dev/null || printf '')"
+case "$url" in
+  *github*)    printf ' ' ;;
+  *gitlab*)    printf ' ' ;;
+  *bitbucket*) printf ' ' ;;
+  *git*)       printf ' ' ;;
+  *)           printf ' ' ;;
+esac
