@@ -11,6 +11,10 @@ select = "block"
 [editor.soft-wrap]
 enable = true
 
+[editor.indent-guides]
+render = true
+character = "▏"
+
 [keys.normal]
 "C-s" = [":format", ":w"]
 "S-esc" = ":quit"
