@@ -57,6 +57,25 @@ zstyle ':completion:*:descriptions' format '%F{blue}%d%f'
 zstyle ':completion:*:*:-command-:*:*' group-order alias builtins functions commands
 
 ####--------------------------------------------------
+#### Carapace (cross-shell completions)
+####--------------------------------------------------
+# let carapace reuse other shells' completion data when helpful
+export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense'
+
+# Load all available completers (fast & simple)
+if command -v carapace >/dev/null 2>&1; then
+  source <(carapace _carapace)
+fi
+
+# Optional theming
+# Use terminal file colors (if set LS_COLORS, e.g. via vivid)
+export LS_COLORS="$(vivid generate dracula)"
+
+# Style specific elements in the completion UI (examples)
+# carapace --style 'carapace.Value=bold,magenta'
+# carapace --style 'carapace.Description='
+
+####--------------------------------------------------
 #### Aliases & functions
 ####--------------------------------------------------
 # Safe ls → eza (fallback to ls if eza missing)

@@ -30,11 +30,13 @@ PACMAN_PKGS=(
   bluez bluez-utils
   network-manager-applet
   pavucontrol
+  vivid
 )
 
 # AUR packages (installed with yay/paru if present)
 AUR_PKGS=(
   kanata
+  carapace-bin
 )
 
 # Symlinks: "SRC|DST"
