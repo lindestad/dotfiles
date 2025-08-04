@@ -90,23 +90,11 @@ if not ($autocompletions_path | path exists) {
   return
 }
 
-# Load custom completions
-source ~/dev/dotfiles/config/nushell/custom-completions/bat/bat-completions.nu
-source ~/dev/dotfiles/config/nushell/custom-completions/cargo/cargo-completions.nu
-source ~/dev/dotfiles/config/nushell/custom-completions/docker/docker-completions.nu
-source ~/dev/dotfiles/config/nushell/custom-completions/eza/eza-completions.nu
-source ~/dev/dotfiles/config/nushell/custom-completions/git/git-completions.nu
+# Load custom completions not yet available in carapace
 source ~/dev/dotfiles/config/nushell/custom-completions/pytest/pytest-completions.nu
-source ~/dev/dotfiles/config/nushell/custom-completions/rg/rg-completions.nu
-source ~/dev/dotfiles/config/nushell/custom-completions/rustup/rustup-completions.nu
-source ~/dev/dotfiles/config/nushell/custom-completions/ssh/ssh-completions.nu
-source ~/dev/dotfiles/config/nushell/custom-completions/tar/tar-completions.nu
 source ~/dev/dotfiles/config/nushell/custom-completions/typst/typst-completions.nu
 source ~/dev/dotfiles/config/nushell/custom-completions/uv/uv-completions.nu
-source ~/dev/dotfiles/config/nushell/custom-completions/vscode/vscode-completions.nu
 source ~/dev/dotfiles/config/nushell/custom-completions/zellij/zellij-completions.nu
-source ~/dev/dotfiles/config/nushell/custom-completions/zoxide/zoxide-completions.nu
-
 
 # THEME
 source ~/dev/dotfiles/config/nushell/nu-themes/humanoid-dark.nu
