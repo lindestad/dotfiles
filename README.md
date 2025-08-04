@@ -38,9 +38,9 @@ This repository provides a unified development environment across **Linux**, **W
     - **[Waybar](https://github.com/Alexays/Waybar)** – Highly customizable status bar for Wayland  
     - **[Neofetch](https://github.com/dylanaraps/neofetch)** – Command-line system information tool  
     - **[Fuzzel](https://codeberg.org/dnkl/fuzzel)** – Wayland-native application launcher
+    - **[Zellij](https://github.com/zellij-org/zellij)** – Terminal multiplexer
   - **Windows**:
     - **[Nushell](https://github.com/nushell/nushell)** – Structured shell (with Bash/Zsh/Pwsh fallbacks)
-    - **[Zellij](https://github.com/zellij-org/zellij)** – Terminal multiplexer
     - **[Windows Terminal](https://github.com/microsoft/terminal)** – Modern terminal application for Windows
 
 ## Installation
