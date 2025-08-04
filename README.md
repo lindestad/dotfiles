@@ -25,30 +25,39 @@ This repository provides a unified development environment across **Linux**, **W
 ## Contents
 
 - Configuration for:
-  - **[Helix](https://github.com/helix-editor/helix)** – Modal code editor
-  - **[Starship](https://github.com/starship/starship)** – Cross-shell prompt
-  - **[Yazi](https://github.com/sxyazi/yazi)** – TUI file manager
-  - **[Ncspot](https://github.com/hrkfdn/ncspot)** – Terminal-based Spotify client
-  - **[Zellij](https://github.com/zellij-org/zellij)** – Terminal multiplexer
-  - **[Nushell](https://github.com/nushell/nushell)** – Structured shell (with Bash/Zsh/Pwsh fallbacks)
-  - **[Kanata](https://github.com/jtroo/kanata)** - Key remapping (Caps lock --> Tap: Esc, Hold: LCTRL) 
-  - **Patched Nerd Fonts** – (MesloLGS NF)
+  - **All Operating Systems**: Linux, Windows, WSL
+    - **[Helix](https://github.com/helix-editor/helix)** – Modal code editor
+    - **[Starship](https://github.com/starship/starship)** – Cross-shell prompt
+    - **[Yazi](https://github.com/sxyazi/yazi)** – TUI file manager
+    - **[Ncspot](https://github.com/hrkfdn/ncspot)** – Terminal-based Spotify client
+    - **[Kanata](https://github.com/jtroo/kanata)** – Key remapping (Caps Lock → Tap: Esc, Hold: LCTRL)
+    - **[Alacritty](https://github.com/alacritty/alacritty)** – GPU-accelerated terminal emulator
+  - **Arch**:
+    - **[Zsh](https://www.zsh.org/)** – Solid POSIX shell
+    - **[niri](https://github.com/YaLTeR/niri)** – Wayland tiling window manager  
+    - **[Waybar](https://github.com/Alexays/Waybar)** – Highly customizable status bar for Wayland  
+    - **[Neofetch](https://github.com/dylanaraps/neofetch)** – Command-line system information tool  
+    - **[Fuzzel](https://codeberg.org/dnkl/fuzzel)** – Wayland-native application launcher
+  - **Windows**:
+    - **[Nushell](https://github.com/nushell/nushell)** – Structured shell (with Bash/Zsh/Pwsh fallbacks)
+    - **[Zellij](https://github.com/zellij-org/zellij)** – Terminal multiplexer
+    - **[Windows Terminal](https://github.com/microsoft/terminal)** – Modern terminal application for Windows
 
 ## Installation
 
-### Linux / WSL
+### Linux / Arch-based / WSL
 
 ```bash
-git clone https://github.com/lindestad/dotfiles ~/.dotfiles
-cd ~/.dotfiles
+git clone https://github.com/lindestad/dotfiles ~/dev/dotfiles
+cd ~/dev/dotfiles
 ./install.sh
 ````
 
 ### Windows (PowerShell)
 
 ```powershell
-git clone https://github.com/lindestad/dotfiles $HOME\.dotfiles
-cd $HOME\.dotfiles
+git clone https://github.com/lindestad/dotfiles $HOME\dev\dotfiles
+cd $HOME\dev\dotfiles
 .\install.ps1
 ```
 
@@ -60,16 +69,9 @@ The installation scripts install required packages and symlink configuration fil
 
 This dotfiles setup is designed to support:
 
-* 🐧 Linux (Ubuntu, Arch-based)
+* 🐧 Linux (Arch-based, Ubuntu)
 * 🪟 Windows
 * 🧊 WSL2
-
-Shells tested:
-
-* [x] Nushell
-* [x] PowerShell
-* [x] Zsh
-* [x] Bash
 
 ---
 
