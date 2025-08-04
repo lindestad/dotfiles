@@ -1,5 +1,5 @@
 $apps = @(
-    "Helix.Helix",           # or custom install if not in winget
+    "Helix.Helix",
     "Starship.Starship",
     "eza-community.eza",
     "BurntSushi.ripgrep.MSVC",
@@ -56,7 +56,18 @@ if (-not $carapace) {
 }
 
 if ($carapace) {
-    & $carapace _carapace nushell | Out-File -FilePath $initNu -Encoding utf8 -Force
+    # Write UTF-8 *without BOM* in both PS 5.1 and PS 7+
+    if ($PSVersionTable.PSVersion.Major -ge 7) {
+        # Preserves newlines and writes UTF-8 (no BOM) by default in PS7
+        & $carapace _carapace nushell | Set-Content -Path $initNu -Encoding utf8 -Force
+    }
+    else {
+        # Capture as lines, then join with CRLF and write as UTF-8 without BOM
+        $lines = & $carapace _carapace nushell
+        $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+        [System.IO.File]::WriteAllText($initNu, ($lines -join "`r`n"), $utf8NoBom)
+    }
+    Write-Host "Successfully created ~\.cache\carapace\init.nu"
 }
 else {
     Write-Warning "carapace not found yet. You can re-run this section after the install step or start a new shell."
