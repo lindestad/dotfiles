@@ -12,7 +12,7 @@ mkdir -p "$HOME"
 # Symlinks
 ln -sf "$DOTFILES_DIR/config/helix"               "$CONFIG_DIR/helix"
 ln -sf "$DOTFILES_DIR/config/yazi"                "$CONFIG_DIR/yazi"
-ln -sf "$DOTFILES_DIR/config/starship/starship.toml" "$CONFIG_DIR/starship.toml"
+ln -sf "$DOTFILES_DIR/config/starship/zsh/starship.toml" "$CONFIG_DIR/starship.toml"
 
 mkdir -p "$CONFIG_DIR/nushell"
 ln -sf "$DOTFILES_DIR/shells/config.nu"           "$CONFIG_DIR/nushell/config.nu"
