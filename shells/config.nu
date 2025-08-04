@@ -1,10 +1,43 @@
 $env.config.show_banner = false
-
 $env.config.buffer_editor = "hx"
-
 mkdir ($nu.data-dir | path join "vendor/autoload")
 starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.nu")
 
+# KEYBINDINGS
+$env.config.keybindings ++= [
+
+  # accept inline history suggestion with Shift+Space (fallback: insert space)
+  {
+    name: accept_history_hint_shift_space
+    modifier: shift
+    keycode: space
+    mode: [emacs, vi_insert]
+    event: {
+        until: [
+          { send: historyhintcomplete }
+          { edit: insertstring, value: " " }
+        ]
+      }
+  }
+  
+  # accept single word from suggestion
+  {
+    name: accept_history_hint_word_shift_alt_space
+    modifier: control
+    keycode: space
+    mode: [emacs, vi_insert]
+    event: { send: historyhintwordcomplete }
+  }
+
+  # Esc clears the line in Emacs mode only (keeps Vi's Esc intact)
+  {
+    name: clear_line_esc_emacs
+    modifier: none
+    keycode: esc
+    mode: emacs
+    event: { edit: clear }
+  } 
+]
 
 # ALIASES
 
@@ -29,16 +62,10 @@ def gc [...msg_parts: string] {
   let msg = $msg_parts | str join " " | str trim
 
   if ($msg == "") {
-    error make {
-      msg: "Commit message cannot be empty.",
-      label: {
-        text: "Provide a commit message, e.g. `gc Add login form`",
-        span: (0, 0)
-      }
-    }
+    git commit
+  } else {
+    git commit -m $msg
   }
-
-  git commit -m $msg
 }
 
 # Eza
