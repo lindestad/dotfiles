@@ -13,7 +13,7 @@ $apps = @(
     "ajeetdsouza.zoxide", 
     "ImageMagick.ImageMagick",
     "sxyazi.yazi",
-    "nushell.Nushell",
+    "Nushell.Nushell",
     "Git.Git",
     "Microsoft.PowerShell",
     "uutils.coreutils",
