@@ -30,7 +30,7 @@ This repository provides a unified development environment across **Linux**, **W
     - **[Starship](https://github.com/starship/starship)** – Cross-shell prompt
     - **[Yazi](https://github.com/sxyazi/yazi)** – TUI file manager
     - **[Ncspot](https://github.com/hrkfdn/ncspot)** – Terminal-based Spotify client
-    - **[Kanata](https://github.com/jtroo/kanata)** – Key remapping - see [Key remapping section][#kanata-key-remappings) below
+    - **[Kanata](https://github.com/jtroo/kanata)** – Key remapping – see [Key remapping section](#kanata-key-remappings) below
     - **[Alacritty](https://github.com/alacritty/alacritty)** – GPU-accelerated terminal emulator
   - **Arch**:
     - **[Zsh](https://www.zsh.org/)** – Solid POSIX shell
