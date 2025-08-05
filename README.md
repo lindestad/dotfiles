@@ -21,7 +21,6 @@ This repository provides a unified development environment across **Linux**, **W
 
 <img width="1785" height="230" alt="image" src="https://github.com/user-attachments/assets/09046c6d-0bb9-4652-bbe6-93a2a78cd9bd" />
 
-
 ## Contents
 
 - Configuration for:
@@ -69,16 +68,19 @@ The installation scripts install required packages and symlink configuration fil
 
 This dotfiles setup is designed to support:
 
-* 🐧 Linux (Arch-based, Ubuntu)
-* 🪟 Windows
-* 🧊 WSL2
+- 🐧 Linux (Arch-based, Ubuntu)
+- 🪟 Windows
+- 🧊 WSL2
 
 ---
 
 ## Kanata Key Remappings
-Caps Lock → LeftCtrl
-LeftCtrl → Escape
-RightCtrl → Caps Lock
+
+- Caps Lock → LeftCtrl
+- LeftCtrl → Escape
+- RightCtrl → Caps Lock
+
+---
 
 ## License
 
@@ -89,4 +91,3 @@ This project is licensed under the MIT License. See [LICENSE](./LICENSE) for det
 <p align="center">
   <a href="#top">Back to top ↑</a>
 </p>
-
