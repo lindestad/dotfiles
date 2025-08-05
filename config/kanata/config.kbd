@@ -4,12 +4,12 @@
 
 (defsrc
   caps
-)
-
-(defalias
-  escctrl (tap-hold 200 200 esc lctrl)
+  lctrl
+  rctrl
 )
 
 (deflayer base
-  @escctrl
+  lctrl
+  esc
+  caps
 )
