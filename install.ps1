@@ -75,3 +75,6 @@ else {
 
 # Symlink config files
 .\symlink.ps1
+
+# Add kanata autostart
+.\config\kanata\add_to_startup_windows.ps1
