@@ -78,6 +78,10 @@ export LS_COLORS="$(vivid generate dracula)"
 ####--------------------------------------------------
 #### Aliases & functions
 ####--------------------------------------------------
+
+# pacman
+alias sps='sudo pacman -S'
+
 # Safe ls → eza (fallback to ls if eza missing)
 if command -v eza >/dev/null 2>&1; then
   alias ls='eza --group-directories-first --icons'
