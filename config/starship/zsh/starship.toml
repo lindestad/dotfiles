@@ -188,11 +188,11 @@ command = """
 #!/usr/bin/env sh
 url="$(git ls-remote --get-url 2>/dev/null || printf '')"
 case "$url" in
-  *github*)    printf ' uwu' ;;
-  *gitlab*)    printf ' fda' ;;
-  *bitbucket*) printf ' fdas' ;;
-  *git*)       printf ' fads' ;;
-  *)           printf 'fdas' ;;
+  *github*)    printf '' ;;
+  *gitlab*)    printf '' ;;
+  *bitbucket*) printf '' ;;
+  *git*)       printf '' ;;
+  *)           printf '' ;;
 esac
 """
 when = 'git rev-parse --is-inside-work-tree 2>/dev/null'
