@@ -45,7 +45,7 @@ LINKS=(
   "$DOTFILES_DIR/shells/.zshrc|$HOME/.zshrc"
   "$DOTFILES_DIR/config/helix/config.toml|$HOME/.config/helix/config.toml"
   "$DOTFILES_DIR/config/helix/languages.toml|$HOME/.config/helix/languages.toml"
-  "$DOTFILES_DIR/config/starship/starship.toml|$HOME/.config/starship.toml"
+  "$DOTFILES_DIR/config/starship/zsh/starship.toml|$HOME/.config/starship.toml"
   "$DOTFILES_DIR/config/yazi|$HOME/.config/yazi"
   "$DOTFILES_DIR/config/ncspot/config.toml|$HOME/.config/ncspot/config.toml"
   "$DOTFILES_DIR/config/kanata|$HOME/.config/kanata"
@@ -128,9 +128,6 @@ done
 
 # Ensure ~/.local/bin exists
 mkdir -p "$HOME/.local/bin"
-# Symlink
-ln -sf "$DOTFILES_DIR/bin/git-remote-icon" "$HOME/.local/bin/git-remote-icon"
-chmod +x "$HOME/.local/bin/git-remote-icon"
 
 echo "==> Done."
 echo "Notes:"
