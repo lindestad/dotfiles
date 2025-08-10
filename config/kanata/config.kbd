@@ -6,10 +6,43 @@
   caps
   lctrl
   rctrl
+  ralt
+  ;
+  '
+  [
+  lsft
+  rsft
+)
+
+(defalias
+  no     (layer-while-held no)        ;; Hold RAlt -> “Norwegian” layer
+  nocaps (layer-while-held no-caps)   ;; On that layer, holding Shift -> uppercase layer
 )
 
 (deflayer base
   lctrl
   esc
   caps
+  @no
+  ;
+  '
+  [
+  lsft
+  rsft
+)
+
+;; Norwegian layer (RAlt held)
+(deflayer no
+  caps
+  lctrl
+  rctrl
+  ralt    (unicode ø) (unicode æ) (unicode å)  @nocaps @nocaps
+)
+
+;; Uppercase Norwegian layer (RAlt + Shift held)
+(deflayer no-caps
+  caps
+  lctrl
+  rctrl
+  ralt     (unicode Ø) (unicode Æ) (unicode Å)  lsft    rsft
 )
