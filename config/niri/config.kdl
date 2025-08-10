@@ -43,6 +43,10 @@ input {
     warp-mouse-to-focus
 }
 
+hotkey-overlay {
+    skip-at-startup
+}
+
 layout {
     focus-ring {
         off
