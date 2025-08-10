@@ -51,8 +51,14 @@ sudo udevadm trigger
 sudo modprobe uinput || true
 ls -l /dev/uinput || echo "   (node may appear when first opened)"
 
-# Prompt for service setup
-read -r -p "Install & enable Kanata systemd user service for $TARGET_USER? [y/N] " REPLY
+# Prompt for service setup (honor env override)
+if [[ "${KANATA_ENABLE_USER:-}" == "yes" ]]; then
+  REPLY="y"
+elif [[ "${KANATA_ENABLE_USER:-}" == "no" ]]; then
+  REPLY="n"
+else
+  read -r -p "Install & enable Kanata systemd user service for $TARGET_USER? [y/N] " REPLY
+fi
 if [[ "$REPLY" =~ ^[Yy]$ ]]; then
   echo "==> Setting up systemd --user service…"
 
@@ -127,6 +133,65 @@ UNIT
   echo "==> If groups were just added, log out/in (or reboot) so they take effect."
 else
   echo "==> Skipping systemd user service."
+fi
+
+# Offer system-wide service for login screen (honor env override)
+if [[ "${KANATA_ENABLE_SYSTEM:-}" == "yes" ]]; then
+  REPLY_SYS="y"
+elif [[ "${KANATA_ENABLE_SYSTEM:-}" == "no" ]]; then
+  REPLY_SYS="n"
+else
+  read -r -p "Enable Kanata system-wide so it works at the login screen? [y/N] " REPLY_SYS
+fi
+if [[ "$REPLY_SYS" =~ ^[Yy]$ ]]; then
+  echo "==> Setting up system-wide Kanata service (pre-login)…"
+
+  if [[ -z "$KANATA_BIN" ]]; then
+    echo "!! 'kanata' not found in PATH. Install it first."
+    exit 1
+  fi
+  if [[ ! -f "$KANATA_CFG" ]]; then
+    echo "!! Kanata config not found at: $KANATA_CFG"
+    exit 1
+  fi
+
+  sudo mkdir -p /etc/kanata
+  # Copy current config into /etc so it’s available before login
+  sudo install -m 0644 "$KANATA_CFG" /etc/kanata/config.kbd
+
+  SYS_UNIT="/etc/systemd/system/kanata.service"
+  cat <<'UNIT' | sudo tee "$SYS_UNIT" >/dev/null
+[Unit]
+Description=Kanata keyboard remapper (system-wide, before display manager)
+After=systemd-udev-settle.service
+Wants=systemd-udev-settle.service
+Before=display-manager.service
+
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/sh -c 'for i in $(seq 1 25); do [ -e /dev/uinput ] && exit 0; sleep 0.2; done; echo "/dev/uinput missing" >&2; exit 1'
+ExecStart=/usr/bin/kanata -c /etc/kanata/config.kbd
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
+UNIT
+
+  # Adjust ExecStart path if needed
+  if [[ "$KANATA_BIN" != "/usr/bin/kanata" && -n "$KANATA_BIN" ]]; then
+    sudo sed -i "s|^ExecStart=/usr/bin/kanata|ExecStart=${KANATA_BIN}|" "$SYS_UNIT"
+  fi
+
+  sudo systemctl daemon-reload
+  sudo systemctl enable --now kanata.service
+
+  # Avoid double-grabbing: stop/disable per-user unit if running
+  SCMD_USER=(systemctl --user --machine="$TARGET_USER@.host")
+  "${SCMD_USER[@]}" stop kanata.service >/dev/null 2>&1 || true
+  "${SCMD_USER[@]}" disable kanata.service >/dev/null 2>&1 || true
+
+  echo "   System-wide service enabled. If you change your Kanata config, re-run this to sync /etc/kanata/config.kbd."
 fi
 
 echo "==> Done."

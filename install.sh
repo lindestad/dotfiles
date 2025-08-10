@@ -164,8 +164,23 @@ if [[ "$KANATA_INSTALL" == "yes" ]]; then
   if [[ -n "$KANATA_CONFIG_SRC" ]]; then
     backup_then_link "$KANATA_CONFIG_SRC" "$HOME/.config/kanata/config.kbd"
   fi
-  # Run idempotent autostart/systemd user service setup (robust to missing user bus)
-  bash "$DOTFILES_DIR/config/kanata/add_to_startup_arch.sh"
+
+  # Ask how to enable Kanata: system-wide (pre-login) or user-only (post-login)
+  SYS_PROMPT="Enable Kanata system-wide (pre-login; copies config to /etc, rerun script after changes)?"
+  if [[ "$(prompt_yes_no "$SYS_PROMPT")" == "yes" ]]; then
+    KANATA_ENABLE_SYSTEM=yes KANATA_ENABLE_USER=no \
+      bash "$DOTFILES_DIR/config/kanata/add_to_startup_arch.sh"
+  else
+    USER_PROMPT="Enable Kanata for this user (starts after login)?"
+    if [[ "$(prompt_yes_no "$USER_PROMPT")" == "yes" ]]; then
+      KANATA_ENABLE_SYSTEM=no KANATA_ENABLE_USER=yes \
+        bash "$DOTFILES_DIR/config/kanata/add_to_startup_arch.sh"
+    else
+      # Still run to ensure uinput rules/groups are configured; skip enabling units
+      KANATA_ENABLE_SYSTEM=no KANATA_ENABLE_USER=no \
+        bash "$DOTFILES_DIR/config/kanata/add_to_startup_arch.sh"
+    fi
+  fi
 fi
 
 echo "==> Done."
