@@ -95,6 +95,9 @@ These binds are only enabled if selected during install.
 - `Enter` → `\` -- Remap `Enter` to the key that resides above `Enter` on ANSI.
 - `\` key (between `'` and `Enter`) → `Enter` -- Emulates long enter key, shorter stroke
 
+**Force exit Kanata:**
+`LeftCtrl` + `Space` + `Esc` (Ignores rebinds).
+
 ---
 
 ## License
