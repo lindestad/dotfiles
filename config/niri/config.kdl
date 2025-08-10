@@ -3,6 +3,13 @@ spawn-at-startup "nm-applet"
 spawn-at-startup "swaybg" "-i" "/home/dan/Pictures/wp/dark_circle.png" "-m" "fill"
 spawn-at-startup "swayidle" "-w" "before-sleep" "swaylock" "-f" "-c" "000000"
 
+environment {
+    DISPLAY ":0"
+    _JAVA_AWT_WM_NONREPARENTING "1"
+}
+
+spawn-at-startup "xwayland-satellite"
+
 // Persistent/named workspaces
 workspace "a"
 workspace "b"
