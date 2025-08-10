@@ -60,7 +60,7 @@ cd $HOME\dev\dotfiles
 .\install.ps1
 ```
 
-The installation scripts install required packages and symlink configuration files. You may also run `symlink.ps1` or `symlink.sh` directly to skip system configuration.
+The installation scripts install required packages and symlink configuration files.
 
 ---
 
@@ -76,9 +76,24 @@ This dotfiles setup is designed to support:
 
 ## Kanata Key Remappings
 
-- Caps Lock → LeftCtrl
-- LeftCtrl → Escape
-- RightCtrl → Caps Lock
+Kanata is an optional install (Prompted during install scripts).
+
+**Standard binds:**
+
+- `Caps Lock` → `LeftCtrl`
+- `LeftCtrl` → `Escape`
+- `RightCtrl` → `Caps Lock`
+- `RightAlt` + `;`/`'`/`[` → `ø`/`æ`/`å`
+
+**Optional binds:**
+
+These binds are only enabled if selected during install.
+*Warning:* Enter is rebound
+
+- ISO to ANSI-like feel:
+- `<` key (Between `LeftShift` and `Z`) → `LeftShift` -- Emulates long left shift key
+- `Enter` → `\` -- Remap `Enter` to the key that resides above `Enter` on ANSI.
+- `\` key (between `'` and `Enter`) → `Enter` -- Emulates long enter key, shorter stroke
 
 ---
 
