@@ -183,6 +183,10 @@ if [[ "$KANATA_INSTALL" == "yes" ]]; then
   fi
 fi
 
+# Run sensors-detect non-interactively to enable temperature readings
+if have sensors-detect; then
+  echo "==> Detecting hardware sensors..."
+  sudo sensors-detect --auto >/dev/null 2>&1 || echo "   sensors-detect failed; run 'sudo sensors-detect' later if needed."
+fi
+
 echo "==> Done."
-echo "Notes:"
-echo " - Run 'sudo sensors-detect' once for temperature readings."
