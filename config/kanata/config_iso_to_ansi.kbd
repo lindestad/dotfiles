@@ -1,0 +1,81 @@
+;; ISO-to-ANSI feel remap
+;; - Keep existing ANSI mapping (same as config.kbd) for base + Norwegian layers
+;; - Additionally:
+;;   • Key left of Z (often labelled < > | on ISO) becomes lsft
+;;   • Key between ' and Enter (ISO extra key, often # ~ on UK) becomes Enter
+;;   • Enter outputs the ANSI "key above Enter" behaviour (the [ ] \\ row key). On US ANSI this is '\\'.
+;;     We map Enter position to backslash to emulate ANSI enter/row relationship.
+
+(defcfg
+  process-unmapped-keys no
+)
+
+;; Ensure non-US key names resolve on Linux
+(deflocalkeys-linux
+  lsgt 86   ;; KEY_102ND (left of Z)
+  nuhs 43   ;; KEY_BACKSLASH (between ' and Enter on ISO when using US layout)
+)
+
+;; Note: We add two ISO-only source keys:
+;;  - lsgt  : ISO 102nd key, left of Z
+;;  - nuhs  : ISO Non-US Hash (between ' and Enter)
+;; See docs non-us keyboards; these names are supported in defsrc/deflayer.
+(defsrc
+  caps
+  lctrl
+  rctrl
+  ralt
+  ;
+  '
+  [
+  lsft
+  rsft
+  lsgt   ;; ISO 102nd key (left of Z)
+  nuhs   ;; ISO Non-US Hash (between ' and Enter)
+)
+
+(defalias
+  no     (layer-while-held no)        ;; Hold RAlt -> “Norwegian” layer
+  nocaps (layer-while-held no-caps)   ;; On that layer, holding Shift -> uppercase layer
+)
+
+(deflayer base
+  lctrl
+  esc
+  caps
+  @no
+  ;
+  '
+  [
+  lsft
+  rsft
+  lsft         ;; lsgt -> left shift for ANSI feel
+  ret          ;; nuhs -> Enter
+)
+
+;; Norwegian layer (RAlt held)
+(deflayer no
+  caps
+  lctrl
+  rctrl
+  ralt    (unicode ø) (unicode æ) (unicode å)  @nocaps @nocaps
+  lsft                                   ;; lsgt -> lsft
+  ret                                    ;; nuhs -> Enter
+)
+
+;; Uppercase Norwegian layer (RAlt + Shift held)
+(deflayer no-caps
+  caps
+  lctrl
+  rctrl
+  ralt     (unicode Ø) (unicode Æ) (unicode Å)  lsft    rsft
+  lsft                                   ;; lsgt -> lsft
+  ret                                    ;; nuhs -> Enter
+)
+
+;; ANSI feel tweak for Enter row: map Enter position to ANSI “key above Enter”
+;; Using defoverrides so pressing Enter outputs backslash (ANSI key above Enter row)
+;; This ensures physical Enter behaves like ANSI row key for consistency request.
+(defoverrides
+  (ret) (\)
+)

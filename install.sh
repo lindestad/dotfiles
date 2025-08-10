@@ -35,7 +35,7 @@ PACMAN_PKGS=(
 
 # AUR packages (installed with yay/paru if present)
 AUR_PKGS=(
-  kanata
+  # kanata is optional; installed based on prompt below
   carapace-bin
 )
 
@@ -48,7 +48,7 @@ LINKS=(
   "$DOTFILES_DIR/config/starship/zsh/starship.toml|$HOME/.config/starship.toml"
   "$DOTFILES_DIR/config/yazi|$HOME/.config/yazi"
   "$DOTFILES_DIR/config/ncspot/config.toml|$HOME/.config/ncspot/config.toml"
-  "$DOTFILES_DIR/config/kanata|$HOME/.config/kanata"
+  # Kanata config is handled conditionally below; do not link entire dir here
   "$DOTFILES_DIR/config/niri|$HOME/.config/niri"
   "$DOTFILES_DIR/config/waybar|$HOME/.config/waybar"
   "$DOTFILES_DIR/config/fuzzel/fuzzel.ini|$HOME/.config/fuzzel/fuzzel.ini"
@@ -109,6 +109,19 @@ backup_then_link() {
   echo "-> Linked $SRC  ->  $DST"
 }
 
+prompt_yes_no() {
+  # $1 = prompt text, default No
+  local ans
+  while true; do
+    read -r -p "$1 y/N " ans || ans=""
+    case "${ans}" in
+      [Yy]) echo "yes"; return 0;;
+      ''|[Nn]) echo "no"; return 0;;
+      *) echo "Please answer y or n.";;
+    esac
+  done
+}
+
 # --- Run ----------------------------------------------------------------------
 
 echo "==> Installing pacman packages..."
@@ -117,6 +130,22 @@ install_pacman "${PACMAN_PKGS[@]}"
 if ((${#AUR_PKGS[@]})); then
   echo "==> Installing AUR packages (if helper found)..."
   install_aur "${AUR_PKGS[@]}"
+fi
+
+# Kanata optional install + config selection
+KANATA_INSTALL="$(prompt_yes_no "Install Kanata (Keyboard remapping)?")"
+KANATA_CONFIG_SRC=""
+if [[ "$KANATA_INSTALL" == "yes" ]]; then
+  echo "==> Installing Kanata from AUR (if helper found)..."
+  install_aur kanata || true
+
+  # Choose config variant
+  ISO_PROMPT="Remap ISO to ANSI like? Warning, remaps Enter key."
+  if [[ "$(prompt_yes_no "$ISO_PROMPT")" == "yes" ]]; then
+    KANATA_CONFIG_SRC="$DOTFILES_DIR/config/kanata/config_iso_to_ansi.kbd"
+  else
+    KANATA_CONFIG_SRC="$DOTFILES_DIR/config/kanata/config.kbd"
+  fi
 fi
 
 echo "==> Creating config symlinks..."
@@ -128,6 +157,15 @@ done
 
 # Ensure ~/.local/bin exists
 mkdir -p "$HOME/.local/bin"
+
+# Handle Kanata config link only if installing Kanata
+if [[ "$KANATA_INSTALL" == "yes" ]]; then
+  mkdir -p "$HOME/.config/kanata"
+  if [[ -n "$KANATA_CONFIG_SRC" ]]; then
+    backup_then_link "$KANATA_CONFIG_SRC" "$HOME/.config/kanata/config.kbd"
+  fi
+  echo "==> You can run: $DOTFILES_DIR/config/kanata/add_to_startup_arch.sh to enable autostart (systemd user)."
+fi
 
 echo "==> Done."
 echo "Notes:"

@@ -2,7 +2,18 @@ $KanataExe = try { (Get-Command kanata_gui.exe -ErrorAction Stop).Source } catch
 
 if ($KanataExe -and (Test-Path $KanataExe)) {
     $WScriptShell = New-Object -ComObject WScript.Shell
-    $ConfigPath = "$HOME\dev\dotfiles\config\kanata\config.kbd"
+    # Prefer a user-configured link in %AppData%\kanata\config.kbd, else fall back to repo config
+    $Roaming = [Environment]::GetFolderPath('ApplicationData')
+    $UserCfg = Join-Path $Roaming "kanata\config.kbd"
+    if (Test-Path $UserCfg) {
+        $ConfigPath = $UserCfg
+    }
+    else {
+        $RepoIso = "$HOME\dev\dotfiles\config\kanata\config_iso_to_ansi.kbd"
+        $RepoAnsi = "$HOME\dev\dotfiles\config\kanata\config.kbd"
+        if (Test-Path $RepoIso) { $ConfigPath = $RepoIso } else { $ConfigPath = $RepoAnsi }
+    }
+
     $ArgString = "-c `"$ConfigPath`""
 
     # --- Startup Shortcut ---

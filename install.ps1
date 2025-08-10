@@ -18,7 +18,8 @@ $apps = @(
     "Microsoft.PowerShell",
     "uutils.coreutils",
     "hrkfdn.ncspot",
-    "jtroo.kanata_gui",
+    # Kanata is optional; installed only if selected
+    # "jtroo.kanata_gui",
     "rsteube.Carapace"
 )
 
@@ -67,14 +68,112 @@ if ($carapace) {
         $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
         [System.IO.File]::WriteAllText($initNu, ($lines -join "`r`n"), $utf8NoBom)
     }
-    Write-Host "Successfully created ~\.cache\carapace\init.nu"
+    Write-Host "Successfully created ~/.cache/carapace/init.nu"
 }
 else {
     Write-Warning "carapace not found yet. You can re-run this section after the install step or start a new shell."
 }
 
-# Symlink config files
-.\symlink.ps1
+function Prompt-YesNo([string]$Question) {
+    while ($true) {
+        $ans = Read-Host "$Question y/N"
+        if ([string]::IsNullOrWhiteSpace($ans)) { return $false }
+        switch -Regex ($ans) {
+            '^[Yy]$' { return $true }
+            '^[Nn]$' { return $false }
+            default { Write-Host "Please answer y or n." }
+        }
+    }
+}
 
-# Add kanata autostart
-.\config\kanata\add_to_startup_windows.ps1
+# Optional: Kanata
+$installKanata = Prompt-YesNo "Install Kanata (Keyboard remapping)?"
+$chosenKanataCfg = $null
+if ($installKanata) {
+    winget install --id "jtroo.kanata_gui" --accept-source-agreements --accept-package-agreements -e
+
+    $isoToAnsi = Prompt-YesNo "Remap ISO to ANSI like? Warning, remaps Enter key."
+    $repo = Split-Path -Parent $MyInvocation.MyCommand.Definition
+    if ($isoToAnsi) {
+        $chosenKanataCfg = Join-Path $repo "config/kanata/config_iso_to_ansi.kbd"
+    }
+    else {
+        $chosenKanataCfg = Join-Path $repo "config/kanata/config.kbd"
+    }
+
+    $appDataKanata = Join-Path $env:APPDATA "kanata"
+    New-Item -ItemType Directory -Force -Path $appDataKanata | Out-Null
+    $dstCfg = Join-Path $appDataKanata "config.kbd"
+    # Create or update a symlink/junction for config; fallback to copy if not permitted
+    try {
+        if (Test-Path $dstCfg) { Remove-Item $dstCfg -Force }
+        New-Item -ItemType SymbolicLink -Path $dstCfg -Target $chosenKanataCfg | Out-Null
+    }
+    catch {
+        Copy-Item $chosenKanataCfg $dstCfg -Force
+    }
+
+    # Add kanata autostart
+    .\config\kanata\add_to_startup_windows.ps1
+}
+else {
+    Write-Host "Skipping Kanata install."
+}
+
+# --- Windows symlinks (inline, no external symlink.ps1) ---
+function New-SafeLink {
+    param(
+        [Parameter(Mandatory)] [string]$Src,
+        [Parameter(Mandatory)] [string]$Dst
+    )
+    $dstDir = Split-Path $Dst
+    if (-not (Test-Path $dstDir)) { New-Item -ItemType Directory -Force -Path $dstDir | Out-Null }
+
+    $needsLink = $true
+    if (Test-Path $Dst) {
+        try {
+            $existing = Get-Item $Dst -Force
+            if ($existing.LinkType -eq 'SymbolicLink' -and $existing.Target -eq $Src) {
+                $needsLink = $false
+            }
+            else {
+                Remove-Item $Dst -Force -Recurse
+            }
+        }
+        catch {
+            Remove-Item $Dst -Force -Recurse
+        }
+    }
+
+    if ($needsLink) {
+        try {
+            New-Item -ItemType SymbolicLink -Path $Dst -Target $Src | Out-Null
+        }
+        catch {
+            if (Test-Path $Src -PathType Container) {
+                Copy-Item $Src $Dst -Recurse -Force
+            }
+            else {
+                Copy-Item $Src $Dst -Force
+            }
+        }
+        Write-Host "Linked $Src --> $Dst"
+    }
+    else {
+        Write-Host "Already linked: $Dst"
+    }
+}
+
+$Dotfiles = Split-Path -Parent $MyInvocation.MyCommand.Definition
+$UserHome = [Environment]::GetFolderPath('UserProfile')
+$Roaming = [Environment]::GetFolderPath('ApplicationData')
+
+# Links specific to Windows setup
+New-SafeLink -Src (Join-Path $Dotfiles "config/helix/config.toml") -Dst (Join-Path $Roaming "helix/config.toml")
+New-SafeLink -Src (Join-Path $Dotfiles "config/helix/languages.toml") -Dst (Join-Path $Roaming "helix/languages.toml")
+New-SafeLink -Src (Join-Path $Dotfiles "shells/config.nu") -Dst (Join-Path $Roaming "nushell/config.nu")
+New-SafeLink -Src (Join-Path $Dotfiles "config/starship/nushell/starship.toml") -Dst (Join-Path $UserHome ".config/starship.toml")
+New-SafeLink -Src (Join-Path $Dotfiles "config/yazi") -Dst (Join-Path $Roaming "yazi/config")
+New-SafeLink -Src (Join-Path $Dotfiles "config/ncspot/config.toml") -Dst (Join-Path $Roaming "ncspot/config.toml")
+
+Write-Host "Windows config links completed."
