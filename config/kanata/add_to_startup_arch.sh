@@ -96,10 +96,33 @@ UNIT
 
   echo "   wrote $UNIT_PATH"
 
-  # Enable & start for the target user
-  sudo -u "$TARGET_USER" systemctl --user daemon-reload
-  sudo -u "$TARGET_USER" systemctl --user enable --now kanata.service
-  sudo -u "$TARGET_USER" systemctl --user status --no-pager kanata || true
+  # Robust enablement without requiring an interactive user bus
+  UID_NUM="$(id -u "$TARGET_USER")"
+  BUS_SOCKET="/run/user/${UID_NUM}/bus"
+
+  # Ensure a user manager exists; enable lingering and start user@ if needed
+  if [[ ! -S "$BUS_SOCKET" ]]; then
+    sudo loginctl enable-linger "$TARGET_USER" >/dev/null 2>&1 || true
+    sudo systemctl start "user@${UID_NUM}.service" >/dev/null 2>&1 || true
+  fi
+
+  SCMD=(systemctl --user --machine="$TARGET_USER@.host")
+
+  # Try to talk to user manager; if it fails, fall back to static enable (symlink)
+  if "${SCMD[@]}" daemon-reload >/dev/null 2>&1; then
+    "${SCMD[@]}" enable kanata.service >/dev/null 2>&1 || true
+    "${SCMD[@]}" start kanata.service  >/dev/null 2>&1 || true
+    # Optional status only if bus/socket exists
+    if [[ -S "$BUS_SOCKET" ]]; then
+      "${SCMD[@]}" status --no-pager kanata.service || true
+    fi
+  else
+    # Fallback: create wants symlink so it starts on next user session
+    WANTS_DIR="$UNIT_DIR/graphical-session.target.wants"
+    sudo -u "$TARGET_USER" mkdir -p "$WANTS_DIR"
+    sudo -u "$TARGET_USER" ln -sf "$UNIT_PATH" "$WANTS_DIR/kanata.service"
+    echo "   (No user bus; enabled via wants symlink. It will start on next login.)"
+  fi
 
   echo "==> If groups were just added, log out/in (or reboot) so they take effect."
 else

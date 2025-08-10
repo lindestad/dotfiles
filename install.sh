@@ -164,7 +164,8 @@ if [[ "$KANATA_INSTALL" == "yes" ]]; then
   if [[ -n "$KANATA_CONFIG_SRC" ]]; then
     backup_then_link "$KANATA_CONFIG_SRC" "$HOME/.config/kanata/config.kbd"
   fi
-  echo "==> You can run: $DOTFILES_DIR/config/kanata/add_to_startup_arch.sh to enable autostart (systemd user)."
+  # Run idempotent autostart/systemd user service setup (robust to missing user bus)
+  bash "$DOTFILES_DIR/config/kanata/add_to_startup_arch.sh"
 fi
 
 echo "==> Done."
