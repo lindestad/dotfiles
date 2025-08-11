@@ -13,7 +13,6 @@
 ;; Ensure non-US key names resolve on Linux
 (deflocalkeys-linux
   lsgt 86   ;; KEY_102ND (left of Z)
-  nuhs 43   ;; KEY_BACKSLASH (between ' and Enter on ISO when using US layout)
 )
 
 (defsrc
