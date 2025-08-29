@@ -167,6 +167,6 @@ export LESSHISTFILE=-
 
 # Path tweaks (optional)
 # export PATH="$HOME/.local/bin:$PATH"
-
+export PATH="$HOME/.cargo/bin:$PATH"
 # Quiet login banners from some tools
 export STARSHIP_CONFIG="$HOME/.config/starship.toml"
