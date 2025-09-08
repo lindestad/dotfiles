@@ -1,10 +1,9 @@
 ;; ISO-to-ANSI feel remap
 ;; - Keep existing ANSI mapping (same as config.kbd) for base + Norwegian layers
 ;; - Additionally:
-;;   • Key left of Z (often labelled < > | on ISO) becomes lsft
-;;   • Key between ' and Enter (ISO extra key) becomes Enter
-;;   • Enter outputs the ANSI "key above Enter" behaviour (the [ ] \ row key). On US ANSI this is '\'.
-;;     We map Enter position to backslash to emulate ANSI enter/row relationship.
+;;   Key left of Z (often labelled < > | on ISO) becomes lsft
+;;   Key between ' and Enter (ISO extra key) becomes Enter
+;;   When Right alt is held, both the ISO extra key and enter becomes backslash ( \ )
 
 (defcfg
   process-unmapped-keys no
@@ -47,7 +46,7 @@
   rsft
   lsft         ;; lsgt -> left shift for ANSI feel
   ret          ;; nuhs -> Enter
-  \            ;; ret (Enter) -> backslash (ANSI key above Enter row)
+  ret          ;; ret (Enter) -> backslash (ANSI key above Enter row)
 )
 
 ;; Norwegian layer (RAlt held)
@@ -57,7 +56,7 @@
   rctrl
   ralt    (unicode ø) (unicode æ) (unicode å)  @nocaps @nocaps
   lsft                                   ;; lsgt -> lsft
-  ret                                    ;; nuhs -> Enter
+  \                                      ;; backslash -> backslash
   \                                      ;; ret (Enter) -> backslash
 )
 
@@ -68,6 +67,6 @@
   rctrl
   ralt     (unicode Ø) (unicode Æ) (unicode Å)  lsft    rsft
   lsft                                   ;; lsgt -> lsft
-  ret                                    ;; nuhs -> Enter
+  \                                      ;; backslash -> backslash
   \                                      ;; ret (Enter) -> backslash
 )
