@@ -22,6 +22,7 @@ PACMAN_PKGS=(
   imagemagick
   yazi
   git
+  git-delta
   uutils-coreutils # coreutils (Rust)
   ncspot
   lm_sensors       # for temperature scripts/modules

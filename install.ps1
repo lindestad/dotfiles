@@ -15,6 +15,7 @@ $apps = @(
     "sxyazi.yazi",
     "Nushell.Nushell",
     "Git.Git",
+    "dandavison.delta",
     "Microsoft.PowerShell",
     "uutils.coreutils",
     "hrkfdn.ncspot",
