@@ -159,6 +159,18 @@ done
 # Ensure ~/.local/bin exists
 mkdir -p "$HOME/.local/bin"
 
+# Ensure ~/.gitconfig exists (copy, don't symlink)
+if [[ ! -f "$HOME/.gitconfig" ]]; then
+  if [[ -f "$DOTFILES_DIR/config/git/gitconfig" ]]; then
+    cp "$DOTFILES_DIR/config/git/gitconfig" "$HOME/.gitconfig"
+    echo "-> Copied gitconfig to ~/.gitconfig"
+  else
+    echo "!! Source gitconfig not found at $DOTFILES_DIR/config/git/gitconfig"
+  fi
+else
+  echo "== ~/.gitconfig exists; leaving as-is."
+fi
+
 # Handle Kanata config link only if installing Kanata
 if [[ "$KANATA_INSTALL" == "yes" ]]; then
   mkdir -p "$HOME/.config/kanata"

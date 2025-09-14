@@ -178,4 +178,20 @@ New-SafeLink -Src (Join-Path $Dotfiles "config/starship/nushell/starship.toml") 
 New-SafeLink -Src (Join-Path $Dotfiles "config/yazi") -Dst (Join-Path $Roaming "yazi/config")
 New-SafeLink -Src (Join-Path $Dotfiles "config/ncspot/config.toml") -Dst (Join-Path $Roaming "ncspot/config.toml")
 
+# Ensure ~/.gitconfig exists (copy, don't symlink)
+$srcGitCfg = Join-Path $Dotfiles "config/git/gitconfig"
+$dstGitCfg = Join-Path $UserHome ".gitconfig"
+if (-not (Test-Path $dstGitCfg)) {
+    if (Test-Path $srcGitCfg) {
+        Copy-Item $srcGitCfg $dstGitCfg -Force
+        Write-Host "Copied gitconfig to $dstGitCfg"
+    }
+    else {
+        Write-Warning "Source gitconfig not found at $srcGitCfg"
+    }
+}
+else {
+    Write-Host "Existing ~/.gitconfig detected; leaving as-is."
+}
+
 Write-Host "Windows config links completed."
