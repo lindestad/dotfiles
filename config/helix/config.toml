@@ -38,3 +38,5 @@ character = "▏"
 "C-s" = [":format", ":w"]
 "S-esc" = ":quit"
 "S-tab" = ":quit"
+"A-c" = "copy_selection_on_next_line"
+"S-c" = "copy_selection_on_prev_line"
