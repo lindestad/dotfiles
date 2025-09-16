@@ -24,16 +24,16 @@
   [
   lsft
   rsft
-  lsgt   ;; ISO 102nd key (left of Z)
-  \   ;; ISO Non-US Hash (between ' and Enter)
-  ret    ;; Enter
+  lsgt                               ;; ISO 102nd key (left of Z)
+  \                                  ;; ISO Non-US Hash (between ' and Enter)
+  ret                                ;; Enter
 )
 
 (defalias
-  no     (layer-while-held no)        ;; Hold RAlt -> “Norwegian” layer
-  nocaps (layer-while-held no-caps)   ;; On that layer, holding Shift -> uppercase layer
-  shnocaps (multi lsft @nocaps)   ;; for left shift
-  rshnocaps (multi rsft @nocaps)  ;; for right shift
+  no     (layer-while-held no)       ;; Hold RAlt -> Norwegian layer
+  nocaps (layer-while-held no-caps)  ;; On that layer, holding Shift -> uppercase layer
+  shnocaps (multi lsft @nocaps)      ;; for left shift
+  rshnocaps (multi rsft @nocaps)     ;; for right shift
 )
 
 (deflayer base
@@ -43,9 +43,9 @@
   @no
   ; ' [
   lsft rsft
-  lsft         ;; lsgt -> left shift for ANSI feel
-  ret          ;; nuhs -> Enter
-  ret          ;; ret (Enter) -> backslash (ANSI key above Enter row)
+  lsft                               ;; lsgt -> left shift for ANSI feel
+  ret                                ;; nuhs -> Enter
+  ret                                ;; ret (Enter) -> backslash (ANSI key above Enter row)
 )
 
 ;; Norwegian layer (RAlt held)
@@ -56,9 +56,9 @@
   ralt
   (unicode ø) (unicode æ) (unicode å)
   @shnocaps @shnocaps
-  lsft                                   ;; lsgt -> lsft
-  \                                      ;; backslash -> backslash
-  \                                      ;; ret (Enter) -> backslash
+  lsft                               ;; lsgt -> lsft
+  \                                  ;; backslash -> backslash
+  \                                  ;; ret (Enter) -> backslash
 )
 
 ;; Uppercase Norwegian layer (RAlt + Shift held)
@@ -69,7 +69,7 @@
   ralt
   (unicode Ø) (unicode Æ) (unicode Å)
   lsft rsft
-  lsft                                   ;; lsgt -> lsft
-  \                                      ;; backslash -> backslash
-  \                                      ;; ret (Enter) -> backslash
+  lsft                               ;; lsgt -> lsft
+  \                                  ;; backslash -> backslash
+  \                                  ;; ret (Enter) -> backslash
 )
