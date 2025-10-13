@@ -53,6 +53,7 @@ alias gd = git diff
 alias gdc = git diff --cached
 alias gf = git fetch
 alias gl = git log --oneline --graph
+alias gr = git rebase
 alias gri = git rebase -i
 alias pull = git pull
 alias push = git push
