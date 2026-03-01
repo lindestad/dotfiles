@@ -41,23 +41,29 @@ AUR_PKGS=(
 )
 
 # Symlinks: "SRC|DST"
-# (Create the source files/dirs in your repo matching these paths)
+# Built dynamically for Linux distro + WSL environment.
 LINKS=(
-  "$DOTFILES_DIR/shells/.zshrc|$HOME/.zshrc"
   "$DOTFILES_DIR/config/helix/config.toml|$HOME/.config/helix/config.toml"
   "$DOTFILES_DIR/config/helix/languages.toml|$HOME/.config/helix/languages.toml"
   "$DOTFILES_DIR/config/starship/zsh/starship.toml|$HOME/.config/starship.toml"
   "$DOTFILES_DIR/config/yazi|$HOME/.config/yazi"
   "$DOTFILES_DIR/config/ncspot/config.toml|$HOME/.config/ncspot/config.toml"
-  # Kanata config is handled conditionally below; do not link entire dir here
-  "$DOTFILES_DIR/config/niri|$HOME/.config/niri"
-  "$DOTFILES_DIR/config/waybar|$HOME/.config/waybar"
-  "$DOTFILES_DIR/config/fuzzel/fuzzel.ini|$HOME/.config/fuzzel/fuzzel.ini"
 )
 
 # --- Helpers ------------------------------------------------------------------
 
 have() { command -v "$1" >/dev/null 2>&1; }
+
+is_wsl() {
+  [[ -n "${WSL_DISTRO_NAME:-}" ]] || grep -qiE "(microsoft|wsl)" /proc/version 2>/dev/null
+}
+
+is_ubuntu() {
+  [[ -f /etc/os-release ]] || return 1
+  # shellcheck disable=SC1091
+  . /etc/os-release
+  [[ "${ID:-}" == "ubuntu" || "${ID_LIKE:-}" == *ubuntu* ]]
+}
 
 aur_helper() {
   if have yay; then echo yay; return 0; fi
@@ -124,6 +130,25 @@ prompt_yes_no() {
 }
 
 # --- Run ----------------------------------------------------------------------
+
+# Add shell + desktop paths based on environment.
+if is_ubuntu; then
+  LINKS+=(
+    "$DOTFILES_DIR/shells/.bashrc|$HOME/.bashrc"
+    "$DOTFILES_DIR/shells/config.nu|$HOME/.config/nushell/config.nu"
+  )
+fi
+
+# Zsh + desktop Wayland config are skipped in WSL.
+if ! is_wsl; then
+  LINKS+=(
+    "$DOTFILES_DIR/shells/.zshrc|$HOME/.zshrc"
+    # Kanata config is handled conditionally below; do not link entire dir here
+    "$DOTFILES_DIR/config/niri|$HOME/.config/niri"
+    "$DOTFILES_DIR/config/waybar|$HOME/.config/waybar"
+    "$DOTFILES_DIR/config/fuzzel/fuzzel.ini|$HOME/.config/fuzzel/fuzzel.ini"
+  )
+fi
 
 echo "==> Installing pacman packages..."
 install_pacman "${PACMAN_PKGS[@]}"
