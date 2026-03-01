@@ -18,6 +18,7 @@ APT_PKGS=(
   p7zip-full
   jq
   bat
+  htop
   fzf
   zoxide
   imagemagick

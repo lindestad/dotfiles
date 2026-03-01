@@ -17,6 +17,7 @@ PACMAN_PKGS=(
   p7zip            # 7zip
   jq
   bat
+  htop
   fzf
   zoxide
   imagemagick
@@ -42,6 +43,7 @@ APT_PKGS_COMMON=(
   p7zip-full
   jq
   bat
+  htop
   fzf
   zoxide
   imagemagick
