@@ -34,6 +34,42 @@ PACMAN_PKGS=(
   vivid
 )
 
+# Packages for Ubuntu/Debian (installed with apt)
+APT_PKGS_COMMON=(
+  ripgrep
+  fd-find
+  ffmpeg
+  p7zip-full
+  jq
+  bat
+  fzf
+  zoxide
+  imagemagick
+  git
+)
+
+APT_PKGS_DESKTOP=(
+  lm-sensors
+  brightnessctl
+  bluez
+  network-manager-gnome
+  pavucontrol
+)
+
+# Nice-to-have packages that may not exist in all Ubuntu repos.
+APT_PKGS_OPTIONAL=(
+  helix
+  starship
+  eza
+  yazi
+  git-delta
+  uutils-coreutils
+  ncspot
+  vivid
+  cliphist
+  carapace
+)
+
 # AUR packages (installed with yay/paru if present)
 AUR_PKGS=(
   # kanata is optional; installed based on prompt below
@@ -73,6 +109,27 @@ aur_helper() {
 
 install_pacman() {
   sudo pacman -Sy --needed --noconfirm "$@"
+}
+
+install_apt() {
+  local pkgs=("$@")
+  local available=() missing=()
+
+  sudo apt-get update -y
+  for pkg in "${pkgs[@]}"; do
+    if apt-cache show "$pkg" >/dev/null 2>&1; then
+      available+=("$pkg")
+    else
+      missing+=("$pkg")
+    fi
+  done
+
+  if ((${#available[@]})); then
+    sudo apt-get install -y "${available[@]}"
+  fi
+  if ((${#missing[@]})); then
+    echo ">> Skipping unavailable apt packages: ${missing[*]}"
+  fi
 }
 
 install_aur() {
@@ -150,20 +207,37 @@ if ! is_wsl; then
   )
 fi
 
-echo "==> Installing pacman packages..."
-install_pacman "${PACMAN_PKGS[@]}"
+if have pacman; then
+  echo "==> Installing pacman packages..."
+  install_pacman "${PACMAN_PKGS[@]}"
 
-if ((${#AUR_PKGS[@]})); then
-  echo "==> Installing AUR packages (if helper found)..."
-  install_aur "${AUR_PKGS[@]}"
+  if ((${#AUR_PKGS[@]})); then
+    echo "==> Installing AUR packages (if helper found)..."
+    install_aur "${AUR_PKGS[@]}"
+  fi
+elif have apt-get; then
+  echo "==> Installing apt packages..."
+  APT_PKGS=("${APT_PKGS_COMMON[@]}" "${APT_PKGS_OPTIONAL[@]}")
+  if ! is_wsl; then
+    APT_PKGS+=("${APT_PKGS_DESKTOP[@]}")
+  fi
+  install_apt "${APT_PKGS[@]}"
+else
+  echo "!! No supported package manager found (expected pacman or apt-get)."
+  exit 1
 fi
 
 # Kanata optional install + config selection
 KANATA_INSTALL="$(prompt_yes_no "Install Kanata (Keyboard remapping)?")"
 KANATA_CONFIG_SRC=""
 if [[ "$KANATA_INSTALL" == "yes" ]]; then
-  echo "==> Installing Kanata from AUR (if helper found)..."
-  install_aur kanata || true
+  if have pacman; then
+    echo "==> Installing Kanata from AUR (if helper found)..."
+    install_aur kanata || true
+  else
+    echo ">> Kanata auto-install is currently only configured for Arch/AUR."
+    echo "   On Ubuntu/WSL, install Kanata manually if desired."
+  fi
 
   # Choose config variant
   ISO_PROMPT="Remap ISO to ANSI like? Warning, remaps Enter key."
@@ -203,21 +277,25 @@ if [[ "$KANATA_INSTALL" == "yes" ]]; then
     backup_then_link "$KANATA_CONFIG_SRC" "$HOME/.config/kanata/config.kbd"
   fi
 
-  # Ask how to enable Kanata: system-wide (pre-login) or user-only (post-login)
-  SYS_PROMPT="Enable Kanata system-wide (pre-login; copies config to /etc, rerun script after changes)?"
-  if [[ "$(prompt_yes_no "$SYS_PROMPT")" == "yes" ]]; then
-    KANATA_ENABLE_SYSTEM=yes KANATA_ENABLE_USER=no \
-      bash "$DOTFILES_DIR/config/kanata/add_to_startup_arch.sh"
-  else
-    USER_PROMPT="Enable Kanata for this user (starts after login)?"
-    if [[ "$(prompt_yes_no "$USER_PROMPT")" == "yes" ]]; then
-      KANATA_ENABLE_SYSTEM=no KANATA_ENABLE_USER=yes \
+  if have pacman; then
+    # Ask how to enable Kanata: system-wide (pre-login) or user-only (post-login)
+    SYS_PROMPT="Enable Kanata system-wide (pre-login; copies config to /etc, rerun script after changes)?"
+    if [[ "$(prompt_yes_no "$SYS_PROMPT")" == "yes" ]]; then
+      KANATA_ENABLE_SYSTEM=yes KANATA_ENABLE_USER=no \
         bash "$DOTFILES_DIR/config/kanata/add_to_startup_arch.sh"
     else
-      # Still run to ensure uinput rules/groups are configured; skip enabling units
-      KANATA_ENABLE_SYSTEM=no KANATA_ENABLE_USER=no \
-        bash "$DOTFILES_DIR/config/kanata/add_to_startup_arch.sh"
+      USER_PROMPT="Enable Kanata for this user (starts after login)?"
+      if [[ "$(prompt_yes_no "$USER_PROMPT")" == "yes" ]]; then
+        KANATA_ENABLE_SYSTEM=no KANATA_ENABLE_USER=yes \
+          bash "$DOTFILES_DIR/config/kanata/add_to_startup_arch.sh"
+      else
+        # Still run to ensure uinput rules/groups are configured; skip enabling units
+        KANATA_ENABLE_SYSTEM=no KANATA_ENABLE_USER=no \
+          bash "$DOTFILES_DIR/config/kanata/add_to_startup_arch.sh"
+      fi
     fi
+  else
+    echo ">> Skipping Arch-specific Kanata startup setup on non-Arch system."
   fi
 fi
 
