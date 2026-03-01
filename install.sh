@@ -188,6 +188,11 @@ prompt_yes_no() {
 
 # --- Run ----------------------------------------------------------------------
 
+if is_wsl; then
+  echo "!! WSL detected. Use ./install-wsl.sh for WSL installs."
+  exit 1
+fi
+
 # Add shell + desktop paths based on environment.
 if is_ubuntu; then
   LINKS+=(

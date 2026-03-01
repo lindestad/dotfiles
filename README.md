@@ -44,12 +44,20 @@ This repository provides a unified development environment across **Linux**, **W
 
 ## Installation
 
-### Linux / Arch-based / WSL
+### Linux / Arch-based
 
 ```bash
 git clone https://github.com/lindestad/dotfiles ~/dev/dotfiles
 cd ~/dev/dotfiles
 ./install.sh
+````
+
+### WSL (Ubuntu)
+
+```bash
+git clone https://github.com/lindestad/dotfiles ~/dev/dotfiles
+cd ~/dev/dotfiles
+./install-wsl.sh
 ````
 
 ### Windows (PowerShell)
