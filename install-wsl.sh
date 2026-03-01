@@ -152,8 +152,42 @@ ensure_helix() {
     return
   fi
 
-  echo "==> Installing Helix with cargo..."
-  cargo install --locked helix-term
+  local machine deb_arch
+  machine="$(uname -m)"
+  case "$machine" in
+    x86_64|amd64) deb_arch="amd64" ;;
+    aarch64|arm64) deb_arch="arm64" ;;
+    *) deb_arch="" ;;
+  esac
+
+  if [[ -n "$deb_arch" ]] && have curl && have jq; then
+    local api_url release_json asset_url deb_file
+    api_url="https://api.github.com/repos/helix-editor/helix/releases/latest"
+
+    echo "==> Resolving latest Helix release artifact for $deb_arch..."
+    release_json="$(curl -fsSL "$api_url")"
+    asset_url="$(printf '%s\n' "$release_json" | jq -r --arg arch "$deb_arch" \
+      '.assets[] | select(.name | test("^helix_.*_" + $arch + "\\.deb$")) | .browser_download_url' | head -n1)"
+
+    if [[ -n "$asset_url" && "$asset_url" != "null" ]]; then
+      deb_file="$(mktemp /tmp/helix.XXXXXX.deb)"
+      echo "==> Installing Helix from release: $asset_url"
+      curl -fL "$asset_url" -o "$deb_file"
+      sudo apt-get install -y "$deb_file"
+      rm -f "$deb_file"
+      return
+    fi
+  fi
+
+  echo ">> Could not resolve Helix release .deb automatically."
+  if apt-cache show helix >/dev/null 2>&1; then
+    echo "==> Falling back to apt helix package..."
+    sudo apt-get install -y helix
+    return
+  fi
+
+  echo "!! Helix install failed. Install manually from https://github.com/helix-editor/helix/releases and rerun."
+  exit 1
 }
 
 # --- Run ----------------------------------------------------------------------
