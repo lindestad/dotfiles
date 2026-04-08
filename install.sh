@@ -177,10 +177,10 @@ backup_then_link() {
 
 prompt_yes_no() {
   # $1 = prompt text, default No
-  local ans
+  local answer
   while true; do
-    read -r -p "$1 y/N " ans || ans=""
-    case "${ans}" in
+    read -r -p "$1 y/N " answer || answer=""
+    case "${answer}" in
       [Yy]) echo "yes"; return 0;;
       ''|[Nn]) echo "no"; return 0;;
       *) echo "Please answer y or n.";;

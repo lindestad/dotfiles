@@ -51,10 +51,10 @@ is_wsl() {
 }
 
 prompt_yes_no() {
-  local ans
+  local answer
   while true; do
-    read -r -p "$1 y/N " ans || ans=""
-    case "${ans}" in
+    read -r -p "$1 y/N " answer || answer=""
+    case "${answer}" in
       [Yy]) echo "yes"; return 0 ;;
       ''|[Nn]) echo "no"; return 0 ;;
       *) echo "Please answer y or n." ;;
@@ -208,7 +208,7 @@ install_apt "${APT_PKGS[@]}" "${APT_PKGS_OPTIONAL[@]}"
 
 echo "==> Installing Rust and cargo tools..."
 ensure_rust_toolchain
-# shellcheck disable=SC1090
+# shellcheck disable=SC1091
 [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
 export PATH="$HOME/.cargo/bin:$HOME/.local/bin:$PATH"
 
