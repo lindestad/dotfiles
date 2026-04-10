@@ -14,6 +14,7 @@ $apps = @(
     "ImageMagick.ImageMagick",
     "sxyazi.yazi",
     "oschwartz10612.Poppler",
+    "GitHub.cli",
     "Nushell.Nushell",
     "Git.Git",
     "jftuga.less",
