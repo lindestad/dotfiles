@@ -1,3 +1,8 @@
+# Yazi requires `file.exe` on Windows (from Git for Windows)
+if ($nu.os-info.family == "windows") and ("C:/Program Files/Git/usr/bin/file.exe" | path exists) {
+  $env.YAZI_FILE_ONE = "C:/Program Files/Git/usr/bin/file.exe"
+}
+
 $env.config.show_banner = false
 $env.config.buffer_editor = "hx"
 mkdir ($nu.data-dir | path join "vendor/autoload")
