@@ -104,15 +104,16 @@ source ~/dev/dotfiles/config/nushell/custom-completions/zellij/zellij-completion
 source ~/dev/dotfiles/config/nushell/nu-themes/humanoid-dark.nu
 
 # Yazi binding allowing cd to working directory on exit
-
 def --env y [...args] {
 	let tmp = (mktemp -t "yazi-cwd.XXXXXX")
 	yazi ...$args --cwd-file $tmp
-	let cwd = (open $tmp)
-	if $cwd != "" and $cwd != $env.PWD {
-		cd $cwd
+	if ($tmp | path exists) {
+		let cwd = (open $tmp | str trim)
+		if $cwd != "" and ($cwd | path exists) {
+			cd $cwd
+		}
+		rm -fp $tmp
 	}
-	rm -fp $tmp
 }
 
 # CARAPACE
