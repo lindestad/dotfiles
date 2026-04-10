@@ -13,6 +13,7 @@ $apps = @(
     "ajeetdsouza.zoxide", 
     "ImageMagick.ImageMagick",
     "sxyazi.yazi",
+    "oschwartz10612.Poppler",
     "Nushell.Nushell",
     "Git.Git",
     "jftuga.less",
