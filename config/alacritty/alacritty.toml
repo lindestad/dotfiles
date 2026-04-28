@@ -2,3 +2,7 @@
 decorations = "None"
 padding = { x = 10, y = 20 }
 dynamic_padding = true
+
+[terminal.shell]
+program = "/usr/bin/zsh"
+args = ["-l"]

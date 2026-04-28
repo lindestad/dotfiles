@@ -58,6 +58,7 @@ add_nushell_link() {
 
 add_wayland_desktop_links() {
   LINKS+=(
+    "$DOTFILES_DIR/config/alacritty/alacritty.toml|$HOME/.config/alacritty/alacritty.toml"
     "$DOTFILES_DIR/config/niri|$HOME/.config/niri"
     "$DOTFILES_DIR/config/waybar|$HOME/.config/waybar"
     "$DOTFILES_DIR/config/fuzzel/fuzzel.ini|$HOME/.config/fuzzel/fuzzel.ini"

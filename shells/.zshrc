@@ -12,6 +12,10 @@ HISTSIZE=100000
 SAVEHIST=100000
 setopt SHARE_HISTORY INC_APPEND_HISTORY HIST_IGNORE_DUPS HIST_IGNORE_SPACE
 
+# Path and prompt config need to exist before tool initialization below.
+export PATH="$HOME/.cargo/bin:$HOME/.local/bin:$PATH"
+export STARSHIP_CONFIG="$HOME/.config/starship.toml"
+
 # Editor
 export EDITOR=hx
 export VISUAL=hx
@@ -170,9 +174,3 @@ export GREP_COLOR='1;32'
 # Less with colors
 export LESS='-R'
 export LESSHISTFILE=-
-
-# Path tweaks (optional)
-export PATH="$HOME/.local/bin:$PATH"
-export PATH="$HOME/.cargo/bin:$PATH"
-# Quiet login banners from some tools
-export STARSHIP_CONFIG="$HOME/.config/starship.toml"
