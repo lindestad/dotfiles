@@ -440,10 +440,13 @@ ensure_shell_shims() {
 }
 
 choose_kanata_config() {
+  # Read by the sourcing distro installer after this function returns.
   local prompt="Remap ISO to ANSI like? Warning, remaps Enter key."
   if [[ "$(prompt_yes_no "$prompt")" == "yes" ]]; then
+    # shellcheck disable=SC2034
     KANATA_CONFIG_SRC="$DOTFILES_DIR/config/kanata/config_iso_to_ansi.kbd"
   else
+    # shellcheck disable=SC2034
     KANATA_CONFIG_SRC="$DOTFILES_DIR/config/kanata/config.kbd"
   fi
 }
