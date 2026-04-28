@@ -11,6 +11,7 @@ APT_PKGS_COMMON=(
   zsh
   curl
   ca-certificates
+  fontconfig
   ripgrep
   fd-find
   ffmpeg
@@ -66,6 +67,7 @@ install_apt "${APT_PKGS_COMMON[@]}" "${APT_PKGS_OPTIONAL[@]}" "${APT_PKGS_DESKTO
 ensure_shell_shims
 ensure_rust_toolchain
 ensure_starship
+install_fonts
 
 KANATA_INSTALL="$(prompt_yes_no "Install Kanata (Keyboard remapping)?")"
 KANATA_CONFIG_SRC=""

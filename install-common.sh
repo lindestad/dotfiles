@@ -161,6 +161,31 @@ ensure_starship() {
   cargo install --locked starship
 }
 
+install_fonts() {
+  local src_dir="$DOTFILES_DIR/fonts"
+  local dst_dir="$HOME/.local/share/fonts"
+  local font
+
+  if [[ ! -d "$src_dir" ]]; then
+    echo ">> Font directory not found: $src_dir"
+    return
+  fi
+
+  echo "==> Installing user fonts..."
+  mkdir -p "$dst_dir"
+  for font in "$src_dir"/*.ttf; do
+    [[ -e "$font" ]] || continue
+    cp -f "$font" "$dst_dir/"
+    echo "-> Installed $(basename "$font")"
+  done
+
+  if have fc-cache; then
+    fc-cache -f "$dst_dir"
+  else
+    echo ">> fc-cache not found; restart apps after installing fontconfig."
+  fi
+}
+
 ensure_dirs() {
   local pair _src dst
   for pair in "$@"; do

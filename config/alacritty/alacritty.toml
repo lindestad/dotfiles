@@ -3,6 +3,25 @@ decorations = "None"
 padding = { x = 10, y = 20 }
 dynamic_padding = true
 
+[font]
+size = 12
+
+[font.normal]
+family = "MesloLGS NF"
+style = "Regular"
+
+[font.bold]
+family = "MesloLGS NF"
+style = "Bold"
+
+[font.italic]
+family = "MesloLGS NF"
+style = "Italic"
+
+[font.bold_italic]
+family = "MesloLGS NF"
+style = "Bold Italic"
+
 [terminal.shell]
 program = "/usr/bin/zsh"
 args = ["-l"]

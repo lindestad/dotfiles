@@ -13,6 +13,7 @@ APT_PKGS=(
   zsh
   curl
   ca-certificates
+  fontconfig
   build-essential
   pkg-config
   libssl-dev
@@ -105,6 +106,7 @@ ensure_rust_toolchain
 ensure_shell_shims
 ensure_starship
 ensure_helix
+install_fonts
 
 echo "==> Creating WSL config symlinks..."
 link_pairs "${LINKS[@]}"

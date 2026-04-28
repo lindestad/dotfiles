@@ -31,6 +31,40 @@ foreach ($app in $apps) {
     winget install --id $app --accept-source-agreements --accept-package-agreements -e
 }
 
+function Install-UserFonts {
+    param(
+        [Parameter(Mandatory)] [string]$FontDir
+    )
+
+    if (-not (Test-Path $FontDir)) {
+        Write-Warning "Font directory not found: $FontDir"
+        return
+    }
+
+    $fontsDir = Join-Path $env:LOCALAPPDATA "Microsoft\Windows\Fonts"
+    New-Item -ItemType Directory -Force -Path $fontsDir | Out-Null
+
+    $registryPath = "HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Fonts"
+    $fontNames = @{
+        "MesloLGS NF Regular.ttf"     = "MesloLGS NF Regular (TrueType)"
+        "MesloLGS NF Bold.ttf"        = "MesloLGS NF Bold (TrueType)"
+        "MesloLGS NF Italic.ttf"      = "MesloLGS NF Italic (TrueType)"
+        "MesloLGS NF Bold Italic.ttf" = "MesloLGS NF Bold Italic (TrueType)"
+    }
+
+    foreach ($font in Get-ChildItem -Path $FontDir -Filter "*.ttf") {
+        $destination = Join-Path $fontsDir $font.Name
+        Copy-Item $font.FullName $destination -Force
+
+        $registryName = $fontNames[$font.Name]
+        if (-not $registryName) {
+            $registryName = "$($font.BaseName) (TrueType)"
+        }
+        New-ItemProperty -Path $registryPath -Name $registryName -Value $destination -PropertyType String -Force | Out-Null
+        Write-Host "Installed font $($font.Name)"
+    }
+}
+
 # --- Nushell + Carapace wiring (Windows) ---
 $nuDir = Join-Path $env:APPDATA "nushell"                 # Nushell config dir on Windows
 $cache = Join-Path $env:USERPROFILE ".cache\carapace"
@@ -171,6 +205,8 @@ function New-SafeLink {
 $Dotfiles = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $UserHome = [Environment]::GetFolderPath('UserProfile')
 $Roaming = [Environment]::GetFolderPath('ApplicationData')
+
+Install-UserFonts -FontDir (Join-Path $Dotfiles "fonts")
 
 # Links specific to Windows setup
 New-SafeLink -Src (Join-Path $Dotfiles "config/helix/config.toml") -Dst (Join-Path $Roaming "helix/config.toml")

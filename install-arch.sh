@@ -10,6 +10,7 @@ ensure_not_root
 PACMAN_PKGS=(
   zsh
   curl
+  fontconfig
   helix
   eza
   ripgrep
@@ -60,6 +61,7 @@ echo "==> Installing pacman packages..."
 install_pacman "${PACMAN_PKGS[@]}"
 ensure_rust_toolchain
 ensure_starship
+install_fonts
 
 if ((${#AUR_PKGS[@]})); then
   echo "==> Installing AUR packages (if helper found)..."

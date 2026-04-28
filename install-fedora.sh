@@ -10,6 +10,7 @@ ensure_not_root
 DNF_PKGS=(
   zsh
   curl
+  fontconfig
   helix
   eza
   ripgrep
@@ -64,6 +65,7 @@ echo "==> Installing dnf packages..."
 install_dnf "${DNF_PKGS[@]}" "${DNF_PKGS_OPTIONAL[@]}"
 ensure_rust_toolchain
 ensure_starship
+install_fonts
 
 echo "==> Creating config symlinks..."
 link_pairs "${LINKS[@]}"
