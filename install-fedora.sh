@@ -93,13 +93,13 @@ ensure_zsh_default_shell
 
 KANATA_CONFIG_SRC=""
 if [[ "$INSTALL_KANATA" == "yes" ]]; then
-  echo ">> Kanata auto-install is not configured for Fedora. Install Kanata manually if needed."
+  echo ">> Kanata package install is not configured for Fedora. Install Kanata manually if needed."
   choose_kanata_config
 fi
 
 if [[ "$INSTALL_KANATA" == "yes" && -n "$KANATA_CONFIG_SRC" ]]; then
   link_kanata_config "$KANATA_CONFIG_SRC"
-  echo ">> Skipping Kanata service setup on Fedora."
+  setup_kanata_startup
 fi
 
 if [[ "$INSTALL_NIRI" == "yes" ]]; then

@@ -95,7 +95,7 @@ Kanata is optional and controlled by `--kanata` on Linux installers or an intera
 | --- | --- |
 | Arch | Installs `kanata` from AUR when an AUR helper is available, then can configure system or user startup. |
 | Ubuntu | Links the selected config, but package install and service setup are manual. |
-| Fedora | Links the selected config, but package install and service setup are manual. |
+| Fedora | Links the selected config and configures udev/systemd startup. Package install is manual if `kanata` is missing. |
 | WSL | Not supported. |
 | Windows | Installs `jtroo.kanata_gui` through winget when selected, links/copies config, and runs Windows startup setup. |
 

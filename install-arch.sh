@@ -107,20 +107,7 @@ if [[ "$INSTALL_KANATA" == "yes" ]]; then
     link_kanata_config "$KANATA_CONFIG_SRC"
   fi
 
-  system_prompt="Enable Kanata system-wide (pre-login; copies config to /etc, rerun script after changes)?"
-  if [[ "$(prompt_yes_no "$system_prompt")" == "yes" ]]; then
-    KANATA_ENABLE_SYSTEM=yes KANATA_ENABLE_USER=no \
-      bash "$DOTFILES_DIR/config/kanata/add_to_startup_arch.sh"
-  else
-    user_prompt="Enable Kanata for this user (starts after login)?"
-    if [[ "$(prompt_yes_no "$user_prompt")" == "yes" ]]; then
-      KANATA_ENABLE_SYSTEM=no KANATA_ENABLE_USER=yes \
-        bash "$DOTFILES_DIR/config/kanata/add_to_startup_arch.sh"
-    else
-      KANATA_ENABLE_SYSTEM=no KANATA_ENABLE_USER=no \
-        bash "$DOTFILES_DIR/config/kanata/add_to_startup_arch.sh"
-    fi
-  fi
+  setup_kanata_startup
 fi
 
 if [[ "$INSTALL_NIRI" == "yes" ]]; then

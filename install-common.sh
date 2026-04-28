@@ -419,6 +419,25 @@ link_kanata_config() {
   backup_then_link "$config_src" "$HOME/.config/kanata/config.kbd"
 }
 
+setup_kanata_startup() {
+  local helper="$DOTFILES_DIR/config/kanata/add_to_startup_arch.sh"
+  local system_prompt user_prompt
+
+  system_prompt="Enable Kanata system-wide (pre-login; copies config to /etc, rerun script after changes)?"
+  if [[ "$(prompt_yes_no "$system_prompt")" == "yes" ]]; then
+    KANATA_ENABLE_SYSTEM=yes KANATA_ENABLE_USER=no bash "$helper"
+  else
+    user_prompt="Enable Kanata for this user (starts after login)?"
+    if [[ "$(prompt_yes_no "$user_prompt")" == "yes" ]]; then
+      KANATA_ENABLE_SYSTEM=no KANATA_ENABLE_USER=yes bash "$helper"
+    else
+      KANATA_ENABLE_SYSTEM=no KANATA_ENABLE_USER=no bash "$helper"
+    fi
+  fi
+
+  echo ">> Reboot after Kanata setup so group membership and uinput permissions take effect."
+}
+
 run_sensors_detect() {
   if have sensors-detect; then
     echo "==> Detecting hardware sensors..."
