@@ -5,8 +5,12 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=install-common.sh
 source "$DOTFILES_DIR/install-common.sh"
 
+ensure_not_root
+
 APT_PKGS_COMMON=(
   zsh
+  curl
+  ca-certificates
   ripgrep
   fd-find
   ffmpeg
@@ -30,7 +34,6 @@ APT_PKGS_DESKTOP=(
 
 APT_PKGS_OPTIONAL=(
   helix
-  starship
   eza
   yazi
   git-delta
@@ -61,6 +64,8 @@ fi
 echo "==> Installing apt packages..."
 install_apt "${APT_PKGS_COMMON[@]}" "${APT_PKGS_OPTIONAL[@]}" "${APT_PKGS_DESKTOP[@]}"
 ensure_shell_shims
+ensure_rust_toolchain
+ensure_starship
 
 KANATA_INSTALL="$(prompt_yes_no "Install Kanata (Keyboard remapping)?")"
 KANATA_CONFIG_SRC=""
@@ -73,6 +78,7 @@ echo "==> Creating config symlinks..."
 link_pairs "${LINKS[@]}"
 ensure_local_bin
 copy_gitconfig
+ensure_zsh_default_shell
 
 if [[ "$KANATA_INSTALL" == "yes" && -n "$KANATA_CONFIG_SRC" ]]; then
   link_kanata_config "$KANATA_CONFIG_SRC"

@@ -14,6 +14,14 @@ is_wsl() {
   [[ -n "${WSL_DISTRO_NAME:-}" ]] || grep -qiE "(microsoft|wsl)" /proc/version 2>/dev/null
 }
 
+ensure_not_root() {
+  if [[ "${EUID:-$(id -u)}" -eq 0 ]]; then
+    echo "!! Do not run this installer with sudo."
+    echo "   Run it as your normal user; the script will ask for sudo when needed."
+    exit 1
+  fi
+}
+
 prompt_yes_no() {
   local answer
   while true; do
@@ -118,6 +126,40 @@ install_dnf() {
   fi
 }
 
+load_cargo_env() {
+  if [[ -f "$HOME/.cargo/env" ]]; then
+    # shellcheck disable=SC1091
+    source "$HOME/.cargo/env"
+  fi
+  export PATH="$HOME/.cargo/bin:$PATH"
+}
+
+ensure_rust_toolchain() {
+  if have cargo; then
+    load_cargo_env
+    return
+  fi
+
+  if ! have curl; then
+    echo "!! curl is required to install rustup."
+    return 1
+  fi
+
+  echo "==> Installing Rust toolchain (rustup)..."
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+  load_cargo_env
+}
+
+ensure_starship() {
+  if have starship; then
+    return
+  fi
+
+  ensure_rust_toolchain
+  echo "==> Installing starship with cargo..."
+  cargo install --locked starship
+}
+
 ensure_dirs() {
   local pair _src dst
   for pair in "$@"; do
@@ -172,6 +214,36 @@ copy_gitconfig() {
   else
     echo "== ~/.gitconfig exists; leaving as-is."
   fi
+}
+
+ensure_zsh_default_shell() {
+  if ! have zsh; then
+    echo ">> zsh is not installed; leaving default shell unchanged."
+    return
+  fi
+
+  local zsh_path current_shell
+  zsh_path="$(command -v zsh)"
+  current_shell="$(getent passwd "$USER" | cut -d: -f7)"
+
+  if [[ "$current_shell" == "$zsh_path" ]]; then
+    echo "== zsh is already the default shell."
+    return
+  fi
+
+  if [[ "$(prompt_yes_no "Set zsh as default shell?")" != "yes" ]]; then
+    return
+  fi
+
+  if ! grep -qxF "$zsh_path" /etc/shells; then
+    echo "==> Adding $zsh_path to /etc/shells..."
+    echo "$zsh_path" | sudo tee -a /etc/shells >/dev/null
+  fi
+
+  chsh -s "$zsh_path" "$USER" || sudo chsh -s "$zsh_path" "$USER" || {
+    echo ">> Could not change default shell automatically."
+    echo "   Run manually: chsh -s $zsh_path"
+  }
 }
 
 ensure_local_bin() {

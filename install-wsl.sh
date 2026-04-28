@@ -7,6 +7,8 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=install-common.sh
 source "$DOTFILES_DIR/install-common.sh"
 
+ensure_not_root
+
 APT_PKGS=(
   zsh
   curl
@@ -38,29 +40,6 @@ APT_PKGS_OPTIONAL=(
 LINKS=()
 add_zsh_link
 add_common_cli_links
-
-ensure_rust_toolchain() {
-  if have cargo; then
-    return
-  fi
-
-  echo "==> Installing Rust toolchain (rustup)..."
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-}
-
-ensure_starship() {
-  if have starship; then
-    return
-  fi
-
-  if apt-cache show starship >/dev/null 2>&1; then
-    echo "==> Installing starship from apt..."
-    sudo apt-get install -y starship
-  else
-    echo "==> Installing starship with cargo..."
-    cargo install --locked starship
-  fi
-}
 
 ensure_helix() {
   if have hx; then
@@ -122,9 +101,6 @@ install_apt "${APT_PKGS[@]}" "${APT_PKGS_OPTIONAL[@]}"
 
 echo "==> Installing Rust and cargo tools..."
 ensure_rust_toolchain
-# shellcheck disable=SC1091
-[[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
-export PATH="$HOME/.cargo/bin:$HOME/.local/bin:$PATH"
 
 ensure_shell_shims
 ensure_starship
@@ -135,8 +111,6 @@ link_pairs "${LINKS[@]}"
 
 copy_gitconfig
 
-if [[ "$(prompt_yes_no "Set zsh as default shell?")" == "yes" ]]; then
-  chsh -s "$(command -v zsh)" || echo ">> Could not change default shell automatically."
-fi
+ensure_zsh_default_shell
 
 echo "==> Done."

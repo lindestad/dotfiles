@@ -5,10 +5,12 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=install-common.sh
 source "$DOTFILES_DIR/install-common.sh"
 
+ensure_not_root
+
 PACMAN_PKGS=(
   zsh
+  curl
   helix
-  starship
   eza
   ripgrep
   fd
@@ -56,6 +58,8 @@ fi
 
 echo "==> Installing pacman packages..."
 install_pacman "${PACMAN_PKGS[@]}"
+ensure_rust_toolchain
+ensure_starship
 
 if ((${#AUR_PKGS[@]})); then
   echo "==> Installing AUR packages (if helper found)..."
@@ -74,6 +78,7 @@ echo "==> Creating config symlinks..."
 link_pairs "${LINKS[@]}"
 ensure_local_bin
 copy_gitconfig
+ensure_zsh_default_shell
 
 if [[ "$KANATA_INSTALL" == "yes" ]]; then
   if [[ -n "$KANATA_CONFIG_SRC" ]]; then

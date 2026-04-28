@@ -69,7 +69,9 @@ fi
 
 # Optional theming
 # Use terminal file colors (if set LS_COLORS, e.g. via vivid)
-export LS_COLORS="$(vivid generate dracula)"
+if command -v vivid >/dev/null 2>&1; then
+  export LS_COLORS="$(vivid generate dracula)"
+fi
 
 # Style specific elements in the completion UI (examples)
 # carapace --style 'carapace.Value=bold,magenta'
@@ -170,7 +172,7 @@ export LESS='-R'
 export LESSHISTFILE=-
 
 # Path tweaks (optional)
-# export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
 # Quiet login banners from some tools
 export STARSHIP_CONFIG="$HOME/.config/starship.toml"
