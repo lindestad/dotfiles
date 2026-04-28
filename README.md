@@ -23,57 +23,33 @@ This repository provides a unified development environment across **Linux**, **W
 
 ## Contents
 
-- Configuration for:
-  - **All Operating Systems**: Linux, Windows, WSL
-    - **[Helix](https://github.com/helix-editor/helix)** – Modal code editor
-    - **[Starship](https://github.com/starship/starship)** – Cross-shell prompt
-    - **[Yazi](https://github.com/sxyazi/yazi)** – TUI file manager
-    - **[Ncspot](https://github.com/hrkfdn/ncspot)** – Terminal-based Spotify client
-    - **[Kanata](https://github.com/jtroo/kanata)** – Key remapping – see [Key remapping section](#kanata-key-remappings) below
-    - **[Alacritty](https://github.com/alacritty/alacritty)** – GPU-accelerated terminal emulator
-  - **Arch/Fedora**:
-    - **[Zsh](https://www.zsh.org/)** – Solid POSIX shell
-    - **[niri](https://github.com/YaLTeR/niri)** – Wayland tiling window manager  
-    - **[Waybar](https://github.com/Alexays/Waybar)** – Highly customizable status bar for Wayland  
-    - **[Neofetch](https://github.com/dylanaraps/neofetch)** – Command-line system information tool  
-    - **[Fuzzel](https://codeberg.org/dnkl/fuzzel)** – Wayland-native application launcher
-    - **[Zellij](https://github.com/zellij-org/zellij)** – Terminal multiplexer
-  - **Windows**:
-    - **[Nushell](https://github.com/nushell/nushell)** – Structured shell (with Bash/Zsh/Pwsh fallbacks)
-    - **[Windows Terminal](https://github.com/microsoft/terminal)** – Modern terminal application for Windows
+This repo manages:
+
+- shell, terminal, editor, file manager, prompt, and Git configuration
+- bundled fonts and platform-specific config linking
+- optional Kanata keyboard remapping
+- optional Niri desktop configuration on supported Linux installs
+- package installs for the tools used by the dotfiles
+
+See [apps.md](./apps.md) for the package inventory and platform-specific package names.
 
 ## Installation
 
-### Arch
+### Linux and WSL
 
 ```bash
 git clone https://github.com/lindestad/dotfiles ~/dev/dotfiles
 cd ~/dev/dotfiles
-./install-arch.sh
+./install.sh
 ```
 
-### Ubuntu
+`install.sh` detects Arch-based, Debian/Ubuntu-based, Fedora, and WSL installs, then dispatches to the matching platform installer.
 
-```bash
-git clone https://github.com/lindestad/dotfiles ~/dev/dotfiles
-cd ~/dev/dotfiles
-./install-ubuntu.sh
-```
-
-### Fedora
-
-```bash
-git clone https://github.com/lindestad/dotfiles ~/dev/dotfiles
-cd ~/dev/dotfiles
-./install-fedora.sh
-```
-
-The distro installers prompt for optional components when no flags are provided.
-Use flags for repeatable installs:
+The installer prompts for optional components when no flags are provided. Use flags for repeatable installs:
 
 ```bash
 ./install.sh --niri --kanata
-./install-fedora.sh --no-niri --no-kanata --yes
+./install.sh --no-niri --no-kanata --yes
 ```
 
 Optional components:
@@ -81,23 +57,15 @@ Optional components:
 - `--niri` installs and links the Niri desktop stack: niri, waybar, fuzzel, swaylock/swayidle, and related Wayland utilities.
 - `--kanata` installs or links Kanata keyboard remapping config where supported.
 
-### WSL (Ubuntu)
-
-```bash
-git clone https://github.com/lindestad/dotfiles ~/dev/dotfiles
-cd ~/dev/dotfiles
-./install-wsl.sh
-```
-
 ### Windows (PowerShell)
 
 ```powershell
 git clone https://github.com/lindestad/dotfiles $HOME\dev\dotfiles
 cd $HOME\dev\dotfiles
-.\install-windows.ps1
+.\install.ps1
 ```
 
-The installation scripts install required packages, install bundled fonts, and symlink configuration files. `./install.sh` and `.\install.ps1` remain as compatibility dispatchers.
+The platform-specific scripts are still available for direct use when needed: `install-arch.sh`, `install-ubuntu.sh`, `install-fedora.sh`, `install-wsl.sh`, and `install-windows.ps1`.
 
 ---
 
@@ -105,9 +73,9 @@ The installation scripts install required packages, install bundled fonts, and s
 
 This dotfiles setup is designed to support:
 
-- 🐧 Linux (Arch-based, Ubuntu, Fedora)
-- 🪟 Windows
-- 🧊 WSL2
+- Linux: Arch-based, Debian/Ubuntu-based, and Fedora
+- WSL2
+- Windows
 
 ---
 
