@@ -5,6 +5,7 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=install-common.sh
 source "$DOTFILES_DIR/install-common.sh"
 
+parse_install_flags "$@"
 ensure_not_root
 
 PACMAN_PKGS=(
@@ -28,6 +29,10 @@ PACMAN_PKGS=(
   git-delta
   uutils-coreutils
   ncspot
+  vivid
+)
+
+NIRI_PACMAN_PKGS=(
   lm_sensors
   brightnessctl
   cliphist
@@ -35,7 +40,12 @@ PACMAN_PKGS=(
   bluez-utils
   network-manager-applet
   pavucontrol
-  vivid
+  niri
+  waybar
+  fuzzel
+  swayidle
+  swaylock
+  wl-clipboard
 )
 
 AUR_PKGS=(
@@ -45,7 +55,6 @@ AUR_PKGS=(
 LINKS=()
 add_common_cli_links
 add_zsh_link
-add_wayland_desktop_links
 
 if is_wsl; then
   echo "!! WSL detected. Use ./install-wsl.sh for WSL installs."
@@ -57,8 +66,18 @@ if ! have pacman; then
   exit 1
 fi
 
+resolve_install_flags yes yes
+add_alacritty_link
+if [[ "$INSTALL_NIRI" == "yes" ]]; then
+  add_wayland_desktop_links
+fi
+
 echo "==> Installing pacman packages..."
 install_pacman "${PACMAN_PKGS[@]}"
+if [[ "$INSTALL_NIRI" == "yes" ]]; then
+  echo "==> Installing Niri desktop packages..."
+  install_pacman "${NIRI_PACMAN_PKGS[@]}"
+fi
 ensure_rust_toolchain
 ensure_starship
 install_fonts
@@ -68,9 +87,8 @@ if ((${#AUR_PKGS[@]})); then
   install_aur "${AUR_PKGS[@]}"
 fi
 
-KANATA_INSTALL="$(prompt_yes_no "Install Kanata (Keyboard remapping)?")"
 KANATA_CONFIG_SRC=""
-if [[ "$KANATA_INSTALL" == "yes" ]]; then
+if [[ "$INSTALL_KANATA" == "yes" ]]; then
   echo "==> Installing Kanata from AUR (if helper found)..."
   install_aur kanata || true
   choose_kanata_config
@@ -82,7 +100,7 @@ ensure_local_bin
 copy_gitconfig
 ensure_zsh_default_shell
 
-if [[ "$KANATA_INSTALL" == "yes" ]]; then
+if [[ "$INSTALL_KANATA" == "yes" ]]; then
   if [[ -n "$KANATA_CONFIG_SRC" ]]; then
     link_kanata_config "$KANATA_CONFIG_SRC"
   fi
@@ -103,6 +121,8 @@ if [[ "$KANATA_INSTALL" == "yes" ]]; then
   fi
 fi
 
-run_sensors_detect
+if [[ "$INSTALL_NIRI" == "yes" ]]; then
+  run_sensors_detect
+fi
 
 echo "==> Done."

@@ -68,6 +68,19 @@ cd ~/dev/dotfiles
 ./install-fedora.sh
 ```
 
+The distro installers prompt for optional components when no flags are provided.
+Use flags for repeatable installs:
+
+```bash
+./install.sh --niri --kanata
+./install-fedora.sh --no-niri --no-kanata --yes
+```
+
+Optional components:
+
+- `--niri` installs and links the Niri desktop stack: niri, waybar, fuzzel, swaylock/swayidle, and related Wayland utilities.
+- `--kanata` installs or links Kanata keyboard remapping config where supported.
+
 ### WSL (Ubuntu)
 
 ```bash
@@ -84,7 +97,7 @@ cd $HOME\dev\dotfiles
 .\install-windows.ps1
 ```
 
-The installation scripts install required packages and symlink configuration files. `./install.sh` and `.\install.ps1` remain as compatibility dispatchers.
+The installation scripts install required packages, install bundled fonts, and symlink configuration files. `./install.sh` and `.\install.ps1` remain as compatibility dispatchers.
 
 ---
 
@@ -100,7 +113,7 @@ This dotfiles setup is designed to support:
 
 ## Kanata Key Remappings
 
-Kanata is an optional install (Prompted during install scripts).
+Kanata is an optional install. Use `--kanata`, or answer the installer prompt when running interactively.
 
 **Standard binds:**
 

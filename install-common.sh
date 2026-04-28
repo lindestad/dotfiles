@@ -10,6 +10,10 @@ fi
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
+INSTALL_NIRI=""
+INSTALL_KANATA=""
+ASSUME_YES="no"
+
 is_wsl() {
   [[ -n "${WSL_DISTRO_NAME:-}" ]] || grep -qiE "(microsoft|wsl)" /proc/version 2>/dev/null
 }
@@ -34,6 +38,88 @@ prompt_yes_no() {
   done
 }
 
+usage() {
+  cat <<EOF
+Usage: $(basename "$0") [options]
+
+Options:
+  --niri        Install the Niri desktop stack (niri, waybar, fuzzel, swaylock)
+  --no-niri     Skip the Niri desktop stack
+  --kanata      Install/link Kanata keyboard remapping config
+  --no-kanata   Skip Kanata
+  -y, --yes     Use non-interactive defaults for unspecified options
+  -h, --help    Show this help
+EOF
+}
+
+parse_install_flags() {
+  while (($#)); do
+    case "$1" in
+      --niri) INSTALL_NIRI="yes" ;;
+      --no-niri) INSTALL_NIRI="no" ;;
+      --kanata) INSTALL_KANATA="yes" ;;
+      --no-kanata) INSTALL_KANATA="no" ;;
+      -y|--yes) ASSUME_YES="yes" ;;
+      -h|--help) usage; exit 0 ;;
+      *)
+        echo "!! Unknown option: $1"
+        usage
+        exit 2
+        ;;
+    esac
+    shift
+  done
+}
+
+resolve_install_flags() {
+  local support_niri="${1:-yes}"
+  local support_kanata="${2:-yes}"
+
+  if [[ "$support_niri" == "no" ]]; then
+    if [[ "$INSTALL_NIRI" == "yes" ]]; then
+      echo ">> Niri desktop stack is not supported by this installer; skipping."
+    fi
+    INSTALL_NIRI="no"
+  elif [[ -z "$INSTALL_NIRI" ]]; then
+    if [[ "$ASSUME_YES" == "yes" ]]; then
+      INSTALL_NIRI="no"
+    elif [[ "$(prompt_yes_no "Install Niri desktop stack (niri/waybar/fuzzel/swaylock)?")" == "yes" ]]; then
+      INSTALL_NIRI="yes"
+    else
+      INSTALL_NIRI="no"
+    fi
+  fi
+
+  if [[ "$support_kanata" == "no" ]]; then
+    if [[ "$INSTALL_KANATA" == "yes" ]]; then
+      echo ">> Kanata is not supported by this installer; skipping."
+    fi
+    INSTALL_KANATA="no"
+  elif [[ -z "$INSTALL_KANATA" ]]; then
+    if [[ "$ASSUME_YES" == "yes" ]]; then
+      INSTALL_KANATA="no"
+    elif [[ "$(prompt_yes_no "Install Kanata (keyboard remapping)?")" == "yes" ]]; then
+      INSTALL_KANATA="yes"
+    else
+      INSTALL_KANATA="no"
+    fi
+  fi
+
+  echo "==> Optional components: niri=$INSTALL_NIRI, kanata=$INSTALL_KANATA"
+  if [[ "$support_niri" != "no" && "$INSTALL_NIRI" == "no" ]]; then
+    echo ">> Skipping Niri desktop stack. Re-run with --niri to install niri/waybar/fuzzel/swaylock."
+  fi
+  if [[ "$support_kanata" != "no" && "$INSTALL_KANATA" == "no" ]]; then
+    echo ">> Skipping Kanata. Re-run with --kanata to install/link keyboard remapping config."
+  fi
+}
+
+install_flag_args() {
+  [[ "$INSTALL_NIRI" == "yes" ]] && printf '%s\n' "--niri" || printf '%s\n' "--no-niri"
+  [[ "$INSTALL_KANATA" == "yes" ]] && printf '%s\n' "--kanata" || printf '%s\n' "--no-kanata"
+  [[ "$ASSUME_YES" == "yes" ]] && printf '%s\n' "--yes"
+}
+
 add_common_cli_links() {
   LINKS+=(
     "$DOTFILES_DIR/config/helix/config.toml|$HOME/.config/helix/config.toml"
@@ -56,9 +142,12 @@ add_nushell_link() {
   LINKS+=("$DOTFILES_DIR/shells/config.nu|$HOME/.config/nushell/config.nu")
 }
 
+add_alacritty_link() {
+  LINKS+=("$DOTFILES_DIR/config/alacritty/alacritty.toml|$HOME/.config/alacritty/alacritty.toml")
+}
+
 add_wayland_desktop_links() {
   LINKS+=(
-    "$DOTFILES_DIR/config/alacritty/alacritty.toml|$HOME/.config/alacritty/alacritty.toml"
     "$DOTFILES_DIR/config/niri|$HOME/.config/niri"
     "$DOTFILES_DIR/config/waybar|$HOME/.config/waybar"
     "$DOTFILES_DIR/config/fuzzel/fuzzel.ini|$HOME/.config/fuzzel/fuzzel.ini"

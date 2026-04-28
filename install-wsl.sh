@@ -7,6 +7,7 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=install-common.sh
 source "$DOTFILES_DIR/install-common.sh"
 
+parse_install_flags "$@"
 ensure_not_root
 
 APT_PKGS=(
@@ -96,6 +97,8 @@ if ! have apt-get; then
   echo "!! apt-get is required for WSL installer."
   exit 1
 fi
+
+resolve_install_flags no no
 
 echo "==> Installing apt packages..."
 install_apt "${APT_PKGS[@]}" "${APT_PKGS_OPTIONAL[@]}"

@@ -5,6 +5,7 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=install-common.sh
 source "$DOTFILES_DIR/install-common.sh"
 
+parse_install_flags "$@"
 ensure_not_root
 
 DNF_PKGS=(
@@ -26,6 +27,9 @@ DNF_PKGS=(
   ImageMagick
   git
   git-delta
+)
+
+NIRI_DNF_PKGS=(
   lm_sensors
   brightnessctl
   cliphist
@@ -36,6 +40,9 @@ DNF_PKGS=(
   niri
   waybar
   fuzzel
+  swayidle
+  swaylock
+  wl-clipboard
 )
 
 DNF_PKGS_OPTIONAL=(
@@ -49,7 +56,6 @@ DNF_PKGS_OPTIONAL=(
 LINKS=()
 add_common_cli_links
 add_zsh_link
-add_wayland_desktop_links
 
 if is_wsl; then
   echo "!! WSL detected. Use ./install-wsl.sh for WSL installs."
@@ -61,8 +67,18 @@ if ! have dnf; then
   exit 1
 fi
 
+resolve_install_flags yes yes
+add_alacritty_link
+if [[ "$INSTALL_NIRI" == "yes" ]]; then
+  add_wayland_desktop_links
+fi
+
 echo "==> Installing dnf packages..."
 install_dnf "${DNF_PKGS[@]}" "${DNF_PKGS_OPTIONAL[@]}"
+if [[ "$INSTALL_NIRI" == "yes" ]]; then
+  echo "==> Installing Niri desktop packages..."
+  install_dnf "${NIRI_DNF_PKGS[@]}"
+fi
 ensure_rust_toolchain
 ensure_starship
 install_fonts
@@ -73,18 +89,19 @@ ensure_local_bin
 copy_gitconfig
 ensure_zsh_default_shell
 
-KANATA_INSTALL="$(prompt_yes_no "Install Kanata (Keyboard remapping)?")"
 KANATA_CONFIG_SRC=""
-if [[ "$KANATA_INSTALL" == "yes" ]]; then
+if [[ "$INSTALL_KANATA" == "yes" ]]; then
   echo ">> Kanata auto-install is not configured for Fedora. Install Kanata manually if needed."
   choose_kanata_config
 fi
 
-if [[ "$KANATA_INSTALL" == "yes" && -n "$KANATA_CONFIG_SRC" ]]; then
+if [[ "$INSTALL_KANATA" == "yes" && -n "$KANATA_CONFIG_SRC" ]]; then
   link_kanata_config "$KANATA_CONFIG_SRC"
   echo ">> Skipping Kanata service setup on Fedora."
 fi
 
-run_sensors_detect
+if [[ "$INSTALL_NIRI" == "yes" ]]; then
+  run_sensors_detect
+fi
 
 echo "==> Done."
