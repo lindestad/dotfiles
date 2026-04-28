@@ -34,6 +34,10 @@ APT_PKGS=(
   git
   gh
   shellcheck
+  python3
+  python3.12
+  python3.12-venv
+  pipx
 )
 
 APT_PKGS_OPTIONAL=(

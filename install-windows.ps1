@@ -19,6 +19,7 @@ $apps = @(
     "Nushell.Nushell",
     "Git.Git",
     "Schniz.fnm",
+    "Python.Python.3.12",
     "astral-sh.uv",
     "jftuga.less",
     "dandavison.delta",
@@ -93,7 +94,47 @@ function Ensure-NodeLts {
     Enable-FnmPowerShellProfile
 }
 
+function Ensure-Pipx {
+    $py = Get-Command "py" -ErrorAction SilentlyContinue
+    $python = Get-Command "python" -ErrorAction SilentlyContinue
+    $python312 = Join-Path $env:LOCALAPPDATA "Programs\Python\Python312\python.exe"
+
+    if ($py) {
+        & $py.Source -3.12 -m pip install --user pipx
+        if ($LASTEXITCODE -ne 0) {
+            & $py.Source -m pip install --user pipx
+        }
+        if ($LASTEXITCODE -eq 0) {
+            & $py.Source -3.12 -m pipx ensurepath
+            if ($LASTEXITCODE -ne 0) {
+                & $py.Source -m pipx ensurepath
+            }
+        }
+    }
+    elseif (Test-Path $python312) {
+        & $python312 -m pip install --user pipx
+        if ($LASTEXITCODE -eq 0) {
+            & $python312 -m pipx ensurepath
+        }
+    }
+    elseif ($python) {
+        & $python.Source -m pip install --user pipx
+        if ($LASTEXITCODE -eq 0) {
+            & $python.Source -m pipx ensurepath
+        }
+    }
+    else {
+        Write-Warning "Python not found yet. Start a new shell and run: py -3.12 -m pip install --user pipx; py -3.12 -m pipx ensurepath"
+        return
+    }
+
+    $userScripts = Join-Path $env:APPDATA "Python\Python312\Scripts"
+    $pipxBin = Join-Path $env:USERPROFILE ".local\bin"
+    $env:Path = "$userScripts;$pipxBin;$env:Path"
+}
+
 Ensure-NodeLts
+Ensure-Pipx
 Enable-StarshipPowerShellProfile
 
 function Set-WindowsTerminalGitBashDefault {

@@ -31,6 +31,8 @@ DNF_PKGS=(
   gh
   git-delta
   ShellCheck
+  python3.12
+  pipx
   uv
 )
 

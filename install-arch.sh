@@ -35,6 +35,8 @@ PACMAN_PKGS=(
   uutils-coreutils
   ncspot
   vivid
+  python
+  python-pipx
   uv
 )
 

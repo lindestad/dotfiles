@@ -24,6 +24,8 @@ These tools are installed on at least one Linux installer and on Windows.
 | jq | `jq` | `jq` | `jq` | `jq` | `jqlang.jq` |
 | ncspot | `ncspot` | `ncspot` (optional) | `ncspot` (optional) | `ncspot` (optional) | `hrkfdn.ncspot` |
 | Node.js LTS | via fnm | via fnm | via fnm | via fnm | via fnm |
+| pipx | `python-pipx` | `pipx` | `pipx` | `pipx` | installed with `py -3.12 -m pip install --user pipx` |
+| Python | `python` | `python3`, `python3.12`, `python3.12-venv` | `python3.12` | `python3`, `python3.12`, `python3.12-venv` | `Python.Python.3.12` |
 | ripgrep | `ripgrep` | `ripgrep` | `ripgrep` | `ripgrep` | `BurntSushi.ripgrep.MSVC` |
 | ShellCheck | `shellcheck` | `shellcheck` | `ShellCheck` | `shellcheck` | `koalaman.shellcheck` |
 | starship | cargo fallback | cargo fallback | cargo fallback | cargo fallback | `Starship.Starship` |
@@ -62,6 +64,8 @@ These are the main package naming differences to check when adding support for a
 | lm sensors | `lm_sensors` | `lm-sensors` | `lm_sensors` |
 | network applet | `network-manager-applet` | `network-manager-gnome` | `NetworkManager-applet` |
 | p7zip | `p7zip` | `p7zip-full` | `p7zip`, `p7zip-plugins` |
+| pipx | `python-pipx` | `pipx` | `pipx` |
+| Python | `python` | `python3`, `python3.12`, `python3.12-venv` | `python3.12` |
 
 ## WSL-only
 

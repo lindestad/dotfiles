@@ -29,6 +29,10 @@ APT_PKGS_COMMON=(
   git
   gh
   shellcheck
+  python3
+  python3.12
+  python3.12-venv
+  pipx
 )
 
 NIRI_APT_PKGS=(
