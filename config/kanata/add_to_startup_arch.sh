@@ -6,9 +6,27 @@ TARGET_USER="${SUDO_USER:-$USER}"
 TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6)"
 KANATA_BIN="$(command -v kanata || true)"
 KANATA_CFG="${KANATA_CFG:-$TARGET_HOME/.config/kanata/config.kbd}"
+SYSTEM_KANATA_BIN=""
 
 echo "==> User: $TARGET_USER"
 echo "==> Home: $TARGET_HOME"
+
+prepare_system_kanata_bin() {
+  local src="$1"
+  local dst="/usr/local/bin/kanata"
+
+  SYSTEM_KANATA_BIN="$src"
+  case "$src" in
+    "$TARGET_HOME"/*|/home/*/.cargo/bin/kanata)
+      echo "==> Installing root-owned Kanata binary to $dst..."
+      sudo install -D -m 0755 "$src" "$dst"
+      if command -v restorecon >/dev/null 2>&1; then
+        sudo restorecon "$dst" || true
+      fi
+      SYSTEM_KANATA_BIN="$dst"
+      ;;
+  esac
+}
 
 echo "==> Ensure groups & memberships…"
 # Create uinput group if missing
@@ -154,6 +172,7 @@ if [[ "$REPLY_SYS" =~ ^[Yy]$ ]]; then
     echo "!! Kanata config not found at: $KANATA_CFG"
     exit 1
   fi
+  prepare_system_kanata_bin "$KANATA_BIN"
 
   sudo mkdir -p /etc/kanata
   # Copy current config into /etc so it’s available before login
@@ -179,8 +198,8 @@ WantedBy=multi-user.target
 UNIT
 
   # Adjust ExecStart path if needed
-  if [[ "$KANATA_BIN" != "/usr/bin/kanata" && -n "$KANATA_BIN" ]]; then
-    sudo sed -i "s|^ExecStart=/usr/bin/kanata|ExecStart=${KANATA_BIN}|" "$SYS_UNIT"
+  if [[ "$SYSTEM_KANATA_BIN" != "/usr/bin/kanata" && -n "$SYSTEM_KANATA_BIN" ]]; then
+    sudo sed -i "s|^ExecStart=/usr/bin/kanata|ExecStart=${SYSTEM_KANATA_BIN}|" "$SYS_UNIT"
   fi
 
   sudo systemctl daemon-reload
