@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=install-common.sh
+source "$DOTFILES_DIR/install-common.sh"
+
+APT_PKGS_COMMON=(
+  zsh
+  ripgrep
+  fd-find
+  ffmpeg
+  p7zip-full
+  jq
+  bat
+  htop
+  fzf
+  zoxide
+  imagemagick
+  git
+)
+
+APT_PKGS_DESKTOP=(
+  lm-sensors
+  brightnessctl
+  bluez
+  network-manager-gnome
+  pavucontrol
+)
+
+APT_PKGS_OPTIONAL=(
+  helix
+  starship
+  eza
+  yazi
+  git-delta
+  uutils-coreutils
+  ncspot
+  vivid
+  cliphist
+  carapace
+)
+
+LINKS=()
+add_common_cli_links
+add_bash_link
+add_nushell_link
+add_zsh_link
+add_wayland_desktop_links
+
+if is_wsl; then
+  echo "!! WSL detected. Use ./install-wsl.sh for WSL installs."
+  exit 1
+fi
+
+if ! have apt-get; then
+  echo "!! apt-get is required for the Ubuntu installer."
+  exit 1
+fi
+
+echo "==> Installing apt packages..."
+install_apt "${APT_PKGS_COMMON[@]}" "${APT_PKGS_OPTIONAL[@]}" "${APT_PKGS_DESKTOP[@]}"
+ensure_shell_shims
+
+KANATA_INSTALL="$(prompt_yes_no "Install Kanata (Keyboard remapping)?")"
+KANATA_CONFIG_SRC=""
+if [[ "$KANATA_INSTALL" == "yes" ]]; then
+  echo ">> Kanata auto-install is not configured for Ubuntu. Install Kanata manually if needed."
+  choose_kanata_config
+fi
+
+echo "==> Creating config symlinks..."
+link_pairs "${LINKS[@]}"
+ensure_local_bin
+copy_gitconfig
+
+if [[ "$KANATA_INSTALL" == "yes" && -n "$KANATA_CONFIG_SRC" ]]; then
+  link_kanata_config "$KANATA_CONFIG_SRC"
+  echo ">> Skipping Kanata service setup on Ubuntu."
+fi
+
+run_sensors_detect
+
+echo "==> Done."

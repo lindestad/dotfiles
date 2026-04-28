@@ -31,7 +31,7 @@ This repository provides a unified development environment across **Linux**, **W
     - **[Ncspot](https://github.com/hrkfdn/ncspot)** – Terminal-based Spotify client
     - **[Kanata](https://github.com/jtroo/kanata)** – Key remapping – see [Key remapping section](#kanata-key-remappings) below
     - **[Alacritty](https://github.com/alacritty/alacritty)** – GPU-accelerated terminal emulator
-  - **Arch**:
+  - **Arch/Fedora**:
     - **[Zsh](https://www.zsh.org/)** – Solid POSIX shell
     - **[niri](https://github.com/YaLTeR/niri)** – Wayland tiling window manager  
     - **[Waybar](https://github.com/Alexays/Waybar)** – Highly customizable status bar for Wayland  
@@ -44,13 +44,29 @@ This repository provides a unified development environment across **Linux**, **W
 
 ## Installation
 
-### Linux / Arch-based
+### Arch
 
 ```bash
 git clone https://github.com/lindestad/dotfiles ~/dev/dotfiles
 cd ~/dev/dotfiles
-./install.sh
-````
+./install-arch.sh
+```
+
+### Ubuntu
+
+```bash
+git clone https://github.com/lindestad/dotfiles ~/dev/dotfiles
+cd ~/dev/dotfiles
+./install-ubuntu.sh
+```
+
+### Fedora
+
+```bash
+git clone https://github.com/lindestad/dotfiles ~/dev/dotfiles
+cd ~/dev/dotfiles
+./install-fedora.sh
+```
 
 ### WSL (Ubuntu)
 
@@ -58,17 +74,17 @@ cd ~/dev/dotfiles
 git clone https://github.com/lindestad/dotfiles ~/dev/dotfiles
 cd ~/dev/dotfiles
 ./install-wsl.sh
-````
+```
 
 ### Windows (PowerShell)
 
 ```powershell
 git clone https://github.com/lindestad/dotfiles $HOME\dev\dotfiles
 cd $HOME\dev\dotfiles
-.\install.ps1
+.\install-windows.ps1
 ```
 
-The installation scripts install required packages and symlink configuration files.
+The installation scripts install required packages and symlink configuration files. `./install.sh` and `.\install.ps1` remain as compatibility dispatchers.
 
 ---
 
@@ -76,7 +92,7 @@ The installation scripts install required packages and symlink configuration fil
 
 This dotfiles setup is designed to support:
 
-- 🐧 Linux (Arch-based, Ubuntu)
+- 🐧 Linux (Arch-based, Ubuntu, Fedora)
 - 🪟 Windows
 - 🧊 WSL2
 

@@ -43,7 +43,9 @@ jobs:
           sparse-checkout: |
             .github/workflows
             install.ps1
-          sparse-checkout-cone: true
+            install-windows.ps1
+            config/kanata/add_to_startup_windows.ps1
+          sparse-checkout-cone-mode: false
 
       - name: Install PSScriptAnalyzer
         shell: pwsh
