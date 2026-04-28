@@ -26,6 +26,8 @@ APT_PKGS=(
   jq
   bat
   htop
+  btop
+  btm
   fzf
   zoxide
   imagemagick

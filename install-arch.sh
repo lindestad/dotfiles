@@ -22,6 +22,8 @@ PACMAN_PKGS=(
   jq
   bat
   htop
+  btop
+  bottom
   fzf
   zoxide
   imagemagick

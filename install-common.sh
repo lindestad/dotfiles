@@ -250,6 +250,16 @@ ensure_starship() {
   cargo install --locked starship
 }
 
+ensure_bottom() {
+  if have btm; then
+    return
+  fi
+
+  ensure_rust_toolchain
+  echo "==> Installing bottom with cargo..."
+  cargo install --locked bottom
+}
+
 ensure_fnm() {
   if have fnm; then
     return

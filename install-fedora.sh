@@ -23,6 +23,7 @@ DNF_PKGS=(
   jq
   bat
   htop
+  btop
   fzf
   zoxide
   ImageMagick
@@ -83,6 +84,7 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
 fi
 ensure_rust_toolchain
 ensure_starship
+ensure_bottom
 ensure_node_lts
 ensure_uv
 install_fonts

@@ -36,6 +36,8 @@ These are installed only by the Linux/WSL shell installers.
 
 | Tool | Arch | Ubuntu | Fedora | WSL |
 | --- | --- | --- | --- | --- |
+| bottom/btm | `bottom` | `btm` | cargo fallback | `btm` |
+| btop | `btop` | `btop` | `btop` | `btop` |
 | ca-certificates | not installed | `ca-certificates` | not installed | `ca-certificates` |
 | curl | `curl` | `curl` | `curl` | `curl` |
 | fontconfig | `fontconfig` | `fontconfig` | `fontconfig` | `fontconfig` |
