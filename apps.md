@@ -26,6 +26,7 @@ These tools are installed on at least one Linux installer and on Windows.
 | ripgrep | `ripgrep` | `ripgrep` | `ripgrep` | `ripgrep` | `BurntSushi.ripgrep.MSVC` |
 | starship | cargo fallback | cargo fallback | cargo fallback | cargo fallback | `Starship.Starship` |
 | uutils coreutils | `uutils-coreutils` | `uutils-coreutils` (optional) | `uutils-coreutils` (optional) | not installed | `uutils.coreutils` |
+| uv | `uv` | standalone installer | `uv` with standalone fallback | standalone installer | `astral-sh.uv` |
 | yazi | `yazi` | `yazi` (optional) | `yazi` (optional) | `yazi` (optional) | `sxyazi.yazi` |
 | zoxide | `zoxide` | `zoxide` | `zoxide` | `zoxide` | `ajeetdsouza.zoxide` |
 
@@ -95,7 +96,7 @@ Kanata is optional and controlled by `--kanata` on Linux installers or an intera
 | --- | --- |
 | Arch | Installs `kanata` from AUR when an AUR helper is available, then can configure system or user startup. |
 | Ubuntu | Links the selected config, but package install and service setup are manual. |
-| Fedora | Links the selected config and configures udev/systemd startup. Package install is manual if `kanata` is missing. |
+| Fedora | Installs `kanata` with Cargo when missing, links the selected config, and configures udev/systemd startup. |
 | WSL | Not supported. |
 | Windows | Installs `jtroo.kanata_gui` through winget when selected, links/copies config, and runs Windows startup setup. |
 

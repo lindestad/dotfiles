@@ -277,6 +277,31 @@ ensure_node_lts() {
   fnm default lts-latest
 }
 
+ensure_uv() {
+  if have uv; then
+    return
+  fi
+
+  if ! have curl; then
+    echo "!! curl is required to install uv."
+    return 1
+  fi
+
+  echo "==> Installing uv..."
+  curl -LsSf https://astral.sh/uv/install.sh | env UV_NO_MODIFY_PATH=1 sh
+  export PATH="$HOME/.local/bin:$PATH"
+}
+
+ensure_kanata_cargo() {
+  if have kanata; then
+    return
+  fi
+
+  ensure_rust_toolchain
+  echo "==> Installing Kanata with cargo..."
+  cargo install kanata
+}
+
 install_fonts() {
   local src_dir="$DOTFILES_DIR/fonts"
   local dst_dir="$HOME/.local/share/fonts"

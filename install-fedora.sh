@@ -28,6 +28,7 @@ DNF_PKGS=(
   ImageMagick
   git
   git-delta
+  uv
 )
 
 NIRI_DNF_PKGS=(
@@ -83,6 +84,7 @@ fi
 ensure_rust_toolchain
 ensure_starship
 ensure_node_lts
+ensure_uv
 install_fonts
 
 echo "==> Creating config symlinks..."
@@ -93,7 +95,7 @@ ensure_zsh_default_shell
 
 KANATA_CONFIG_SRC=""
 if [[ "$INSTALL_KANATA" == "yes" ]]; then
-  echo ">> Kanata package install is not configured for Fedora. Install Kanata manually if needed."
+  ensure_kanata_cargo
   choose_kanata_config
 fi
 

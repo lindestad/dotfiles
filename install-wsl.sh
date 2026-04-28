@@ -110,6 +110,7 @@ ensure_rust_toolchain
 ensure_shell_shims
 ensure_starship
 ensure_node_lts
+ensure_uv
 ensure_helix
 install_fonts
 

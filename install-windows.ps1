@@ -18,6 +18,7 @@ $apps = @(
     "Nushell.Nushell",
     "Git.Git",
     "Schniz.fnm",
+    "astral-sh.uv",
     "jftuga.less",
     "dandavison.delta",
     "Microsoft.PowerShell",

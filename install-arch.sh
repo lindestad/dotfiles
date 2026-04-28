@@ -31,6 +31,7 @@ PACMAN_PKGS=(
   uutils-coreutils
   ncspot
   vivid
+  uv
 )
 
 NIRI_PACMAN_PKGS=(

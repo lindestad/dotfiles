@@ -86,6 +86,7 @@ ensure_shell_shims
 ensure_rust_toolchain
 ensure_starship
 ensure_node_lts
+ensure_uv
 install_fonts
 
 KANATA_CONFIG_SRC=""
