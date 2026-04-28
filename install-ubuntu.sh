@@ -27,6 +27,8 @@ APT_PKGS_COMMON=(
   zoxide
   imagemagick
   git
+  gh
+  shellcheck
 )
 
 NIRI_APT_PKGS=(

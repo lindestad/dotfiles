@@ -32,6 +32,8 @@ APT_PKGS=(
   zoxide
   imagemagick
   git
+  gh
+  shellcheck
 )
 
 APT_PKGS_OPTIONAL=(

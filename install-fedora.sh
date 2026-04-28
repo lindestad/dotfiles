@@ -28,7 +28,9 @@ DNF_PKGS=(
   zoxide
   ImageMagick
   git
+  gh
   git-delta
+  ShellCheck
   uv
 )
 

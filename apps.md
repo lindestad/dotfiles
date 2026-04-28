@@ -18,12 +18,14 @@ These tools are installed on at least one Linux installer and on Windows.
 | fzf | `fzf` | `fzf` | `fzf` | `fzf` | `junegunn.fzf` |
 | git | `git` | `git` | `git` | `git` | `Git.Git` |
 | git-delta | `git-delta` | `git-delta` (optional) | `git-delta` | `git-delta` (optional) | `dandavison.delta` |
+| GitHub CLI | `github-cli` | `gh` | `gh` | `gh` | `GitHub.cli` |
 | helix | `helix` | `helix` (optional) | `helix` | release `.deb` fallback | `Helix.Helix` |
 | imagemagick | `imagemagick` | `imagemagick` | `ImageMagick` | `imagemagick` | `ImageMagick.ImageMagick` |
 | jq | `jq` | `jq` | `jq` | `jq` | `jqlang.jq` |
 | ncspot | `ncspot` | `ncspot` (optional) | `ncspot` (optional) | `ncspot` (optional) | `hrkfdn.ncspot` |
 | Node.js LTS | via fnm | via fnm | via fnm | via fnm | via fnm |
 | ripgrep | `ripgrep` | `ripgrep` | `ripgrep` | `ripgrep` | `BurntSushi.ripgrep.MSVC` |
+| ShellCheck | `shellcheck` | `shellcheck` | `ShellCheck` | `shellcheck` | `koalaman.shellcheck` |
 | starship | cargo fallback | cargo fallback | cargo fallback | cargo fallback | `Starship.Starship` |
 | uutils coreutils | `uutils-coreutils` | `uutils-coreutils` (optional) | `uutils-coreutils` (optional) | not installed | `uutils.coreutils` |
 | uv | `uv` | standalone installer | `uv` with standalone fallback | standalone installer | `astral-sh.uv` |
@@ -108,7 +110,6 @@ These winget packages are only in `install-windows.ps1`.
 
 | Tool | Winget ID |
 | --- | --- |
-| GitHub CLI | `GitHub.cli` |
 | less | `jftuga.less` |
 | Nushell | `Nushell.Nushell` |
 | Poppler | `oschwartz10612.Poppler` |

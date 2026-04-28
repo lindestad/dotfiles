@@ -29,7 +29,9 @@ PACMAN_PKGS=(
   imagemagick
   yazi
   git
+  github-cli
   git-delta
+  shellcheck
   uutils-coreutils
   ncspot
   vivid

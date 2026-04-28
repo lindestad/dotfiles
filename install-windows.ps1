@@ -15,6 +15,7 @@ $apps = @(
     "sxyazi.yazi",
     "oschwartz10612.Poppler",
     "GitHub.cli",
+    "koalaman.shellcheck",
     "Nushell.Nushell",
     "Git.Git",
     "Schniz.fnm",
