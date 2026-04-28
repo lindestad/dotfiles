@@ -48,21 +48,33 @@ function Get-WinGetLinkedCommand {
     return $null
 }
 
-function Enable-FnmPowerShellProfile {
+function Add-PowerShellProfileLine {
+    param(
+        [Parameter(Mandatory)] [string]$Line,
+        [Parameter(Mandatory)] [string]$Pattern
+    )
+
     $profilePath = $PROFILE.CurrentUserCurrentHost
     $profileDir = Split-Path $profilePath
     New-Item -ItemType Directory -Force -Path $profileDir | Out-Null
 
-    $line = "fnm env --use-on-cd | Out-String | Invoke-Expression"
     if (Test-Path $profilePath) {
         $existing = Get-Content $profilePath -Raw
-        if ($existing -notmatch 'fnm env') {
-            Add-Content -Path $profilePath -Value "`n$line`n"
+        if ($existing -notmatch $Pattern) {
+            Add-Content -Path $profilePath -Value "`n$Line`n"
         }
     }
     else {
-        Set-Content -Path $profilePath -Value $line
+        Set-Content -Path $profilePath -Value $Line
     }
+}
+
+function Enable-FnmPowerShellProfile {
+    Add-PowerShellProfileLine -Line "fnm env --use-on-cd | Out-String | Invoke-Expression" -Pattern 'fnm env'
+}
+
+function Enable-StarshipPowerShellProfile {
+    Add-PowerShellProfileLine -Line "if (Get-Command starship -ErrorAction SilentlyContinue) { Invoke-Expression (&starship init powershell) }" -Pattern 'starship init powershell'
 }
 
 function Ensure-NodeLts {
@@ -82,6 +94,81 @@ function Ensure-NodeLts {
 }
 
 Ensure-NodeLts
+Enable-StarshipPowerShellProfile
+
+function Set-WindowsTerminalGitBashDefault {
+    $settingsPaths = @(
+        (Join-Path $env:LOCALAPPDATA "Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"),
+        (Join-Path $env:LOCALAPPDATA "Packages\Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe\LocalState\settings.json"),
+        (Join-Path $env:LOCALAPPDATA "Microsoft\Windows Terminal\settings.json")
+    )
+
+    $gitBash = Join-Path $env:ProgramFiles "Git\bin\bash.exe"
+    if (-not (Test-Path $gitBash)) {
+        Write-Warning "Git Bash not found at $gitBash; Windows Terminal default profile was not changed."
+        return
+    }
+
+    $profileGuid = "{4bf3b55f-8f52-45ff-93f8-5f4a191e3f3e}"
+    foreach ($settingsPath in $settingsPaths) {
+        if (-not (Test-Path $settingsPath)) { continue }
+
+        try {
+            $settings = Get-Content $settingsPath -Raw | ConvertFrom-Json
+        }
+        catch {
+            Write-Warning "Could not parse Windows Terminal settings at $settingsPath"
+            continue
+        }
+
+        if ($null -eq $settings.profiles) {
+            $settings | Add-Member -NotePropertyName profiles -NotePropertyValue ([pscustomobject]@{ list = @() }) -Force
+        }
+        if ($null -eq $settings.profiles.list) {
+            $settings.profiles | Add-Member -NotePropertyName list -NotePropertyValue @() -Force
+        }
+        if ($null -eq $settings.profiles.defaults) {
+            $settings.profiles | Add-Member -NotePropertyName defaults -NotePropertyValue ([pscustomobject]@{}) -Force
+        }
+        if ($null -eq $settings.profiles.defaults.font) {
+            $settings.profiles.defaults | Add-Member -NotePropertyName font -NotePropertyValue ([pscustomobject]@{ face = "MesloLGS NF" }) -Force
+        }
+        else {
+            $settings.profiles.defaults.font | Add-Member -NotePropertyName face -NotePropertyValue "MesloLGS NF" -Force
+        }
+
+        $profileList = @($settings.profiles.list)
+        $profile = $profileList | Where-Object { $_.guid -eq $profileGuid -or $_.name -eq "Git Bash" } | Select-Object -First 1
+        if (-not $profile) {
+            $profile = [pscustomobject]@{
+                guid = $profileGuid
+                name = "Git Bash"
+                commandline = "`"$gitBash`" -i -l"
+                startingDirectory = "%USERPROFILE%"
+                icon = "%PROGRAMFILES%\Git\mingw64\share\git\git-for-windows.ico"
+                font = [pscustomobject]@{ face = "MesloLGS NF" }
+            }
+            $settings.profiles.list = @($profileList + $profile)
+        }
+        else {
+            $profile | Add-Member -NotePropertyName guid -NotePropertyValue $profileGuid -Force
+            $profile | Add-Member -NotePropertyName name -NotePropertyValue "Git Bash" -Force
+            $profile | Add-Member -NotePropertyName commandline -NotePropertyValue "`"$gitBash`" -i -l" -Force
+            $profile | Add-Member -NotePropertyName startingDirectory -NotePropertyValue "%USERPROFILE%" -Force
+            $profile | Add-Member -NotePropertyName icon -NotePropertyValue "%PROGRAMFILES%\Git\mingw64\share\git\git-for-windows.ico" -Force
+            if ($null -eq $profile.font) {
+                $profile | Add-Member -NotePropertyName font -NotePropertyValue ([pscustomobject]@{ face = "MesloLGS NF" }) -Force
+            }
+            else {
+                $profile.font | Add-Member -NotePropertyName face -NotePropertyValue "MesloLGS NF" -Force
+            }
+        }
+
+        $settings | Add-Member -NotePropertyName defaultProfile -NotePropertyValue $profileGuid -Force
+        $settings | ConvertTo-Json -Depth 100 | Set-Content -Path $settingsPath -Encoding utf8
+        Write-Host "Set Windows Terminal default profile to Git Bash in $settingsPath"
+    }
+}
 
 function Install-UserFonts {
     param(
@@ -255,10 +342,12 @@ Install-UserFonts -FontDir (Join-Path $Dotfiles "fonts")
 # Links specific to Windows setup
 New-SafeLink -Src (Join-Path $Dotfiles "config/helix/config.toml") -Dst (Join-Path $Roaming "helix/config.toml")
 New-SafeLink -Src (Join-Path $Dotfiles "config/helix/languages.toml") -Dst (Join-Path $Roaming "helix/languages.toml")
+New-SafeLink -Src (Join-Path $Dotfiles "shells/.bashrc") -Dst (Join-Path $UserHome ".bashrc")
 New-SafeLink -Src (Join-Path $Dotfiles "shells/config.nu") -Dst (Join-Path $Roaming "nushell/config.nu")
 New-SafeLink -Src (Join-Path $Dotfiles "config/starship/nushell/starship.toml") -Dst (Join-Path $UserHome ".config/starship.toml")
 New-SafeLink -Src (Join-Path $Dotfiles "config/yazi") -Dst (Join-Path $Roaming "yazi/config")
 New-SafeLink -Src (Join-Path $Dotfiles "config/ncspot/config.toml") -Dst (Join-Path $Roaming "ncspot/config.toml")
+Set-WindowsTerminalGitBashDefault
 
 # Ensure ~/.gitconfig exists (copy, don't symlink)
 $srcGitCfg = Join-Path $Dotfiles "config/git/gitconfig"

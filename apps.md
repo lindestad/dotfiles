@@ -122,11 +122,13 @@ These are not package installs, but the installers manage them alongside the too
 | Config | Linux/WSL | Windows |
 | --- | --- | --- |
 | Alacritty | non-WSL Linux only | not linked |
+| Bash profile | Ubuntu only | linked/copied |
 | Git config | copied if missing | copied if missing |
 | Helix | symlinked | linked/copied |
 | Kanata | optional | optional |
 | ncspot | symlinked | linked/copied |
 | Nushell | Ubuntu only | linked/copied |
 | Starship | symlinked | linked/copied |
+| Windows Terminal | not managed | Git Bash profile/default configured when settings exist |
 | Yazi | symlinked | linked/copied |
 | Zsh | symlinked | not linked |
