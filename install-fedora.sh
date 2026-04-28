@@ -11,6 +11,7 @@ ensure_not_root
 DNF_PKGS=(
   zsh
   curl
+  unzip
   fontconfig
   helix
   eza
@@ -81,6 +82,7 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
 fi
 ensure_rust_toolchain
 ensure_starship
+ensure_node_lts
 install_fonts
 
 echo "==> Creating config symlinks..."

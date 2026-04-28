@@ -174,3 +174,10 @@ export GREP_COLOR='1;32'
 # Less with colors
 export LESS='-R'
 export LESSHISTFILE=-
+
+# fnm (Fast Node Manager)
+export PATH="$HOME/.local/share/fnm:$PATH"
+
+if command -v fnm >/dev/null 2>&1; then
+  eval "$(fnm env --use-on-cd --shell zsh)"
+fi

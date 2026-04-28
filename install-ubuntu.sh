@@ -11,6 +11,7 @@ ensure_not_root
 APT_PKGS_COMMON=(
   zsh
   curl
+  unzip
   ca-certificates
   fontconfig
   ripgrep
@@ -84,6 +85,7 @@ fi
 ensure_shell_shims
 ensure_rust_toolchain
 ensure_starship
+ensure_node_lts
 install_fonts
 
 KANATA_CONFIG_SRC=""

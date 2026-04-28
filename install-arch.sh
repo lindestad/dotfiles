@@ -11,6 +11,7 @@ ensure_not_root
 PACMAN_PKGS=(
   zsh
   curl
+  unzip
   fontconfig
   helix
   eza
@@ -80,6 +81,7 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
 fi
 ensure_rust_toolchain
 ensure_starship
+ensure_node_lts
 install_fonts
 
 if ((${#AUR_PKGS[@]})); then

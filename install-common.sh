@@ -250,6 +250,33 @@ ensure_starship() {
   cargo install --locked starship
 }
 
+ensure_fnm() {
+  if have fnm; then
+    return
+  fi
+
+  if ! have curl || ! have unzip; then
+    echo "!! curl and unzip are required to install fnm."
+    return 1
+  fi
+
+  echo "==> Installing fnm..."
+  curl -fsSL https://fnm.vercel.app/install | bash -s -- --install-dir "$HOME/.local/share/fnm" --skip-shell
+  export PATH="$HOME/.local/share/fnm:$PATH"
+}
+
+ensure_node_lts() {
+  ensure_fnm
+
+  if fnm default >/dev/null 2>&1; then
+    return
+  fi
+
+  echo "==> Installing default Node.js LTS with fnm..."
+  fnm install --lts
+  fnm default lts-latest
+}
+
 install_fonts() {
   local src_dir="$DOTFILES_DIR/fonts"
   local dst_dir="$HOME/.local/share/fonts"

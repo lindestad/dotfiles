@@ -17,6 +17,7 @@ $apps = @(
     "GitHub.cli",
     "Nushell.Nushell",
     "Git.Git",
+    "Schniz.fnm",
     "jftuga.less",
     "dandavison.delta",
     "Microsoft.PowerShell",
@@ -30,6 +31,55 @@ $apps = @(
 foreach ($app in $apps) {
     winget install --id $app --accept-source-agreements --accept-package-agreements -e
 }
+
+function Get-WinGetLinkedCommand {
+    param(
+        [Parameter(Mandatory)] [string]$Name
+    )
+
+    $cmd = Get-Command $Name -ErrorAction SilentlyContinue
+    if ($cmd) { return $cmd.Source }
+
+    $shim = Join-Path $env:LOCALAPPDATA "Microsoft\WinGet\Links\$Name.exe"
+    if (Test-Path $shim) { return $shim }
+
+    return $null
+}
+
+function Enable-FnmPowerShellProfile {
+    $profilePath = $PROFILE.CurrentUserCurrentHost
+    $profileDir = Split-Path $profilePath
+    New-Item -ItemType Directory -Force -Path $profileDir | Out-Null
+
+    $line = "fnm env --use-on-cd | Out-String | Invoke-Expression"
+    if (Test-Path $profilePath) {
+        $existing = Get-Content $profilePath -Raw
+        if ($existing -notmatch 'fnm env') {
+            Add-Content -Path $profilePath -Value "`n$line`n"
+        }
+    }
+    else {
+        Set-Content -Path $profilePath -Value $line
+    }
+}
+
+function Ensure-NodeLts {
+    $fnm = Get-WinGetLinkedCommand -Name "fnm"
+    if (-not $fnm) {
+        Write-Warning "fnm not found yet. Start a new shell and run: fnm install --lts; fnm default lts-latest"
+        return
+    }
+
+    $defaultNode = & $fnm default 2>$null
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($defaultNode)) {
+        & $fnm install --lts
+        & $fnm default lts-latest
+    }
+
+    Enable-FnmPowerShellProfile
+}
+
+Ensure-NodeLts
 
 function Install-UserFonts {
     param(
@@ -84,15 +134,7 @@ else {
 }
 
 # Locate carapace (works even before a new shell picks up PATH)
-$carapaceCmd = Get-Command carapace -ErrorAction SilentlyContinue
-$carapace = $null
-if ($carapaceCmd) {
-    $carapace = $carapaceCmd.Source
-}
-if (-not $carapace) {
-    $carapaceShim = Join-Path $env:LOCALAPPDATA "Microsoft\WinGet\Links\carapace.exe"
-    if (Test-Path $carapaceShim) { $carapace = $carapaceShim }
-}
+$carapace = Get-WinGetLinkedCommand -Name "carapace"
 
 if ($carapace) {
     # Write UTF-8 *without BOM* in both PS 5.1 and PS 7+
