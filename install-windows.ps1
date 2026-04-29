@@ -375,6 +375,37 @@ function New-SafeLink {
     }
 }
 
+function Ensure-GitBashProfile {
+    param(
+        [Parameter(Mandatory)] [string]$UserHome
+    )
+
+    $bashProfile = Join-Path $UserHome ".bash_profile"
+    $bashLogin = Join-Path $UserHome ".bash_login"
+    $profile = Join-Path $UserHome ".profile"
+    $bashrc = Join-Path $UserHome ".bashrc"
+
+    if ((Test-Path $bashProfile) -or (Test-Path $bashLogin) -or (Test-Path $profile)) {
+        Write-Host "Existing Bash login profile detected; leaving as-is."
+        return
+    }
+
+    if (-not (Test-Path $bashrc)) {
+        Write-Warning "Cannot create ~/.bash_profile because ~/.bashrc does not exist yet."
+        return
+    }
+
+    $content = @'
+# Load interactive Bash config for Git Bash login shells.
+if [ -f ~/.bashrc ]; then
+  . ~/.bashrc
+fi
+'@
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($bashProfile, $content, $utf8NoBom)
+    Write-Host "Created $bashProfile"
+}
+
 $Dotfiles = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $UserHome = [Environment]::GetFolderPath('UserProfile')
 $Roaming = [Environment]::GetFolderPath('ApplicationData')
@@ -385,6 +416,7 @@ Install-UserFonts -FontDir (Join-Path $Dotfiles "fonts")
 New-SafeLink -Src (Join-Path $Dotfiles "config/helix/config.toml") -Dst (Join-Path $Roaming "helix/config.toml")
 New-SafeLink -Src (Join-Path $Dotfiles "config/helix/languages.toml") -Dst (Join-Path $Roaming "helix/languages.toml")
 New-SafeLink -Src (Join-Path $Dotfiles "shells/.bashrc") -Dst (Join-Path $UserHome ".bashrc")
+Ensure-GitBashProfile -UserHome $UserHome
 New-SafeLink -Src (Join-Path $Dotfiles "shells/config.nu") -Dst (Join-Path $Roaming "nushell/config.nu")
 New-SafeLink -Src (Join-Path $Dotfiles "config/starship/nushell/starship.toml") -Dst (Join-Path $UserHome ".config/starship.toml")
 New-SafeLink -Src (Join-Path $Dotfiles "config/yazi") -Dst (Join-Path $Roaming "yazi/config")
