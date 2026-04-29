@@ -43,10 +43,13 @@ These are installed only by the Linux/WSL shell installers.
 | --- | --- | --- | --- | --- |
 | bottom/btm | `bottom` | `btm` | cargo fallback | `btm` |
 | btop | `btop` | `btop` | `btop` | `btop` |
+| build tools | not installed | `build-essential` | `gcc`, `make` | `build-essential` |
 | ca-certificates | not installed | `ca-certificates` | not installed | `ca-certificates` |
 | curl | `curl` | `curl` | `curl` | `curl` |
 | fontconfig | `fontconfig` | `fontconfig` | `fontconfig` | `fontconfig` |
 | htop | `htop` | `htop` | `htop` | `htop` |
+| OpenSSL headers | not installed | `libssl-dev` | `openssl-devel` | `libssl-dev` |
+| pkg-config | not installed | `pkg-config` | `pkgconf-pkg-config` | `pkg-config` |
 | rustup/cargo | install script | install script | install script | install script |
 | unzip | `unzip` | `unzip` | `unzip` | `unzip` |
 | user fonts | bundled fonts copied to `~/.local/share/fonts` | same | same | same |
@@ -64,19 +67,11 @@ These are the main package naming differences to check when adding support for a
 | ImageMagick | `imagemagick` | `imagemagick` | `ImageMagick` |
 | lm sensors | `lm_sensors` | `lm-sensors` | `lm_sensors` |
 | network applet | `network-manager-applet` | `network-manager-gnome` | `NetworkManager-applet` |
+| OpenSSL headers | not installed | `libssl-dev` | `openssl-devel` |
 | p7zip | `p7zip` | `p7zip-full` | `p7zip`, `p7zip-plugins` |
+| pkg-config | not installed | `pkg-config` | `pkgconf-pkg-config` |
 | pipx | `python-pipx` | `pipx` | `pipx` |
 | Python | `python` | `python3`, `python3.12`, `python3.12-venv` | `python3.12` |
-
-## WSL-only
-
-These packages are only in `install-wsl.sh`.
-
-| Tool | Package |
-| --- | --- |
-| build tools | `build-essential` |
-| OpenSSL headers | `libssl-dev` |
-| pkg-config | `pkg-config` |
 
 ## Optional Linux Desktop
 

@@ -13,6 +13,9 @@ APT_PKGS_COMMON=(
   curl
   unzip
   ca-certificates
+  build-essential
+  pkg-config
+  libssl-dev
   fontconfig
   ripgrep
   fd-find

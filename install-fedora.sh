@@ -12,6 +12,10 @@ DNF_PKGS=(
   zsh
   curl
   unzip
+  gcc
+  make
+  pkgconf-pkg-config
+  openssl-devel
   fontconfig
   helix
   eza
