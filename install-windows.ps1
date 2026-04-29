@@ -20,6 +20,7 @@ $apps = @(
     "Git.Git",
     "Schniz.fnm",
     "Python.Python.3.12",
+    "Typst.Typst",
     "astral-sh.uv",
     "jftuga.less",
     "dandavison.delta",

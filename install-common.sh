@@ -260,6 +260,16 @@ ensure_bottom() {
   cargo install --locked bottom
 }
 
+ensure_typst_cli() {
+  if have typst; then
+    return
+  fi
+
+  ensure_rust_toolchain
+  echo "==> Installing Typst CLI with cargo..."
+  cargo install --locked typst-cli
+}
+
 ensure_fnm() {
   if have fnm; then
     return

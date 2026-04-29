@@ -89,6 +89,7 @@ fi
 ensure_rust_toolchain
 ensure_starship
 ensure_bottom
+ensure_typst_cli
 ensure_node_lts
 ensure_uv
 install_fonts

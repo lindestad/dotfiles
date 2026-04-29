@@ -37,6 +37,7 @@ PACMAN_PKGS=(
   vivid
   python
   python-pipx
+  typst
   uv
 )
 

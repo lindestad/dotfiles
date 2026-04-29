@@ -29,6 +29,7 @@ These tools are installed on at least one Linux installer and on Windows.
 | ripgrep | `ripgrep` | `ripgrep` | `ripgrep` | `ripgrep` | `BurntSushi.ripgrep.MSVC` |
 | ShellCheck | `shellcheck` | `shellcheck` | `ShellCheck` | `shellcheck` | `koalaman.shellcheck` |
 | starship | cargo fallback | cargo fallback | cargo fallback | cargo fallback | `Starship.Starship` |
+| Typst CLI | `typst` | cargo fallback | cargo fallback | cargo fallback | `Typst.Typst` |
 | uutils coreutils | `uutils-coreutils` | `uutils-coreutils` (optional) | `uutils-coreutils` (optional) | not installed | `uutils.coreutils` |
 | uv | `uv` | standalone installer | `uv` with standalone fallback | standalone installer | `astral-sh.uv` |
 | yazi | `yazi` | `yazi` (optional) | `yazi` (optional) | `yazi` (optional) | `sxyazi.yazi` |
