@@ -181,3 +181,11 @@ export PATH="$HOME/.local/share/fnm:$PATH"
 if command -v fnm >/dev/null 2>&1; then
   eval "$(fnm env --use-on-cd --shell zsh)"
 fi
+
+####--------------------------------------------------
+#### Host-local additions
+####--------------------------------------------------
+# Machine-specific exports belong here instead of in the shared dotfiles repo.
+if [ -f "$HOME/.zshrc.local" ]; then
+  source "$HOME/.zshrc.local"
+fi
