@@ -270,6 +270,47 @@ ensure_typst_cli() {
   cargo install --locked typst-cli
 }
 
+ensure_yazi_cargo() {
+  if have yazi && have ya; then
+    return
+  fi
+
+  ensure_rust_toolchain
+  echo "==> Installing Yazi with cargo..."
+  cargo install --force yazi-build
+}
+
+ensure_ncspot_cargo() {
+  if have ncspot; then
+    return
+  fi
+
+  ensure_rust_toolchain
+  echo "==> Installing ncspot with cargo..."
+  cargo install --locked ncspot
+}
+
+ensure_vivid_cargo() {
+  if have vivid; then
+    return
+  fi
+
+  ensure_rust_toolchain
+  echo "==> Installing vivid with cargo..."
+  cargo install --locked vivid
+}
+
+ensure_carapace_nushell_init() {
+  if ! have carapace; then
+    return
+  fi
+
+  local cache_dir="$HOME/.cache/carapace"
+  mkdir -p "$cache_dir"
+  echo "==> Generating carapace Nushell completions..."
+  carapace _carapace nushell > "$cache_dir/init.nu"
+}
+
 ensure_fnm() {
   if have fnm; then
     return

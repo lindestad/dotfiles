@@ -8,9 +8,9 @@ These tools are installed on at least one Linux installer and on Windows.
 
 | Tool | Arch | Ubuntu | Fedora | WSL | Windows |
 | --- | --- | --- | --- | --- | --- |
-| 7zip/p7zip | `p7zip` | `p7zip-full` | `p7zip`, `p7zip-plugins` | `p7zip-full` | `7zip.7zip` |
+| 7zip/p7zip | `p7zip` | `p7zip-full` | `7zip` | `p7zip-full` | `7zip.7zip` |
 | bat | `bat` | `bat` | `bat` | `bat` | `sharkdp.bat` |
-| carapace | `carapace-bin` (AUR) | `carapace` (optional) | `carapace` (optional) | not installed | `rsteube.Carapace` |
+| carapace | `carapace-bin` (AUR) | `carapace` (optional) | prompted upstream `carapace-bin` RPM repo | not installed | `rsteube.Carapace` |
 | eza | `eza` | `eza` (optional) | `eza` | `eza` (optional) | `eza-community.eza` |
 | fd | `fd` | `fd-find` | `fd-find` | `fd-find` | `sharkdp.fd` |
 | ffmpeg | `ffmpeg` | `ffmpeg` | `ffmpeg-free` | `ffmpeg` | `Gyan.FFmpeg` |
@@ -22,7 +22,7 @@ These tools are installed on at least one Linux installer and on Windows.
 | helix | `helix` | `helix` (optional) | `helix` | release `.deb` fallback | `Helix.Helix` |
 | imagemagick | `imagemagick` | `imagemagick` | `ImageMagick` | `imagemagick` | `ImageMagick.ImageMagick` |
 | jq | `jq` | `jq` | `jq` | `jq` | `jqlang.jq` |
-| ncspot | `ncspot` | `ncspot` (optional) | `ncspot` (optional) | `ncspot` (optional) | `hrkfdn.ncspot` |
+| ncspot | `ncspot` | `ncspot` (optional) | cargo fallback | `ncspot` (optional) | `hrkfdn.ncspot` |
 | Node.js LTS | via fnm | via fnm | via fnm | via fnm | via fnm |
 | pipx | `python-pipx` | `pipx` | `pipx` | `pipx` | installed with `py -3.12 -m pip install --user pipx` |
 | Python | `python` | `python3`, `python3.12`, `python3.12-venv` | `python3.12` | `python3`, `python3.12`, `python3.12-venv` | `Python.Python.3.12` |
@@ -32,7 +32,7 @@ These tools are installed on at least one Linux installer and on Windows.
 | Typst CLI | `typst` | cargo fallback | cargo fallback | cargo fallback | `Typst.Typst` |
 | uutils coreutils | `uutils-coreutils` | `uutils-coreutils` (optional) | `uutils-coreutils` (optional) | not installed | `uutils.coreutils` |
 | uv | `uv` | standalone installer | `uv` with standalone fallback | standalone installer | `astral-sh.uv` |
-| yazi | `yazi` | `yazi` (optional) | `yazi` (optional) | `yazi` (optional) | `sxyazi.yazi` |
+| yazi | `yazi` | `yazi` (optional) | cargo fallback | `yazi` (optional) | `sxyazi.yazi` |
 | zoxide | `zoxide` | `zoxide` | `zoxide` | `zoxide` | `ajeetdsouza.zoxide` |
 
 ## Linux-only
@@ -53,7 +53,7 @@ These are installed only by the Linux/WSL shell installers.
 | rustup/cargo | install script | install script | install script | install script |
 | unzip | `unzip` | `unzip` | `unzip` | `unzip` |
 | user fonts | bundled fonts copied to `~/.local/share/fonts` | same | same | same |
-| vivid | `vivid` | `vivid` (optional) | `vivid` (optional) | `vivid` (optional) |
+| vivid | `vivid` | `vivid` (optional) | cargo fallback | `vivid` (optional) |
 | zsh | `zsh` | `zsh` | `zsh` | `zsh` |
 
 ## Distro-specific
@@ -68,7 +68,7 @@ These are the main package naming differences to check when adding support for a
 | lm sensors | `lm_sensors` | `lm-sensors` | `lm_sensors` |
 | network applet | `network-manager-applet` | `network-manager-gnome` | `NetworkManager-applet` |
 | OpenSSL headers | not installed | `libssl-dev` | `openssl-devel` |
-| p7zip | `p7zip` | `p7zip-full` | `p7zip`, `p7zip-plugins` |
+| p7zip | `p7zip` | `p7zip-full` | `7zip` |
 | pkg-config | not installed | `pkg-config` | `pkgconf-pkg-config` |
 | pipx | `python-pipx` | `pipx` | `pipx` |
 | Python | `python` | `python3`, `python3.12`, `python3.12-venv` | `python3.12` |

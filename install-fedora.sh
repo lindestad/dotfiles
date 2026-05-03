@@ -22,8 +22,7 @@ DNF_PKGS=(
   ripgrep
   fd-find
   ffmpeg-free
-  p7zip
-  p7zip-plugins
+  7zip
   jq
   bat
   htop
@@ -38,6 +37,13 @@ DNF_PKGS=(
   python3.12
   pipx
   uv
+)
+
+NCSPOT_BUILD_DNF_PKGS=(
+  pulseaudio-libs-devel
+  libxcb-devel
+  ncurses-devel
+  dbus-devel
 )
 
 NIRI_DNF_PKGS=(
@@ -57,12 +63,38 @@ NIRI_DNF_PKGS=(
 )
 
 DNF_PKGS_OPTIONAL=(
-  yazi
   uutils-coreutils
-  ncspot
-  vivid
-  carapace
 )
+
+ensure_carapace_fedora() {
+  if have carapace; then
+    ensure_carapace_nushell_init
+    return
+  fi
+
+  echo ">> carapace is not available from Fedora's default repos."
+  if [[ "$ASSUME_YES" == "yes" ]]; then
+    echo ">> Skipping carapace-bin RPM repo setup in non-interactive mode."
+    return
+  fi
+  if [[ "$(prompt_yes_no "Install carapace-bin from the upstream Gemfury RPM repo?")" != "yes" ]]; then
+    return
+  fi
+
+  echo "==> Adding carapace-bin Gemfury RPM repo..."
+  sudo tee /etc/yum.repos.d/carapace-fury.repo >/dev/null <<'EOF'
+[carapace-fury]
+name=carapace-bin Gemfury RPM repository
+baseurl=https://yum.fury.io/rsteube/
+enabled=1
+gpgcheck=0
+EOF
+
+  echo "==> Installing carapace-bin..."
+  sudo dnf makecache -y || true
+  sudo dnf install -y carapace-bin
+  ensure_carapace_nushell_init
+}
 
 LINKS=()
 add_common_cli_links
@@ -94,6 +126,14 @@ ensure_rust_toolchain
 ensure_starship
 ensure_bottom
 ensure_typst_cli
+ensure_yazi_cargo
+ensure_vivid_cargo
+if ! have ncspot; then
+  echo "==> Installing ncspot build dependencies..."
+  install_dnf "${NCSPOT_BUILD_DNF_PKGS[@]}"
+fi
+ensure_ncspot_cargo
+ensure_carapace_fedora
 ensure_node_lts
 ensure_uv
 install_fonts
