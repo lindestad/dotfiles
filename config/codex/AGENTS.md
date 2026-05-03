@@ -2,9 +2,7 @@
 
 ## General
 
-- Read the relevant repo context before making changes; prefer existing project patterns over new abstractions.
 - Reproduce the real failing path first when debugging.
-- Keep edits narrowly scoped to the user's request and avoid unrelated refactors.
 - If asked to get familiar with a repo, do a read-only orientation pass first.
 - If a task depends on recent repo work, inspect recent `git log` first.
 - Never revert user changes unless explicitly asked.
@@ -24,9 +22,3 @@
 - Avoid excessive headings and boilerplate.
 - For PR reviews, lead with bugs, risks, regressions, and missing tests.
 
-## Dotfiles
-
-- In this repo, keep `apps.md` aligned with installer-managed packages and config links.
-- Keep README high level and route package details to `apps.md`.
-- Keep optional desktop stack pieces behind explicit flags like `--niri` and `--kanata`.
-- Mirror behavior across shell and PowerShell installers when both platforms are affected.
