@@ -124,6 +124,7 @@ These are not package installs, but the installers manage them alongside the too
 | --- | --- | --- |
 | Alacritty | non-WSL Linux only | not linked |
 | Bash profile | Ubuntu only | `.bashrc` linked/copied; `.bash_profile` created if no login profile exists |
+| Codex instructions | symlinked | linked/copied |
 | Git config | copied if missing | copied if missing |
 | Helix | symlinked | linked/copied |
 | Kanata | optional | optional |
