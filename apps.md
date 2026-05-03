@@ -9,6 +9,7 @@ These tools are installed on at least one Linux installer and on Windows.
 | Tool | Arch | Ubuntu | Fedora | WSL | Windows |
 | --- | --- | --- | --- | --- | --- |
 | 7zip/p7zip | `p7zip` | `p7zip-full` | `7zip` | `p7zip-full` | `7zip.7zip` |
+| Alacritty | not installed | not installed | `alacritty` | not installed | not installed |
 | bat | `bat` | `bat` | `bat` | `bat` | `sharkdp.bat` |
 | carapace | `carapace-bin` (AUR) | `carapace` (optional) | prompted upstream `carapace-bin` RPM repo | not installed | `rsteube.Carapace` |
 | eza | `eza` | `eza` (optional) | `eza` | `eza` (optional) | `eza-community.eza` |

@@ -17,6 +17,7 @@ DNF_PKGS=(
   pkgconf-pkg-config
   openssl-devel
   fontconfig
+  alacritty
   helix
   eza
   ripgrep
