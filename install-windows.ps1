@@ -414,6 +414,7 @@ Install-UserFonts -FontDir (Join-Path $Dotfiles "fonts")
 
 # Links specific to Windows setup
 New-SafeLink -Src (Join-Path $Dotfiles "config/codex/AGENTS.md") -Dst (Join-Path $UserHome ".codex/AGENTS.md")
+New-SafeLink -Src (Join-Path $Dotfiles "config/git/ignore") -Dst (Join-Path $UserHome ".config/git/ignore")
 New-SafeLink -Src (Join-Path $Dotfiles "config/helix/config.toml") -Dst (Join-Path $Roaming "helix/config.toml")
 New-SafeLink -Src (Join-Path $Dotfiles "config/helix/languages.toml") -Dst (Join-Path $Roaming "helix/languages.toml")
 New-SafeLink -Src (Join-Path $Dotfiles "shells/.bashrc") -Dst (Join-Path $UserHome ".bashrc")
@@ -424,20 +425,53 @@ New-SafeLink -Src (Join-Path $Dotfiles "config/yazi") -Dst (Join-Path $Roaming "
 New-SafeLink -Src (Join-Path $Dotfiles "config/ncspot/config.toml") -Dst (Join-Path $Roaming "ncspot/config.toml")
 Set-WindowsTerminalGitBashDefault
 
-# Ensure ~/.gitconfig exists (copy, don't symlink)
+function Merge-GitConfig {
+    param(
+        [Parameter(Mandatory)] [string]$Src,
+        [Parameter(Mandatory)] [string]$Dst
+    )
+
+    if (-not (Test-Path $Src)) {
+        Write-Warning "Source gitconfig not found at $Src"
+        return
+    }
+
+    if (-not (Test-Path $Dst)) {
+        Copy-Item $Src $Dst -Force
+        Write-Host "Copied gitconfig to $Dst"
+        return
+    }
+
+    if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+        Write-Warning "git not found; cannot merge gitconfig into $Dst"
+        return
+    }
+
+    $entries = & git config --file $Src --list
+    foreach ($entry in $entries) {
+        $separator = $entry.IndexOf("=")
+        if ($separator -lt 0) { continue }
+
+        $key = $entry.Substring(0, $separator)
+        $value = $entry.Substring($separator + 1)
+        $existing = & git config --global --get $key 2>$null
+
+        if ($LASTEXITCODE -eq 0) {
+            $existingValue = $existing -join "`n"
+            if ($existingValue -ne $value) {
+                Write-Warning "~/.gitconfig already has $key=$existingValue; leaving desired value unapplied: $value"
+            }
+        }
+        else {
+            & git config --global $key $value
+            Write-Host "Added git config $key"
+        }
+    }
+}
+
+# Ensure ~/.gitconfig exists and contains repo-managed defaults without overwriting user values
 $srcGitCfg = Join-Path $Dotfiles "config/git/gitconfig"
 $dstGitCfg = Join-Path $UserHome ".gitconfig"
-if (-not (Test-Path $dstGitCfg)) {
-    if (Test-Path $srcGitCfg) {
-        Copy-Item $srcGitCfg $dstGitCfg -Force
-        Write-Host "Copied gitconfig to $dstGitCfg"
-    }
-    else {
-        Write-Warning "Source gitconfig not found at $srcGitCfg"
-    }
-}
-else {
-    Write-Host "Existing ~/.gitconfig detected; leaving as-is."
-}
+Merge-GitConfig -Src $srcGitCfg -Dst $dstGitCfg
 
 Write-Host "Windows config links completed."

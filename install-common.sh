@@ -123,6 +123,7 @@ install_flag_args() {
 add_common_cli_links() {
   LINKS+=(
     "$DOTFILES_DIR/config/codex/AGENTS.md|$HOME/.codex/AGENTS.md"
+    "$DOTFILES_DIR/config/git/ignore|$HOME/.config/git/ignore"
     "$DOTFILES_DIR/config/helix/config.toml|$HOME/.config/helix/config.toml"
     "$DOTFILES_DIR/config/helix/languages.toml|$HOME/.config/helix/languages.toml"
     "$DOTFILES_DIR/config/starship/zsh/starship.toml|$HOME/.config/starship.toml"
@@ -433,16 +434,37 @@ copy_gitconfig() {
   local src="$DOTFILES_DIR/config/git/gitconfig"
   local dst="$HOME/.gitconfig"
 
-  if [[ ! -f "$dst" ]]; then
-    if [[ -f "$src" ]]; then
-      cp "$src" "$dst"
-      echo "-> Copied gitconfig to ~/.gitconfig"
-    else
-      echo "!! Source gitconfig not found at $src"
-    fi
-  else
-    echo "== ~/.gitconfig exists; leaving as-is."
+  if [[ ! -f "$src" ]]; then
+    echo "!! Source gitconfig not found at $src"
+    return
   fi
+
+  if [[ ! -f "$dst" ]]; then
+    cp "$src" "$dst"
+    echo "-> Copied gitconfig to ~/.gitconfig"
+    return
+  fi
+
+  if ! have git; then
+    echo "!! git not found; cannot merge gitconfig into ~/.gitconfig"
+    return
+  fi
+
+  local entry key value existing
+  while IFS= read -r entry; do
+    [[ "$entry" == *=* ]] || continue
+    key="${entry%%=*}"
+    value="${entry#*=}"
+
+    if existing="$(git config --global --get "$key" 2>/dev/null)"; then
+      if [[ "$existing" != "$value" ]]; then
+        echo "!! ~/.gitconfig already has $key=$existing; leaving desired value unapplied: $value"
+      fi
+    else
+      git config --global "$key" "$value"
+      echo "-> Added git config $key"
+    fi
+  done < <(git config --file "$src" --list)
 }
 
 ensure_zsh_default_shell() {
