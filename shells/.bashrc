@@ -98,6 +98,7 @@ fi
 
 alias rg='rg --hidden --glob "!.git"'
 alias fd='fd --hidden --exclude .git'
+alias svenv='source .venv/bin/activate'
 
 alias gs='git status'
 alias ga='git add'

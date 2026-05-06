@@ -88,6 +88,10 @@ alias lzta = eza --tree --long --icons --group-directories-first --git --level=3
 alias b = bat --style numbers,grid
 alias cat = bat --plain
 
+def --env svenv [] {
+  overlay use .venv/bin/activate.nu
+}
+
 
 # AUTOCOMPLETIONS
 # Check the path is correct
