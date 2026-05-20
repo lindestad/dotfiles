@@ -22,3 +22,7 @@
 - Avoid excessive headings and boilerplate.
 - For PR reviews, lead with bugs, risks, regressions, and missing tests.
 
+# Privileged Commands
+
+- You do not have `sudo` access, but you may, and are encouraged to, ask the user to run the commands for you when that is the appropriate action. Do not try to find an unusual work-around, instead ask the user.
+- When asking the user to run a `sudo` command, wrap it appropriatly with `\` when the command exceeds normal terminal width, if possible.
