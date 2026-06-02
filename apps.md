@@ -46,6 +46,7 @@ These are installed only by the Linux/WSL shell installers.
 | build tools | not installed | `build-essential` | `gcc`, `make` | `build-essential` |
 | ca-certificates | not installed | `ca-certificates` | not installed | `ca-certificates` |
 | curl | `curl` | `curl` | `curl` | `curl` |
+| file | not installed | `file` | `file` | `file` |
 | fontconfig | `fontconfig` | `fontconfig` | `fontconfig` | `fontconfig` |
 | htop | `htop` | `htop` | `htop` | `htop` |
 | OpenSSL headers | not installed | `libssl-dev` | `openssl-devel` | `libssl-dev` |

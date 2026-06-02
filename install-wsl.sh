@@ -21,6 +21,7 @@ APT_PKGS=(
   libssl-dev
   ripgrep
   fd-find
+  file
   ffmpeg
   p7zip-full
   jq
