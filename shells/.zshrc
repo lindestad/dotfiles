@@ -22,6 +22,8 @@ export VISUAL=hx
 
 # Colors
 autoload -U colors && colors
+# Advertise 24-bit color so apps like Helix render true-color themes (WSL/Windows Terminal don't set this).
+export COLORTERM=truecolor
 
 ####--------------------------------------------------
 #### Prompt / tools init

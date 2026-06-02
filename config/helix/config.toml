@@ -2,6 +2,7 @@ theme = "ayu_mirage"
 
 [editor]
 line-number = "relative"
+true-color = true
 
 [editor.cursor-shape]
 normal = "block"
