@@ -42,6 +42,7 @@ APT_PKGS=(
 
 APT_PKGS_OPTIONAL=(
   eza
+  carapace
   yazi
   git-delta
   vivid
