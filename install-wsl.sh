@@ -114,12 +114,17 @@ install_apt "${APT_PKGS[@]}" "${APT_PKGS_OPTIONAL[@]}"
 echo "==> Installing Rust and cargo tools..."
 ensure_rust_toolchain
 
+ensure_local_bin
 ensure_shell_shims
 ensure_starship
+ensure_bottom
+ensure_yazi_cargo
 ensure_typst_cli
 ensure_node_lts
 ensure_uv
 ensure_helix
+ensure_vivid_cargo
+ensure_carapace_nushell_init
 install_fonts
 
 echo "==> Creating WSL config symlinks..."
