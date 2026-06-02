@@ -159,18 +159,18 @@ rules = [
     { mime = "application/msword", fg = "#569CD6" },
     { mime = "application/vnd.openxmlformats-officedocument.*", fg = "#569CD6" },
     # Fallback
-    { name = "*", fg = "#D4D4D4" },
-    { name = "*/", fg = "#569CD6" },
+    { url = "*", fg = "#D4D4D4" },
+    { url = "*/", fg = "#569CD6" },
     # Executable
-    { name = "*", category = "executable", fg = "#0DBC79", bg = "#1E1E1E" },
+    { url = "*", is = "exec", fg = "#0DBC79", bg = "#1E1E1E" },
     # Directories
-    { name = "*/", fg = "#2472C8", bg = "#1E1E1E" },
+    { url = "*/", fg = "#2472C8", bg = "#1E1E1E" },
     # Hidden files
-    { name = ".*", fg = "#666666" },
+    { url = ".*", fg = "#666666" },
     # Symlinks
-    { name = "*", category = "link", fg = "#0DBC79", bg = "#1E1E1E" },
+    { url = "*", is = "link", fg = "#0DBC79", bg = "#1E1E1E" },
     # Broken symlinks
-    { name = "*", category = "broken", fg = "#CD3131", bg = "#3A1212" },
+    { url = "*", is = "orphan", fg = "#CD3131", bg = "#3A1212" },
 ]
 
 [icon]
