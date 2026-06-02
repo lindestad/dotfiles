@@ -59,7 +59,6 @@ APT_PKGS_OPTIONAL=(
   yazi
   git-delta
   uutils-coreutils
-  ncspot
   vivid
   cliphist
   carapace

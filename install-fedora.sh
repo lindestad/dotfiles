@@ -40,13 +40,6 @@ DNF_PKGS=(
   uv
 )
 
-NCSPOT_BUILD_DNF_PKGS=(
-  pulseaudio-libs-devel
-  libxcb-devel
-  ncurses-devel
-  dbus-devel
-)
-
 NIRI_DNF_PKGS=(
   lm_sensors
   brightnessctl
@@ -129,11 +122,6 @@ ensure_bottom
 ensure_typst_cli
 ensure_yazi_cargo
 ensure_vivid_cargo
-if ! have ncspot; then
-  echo "==> Installing ncspot build dependencies..."
-  install_dnf "${NCSPOT_BUILD_DNF_PKGS[@]}"
-fi
-ensure_ncspot_cargo
 ensure_carapace_fedora
 ensure_node_lts
 ensure_uv

@@ -26,7 +26,6 @@ $apps = @(
     "dandavison.delta",
     "Microsoft.PowerShell",
     "uutils.coreutils",
-    "hrkfdn.ncspot",
     # Kanata is optional; installed only if selected
     # "jtroo.kanata_gui",
     "rsteube.Carapace"
@@ -423,7 +422,6 @@ Ensure-GitBashProfile -UserHome $UserHome
 New-SafeLink -Src (Join-Path $Dotfiles "shells/config.nu") -Dst (Join-Path $Roaming "nushell/config.nu")
 New-SafeLink -Src (Join-Path $Dotfiles "config/starship/nushell/starship.toml") -Dst (Join-Path $UserHome ".config/starship.toml")
 New-SafeLink -Src (Join-Path $Dotfiles "config/yazi") -Dst (Join-Path $Roaming "yazi/config")
-New-SafeLink -Src (Join-Path $Dotfiles "config/ncspot/config.toml") -Dst (Join-Path $Roaming "ncspot/config.toml")
 Set-WindowsTerminalGitBashDefault
 
 function Merge-GitConfig {

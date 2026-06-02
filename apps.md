@@ -23,7 +23,6 @@ These tools are installed on at least one Linux installer and on Windows.
 | helix | `helix` | `helix` (optional) | `helix` | release `.deb` fallback | `Helix.Helix` |
 | imagemagick | `imagemagick` | `imagemagick` | `ImageMagick` | `imagemagick` | `ImageMagick.ImageMagick` |
 | jq | `jq` | `jq` | `jq` | `jq` | `jqlang.jq` |
-| ncspot | `ncspot` | `ncspot` (optional) | cargo fallback | `ncspot` (optional) | `hrkfdn.ncspot` |
 | Node.js LTS | via fnm | via fnm | via fnm | via fnm | via fnm |
 | pipx | `python-pipx` | `pipx` | `pipx` | `pipx` | installed with `py -3.12 -m pip install --user pipx` |
 | Python | `python` | `python3`, `python3.12`, `python3.12-venv` | `python3.12` | `python3`, `python3.12`, `python3.12-venv` | `Python.Python.3.12` |
@@ -129,7 +128,6 @@ These are not package installs, but the installers manage them alongside the too
 | Git global ignore | symlinked | linked/copied |
 | Helix | symlinked | linked/copied |
 | Kanata | optional | optional |
-| ncspot | symlinked | linked/copied |
 | Nushell | Ubuntu only | linked/copied |
 | Starship | symlinked | linked/copied |
 | Windows Terminal | not managed | Git Bash profile/default configured when settings exist |

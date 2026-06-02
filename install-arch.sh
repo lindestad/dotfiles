@@ -33,7 +33,6 @@ PACMAN_PKGS=(
   git-delta
   shellcheck
   uutils-coreutils
-  ncspot
   vivid
   python
   python-pipx

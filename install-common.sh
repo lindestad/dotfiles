@@ -129,7 +129,6 @@ add_common_cli_links() {
     "$DOTFILES_DIR/config/helix/languages.toml|$HOME/.config/helix/languages.toml"
     "$DOTFILES_DIR/config/starship/zsh/starship.toml|$HOME/.config/starship.toml"
     "$DOTFILES_DIR/config/yazi|$HOME/.config/yazi"
-    "$DOTFILES_DIR/config/ncspot/config.toml|$HOME/.config/ncspot/config.toml"
   )
 }
 
@@ -281,16 +280,6 @@ ensure_yazi_cargo() {
   ensure_rust_toolchain
   echo "==> Installing Yazi with cargo..."
   cargo install --force yazi-build
-}
-
-ensure_ncspot_cargo() {
-  if have ncspot; then
-    return
-  fi
-
-  ensure_rust_toolchain
-  echo "==> Installing ncspot with cargo..."
-  cargo install --locked ncspot
 }
 
 ensure_vivid_cargo() {

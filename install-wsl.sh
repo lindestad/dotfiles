@@ -44,7 +44,6 @@ APT_PKGS_OPTIONAL=(
   eza
   yazi
   git-delta
-  ncspot
   vivid
 )
 
