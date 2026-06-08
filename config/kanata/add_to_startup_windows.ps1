@@ -1,5 +1,13 @@
 $KanataExe = try { (Get-Command kanata_gui.exe -ErrorAction Stop).Source } catch { $null }
 
+# winget installs kanata with a versioned name (e.g. kanata_windows_gui_winIOv2_x64.exe);
+# fall back to any kanata*.exe found in the WinGet links folder.
+if (-not $KanataExe) {
+    $wingetLinks = Join-Path $env:LOCALAPPDATA "Microsoft\WinGet\Links"
+    $KanataExe = Get-ChildItem $wingetLinks -Filter "kanata*.exe" -ErrorAction SilentlyContinue |
+        Select-Object -First 1 -ExpandProperty FullName
+}
+
 if ($KanataExe -and (Test-Path $KanataExe)) {
     $WScriptShell = New-Object -ComObject WScript.Shell
     # Prefer a user-configured link in %AppData%\kanata\config.kbd, else fall back to repo config
