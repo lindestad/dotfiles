@@ -21,3 +21,7 @@ end)
 -- Clipboard yanks/pastes with leader shortcuts
 vim.keymap.set({ "n", "v" }, "<leader>y", "+y", { desc = "Copy to system clipboard" })
 vim.keymap.set({ "n", "v" }, "<leader>p", "+p", { desc = "Paste from system clipboard" })
+
+-- Line navigation
+vim.keymap.set({ "n", "v" }, "g-h", "^", { desc = "Start of line" })
+vim.keymap.set({ "n", "v" }, "g-l", "$", { desc = "End of line" })
