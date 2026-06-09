@@ -17,3 +17,7 @@ vim.keymap.set("n", "<S-Tab>", function()
     vim.cmd("quit")
   end
 end)
+
+-- Clipboard yanks/pastes with leader shortcuts
+vim.keymap.set({ "n", "v" }, "<leader>y", "+y", { desc = "Copy to system clipboard" })
+vim.keymap.set({ "n", "v" }, "<leader>p", "+p", { desc = "Paste from system clipboard" })
