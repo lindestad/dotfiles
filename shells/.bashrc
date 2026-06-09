@@ -56,17 +56,26 @@ fi
 
 export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense'
 
+# true  = lazy-load carapace on first Tab (faster shell startup)
+# false = load carapace eagerly at shell startup
+CARAPACE_LAZY=true
+
 if command -v carapace >/dev/null 2>&1; then
-  # Lazy-load carapace on first Tab to keep shell startup fast.
-  # The default completion loader sources carapace once, removes itself, then
-  # returns 124 so bash retries completion using carapace's registered completers.
-  _carapace_lazy_load() {
-    complete -r -D 2>/dev/null
+  if [ "$CARAPACE_LAZY" = true ]; then
+    # Lazy-load carapace on first Tab to keep shell startup fast.
+    # The default completion loader sources carapace once, removes itself, then
+    # returns 124 so bash retries completion using carapace's registered completers.
+    _carapace_lazy_load() {
+      complete -r -D 2>/dev/null
+      # shellcheck disable=SC1090
+      source <(carapace _carapace)
+      return 124
+    }
+    complete -D -F _carapace_lazy_load
+  else
     # shellcheck disable=SC1090
     source <(carapace _carapace)
-    return 124
-  }
-  complete -D -F _carapace_lazy_load
+  fi
 elif [ -f /etc/bash_completion ]; then
   # shellcheck disable=SC1091
   source /etc/bash_completion
