@@ -26,6 +26,7 @@ DNF_PKGS=(
   7zip
   jq
   bat
+  neovim
   htop
   btop
   fzf

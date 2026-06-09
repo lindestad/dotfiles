@@ -128,6 +128,7 @@ These are not package installs, but the installers manage them alongside the too
 | Git config | copied if missing; missing keys merged | copied if missing; missing keys merged |
 | Git global ignore | symlinked | linked/copied |
 | Helix | symlinked | linked/copied |
+| Neovim | symlinked | linked/copied |
 | Kanata | optional | optional |
 | Nushell | Ubuntu only | linked/copied |
 | Starship | symlinked | linked/copied |

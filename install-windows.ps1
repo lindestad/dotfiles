@@ -1,5 +1,6 @@
 $apps = @(
     "Helix.Helix",
+    "Neovim.Neovim",
     "Starship.Starship",
     "eza-community.eza",
     "BurntSushi.ripgrep.MSVC",
@@ -417,6 +418,7 @@ New-SafeLink -Src (Join-Path $Dotfiles "config/copilot/copilot-instructions.md")
 New-SafeLink -Src (Join-Path $Dotfiles "config/git/ignore") -Dst (Join-Path $UserHome ".config/git/ignore")
 New-SafeLink -Src (Join-Path $Dotfiles "config/helix/config.toml") -Dst (Join-Path $Roaming "helix/config.toml")
 New-SafeLink -Src (Join-Path $Dotfiles "config/helix/languages.toml") -Dst (Join-Path $Roaming "helix/languages.toml")
+New-SafeLink -Src (Join-Path $Dotfiles "config/nvim") -Dst (Join-Path $UserHome ".config/nvim")
 New-SafeLink -Src (Join-Path $Dotfiles "shells/.bashrc") -Dst (Join-Path $UserHome ".bashrc")
 Ensure-GitBashProfile -UserHome $UserHome
 New-SafeLink -Src (Join-Path $Dotfiles "shells/config.nu") -Dst (Join-Path $Roaming "nushell/config.nu")

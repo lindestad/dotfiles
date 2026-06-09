@@ -21,6 +21,7 @@ PACMAN_PKGS=(
   p7zip
   jq
   bat
+  neovim
   htop
   btop
   bottom

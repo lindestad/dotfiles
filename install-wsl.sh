@@ -26,6 +26,7 @@ APT_PKGS=(
   p7zip-full
   jq
   bat
+  neovim
   htop
   btop
   btm
