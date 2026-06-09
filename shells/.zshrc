@@ -68,9 +68,22 @@ zstyle ':completion:*:*:-command-:*:*' group-order alias builtins functions comm
 # let carapace reuse other shells' completion data when helpful
 export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense'
 
-# Load all available completers (fast & simple)
+# Lazy-load all available completers on first Tab to keep shell startup fast.
 if command -v carapace >/dev/null 2>&1; then
-  source <(carapace _carapace)
+  # Remember the current Tab binding (e.g. fzf-completion) so we can chain to it
+  # after carapace is loaded.
+  _carapace_tab_fallback="${${(z)$(bindkey '^I')}[-1]}"
+  case "$_carapace_tab_fallback" in
+    ''|undefined-key|_carapace_lazy_widget) _carapace_tab_fallback=expand-or-complete ;;
+  esac
+
+  _carapace_lazy_widget() {
+    bindkey '^I' "$_carapace_tab_fallback"
+    source <(carapace _carapace)
+    zle "$_carapace_tab_fallback"
+  }
+  zle -N _carapace_lazy_widget
+  bindkey '^I' _carapace_lazy_widget
 fi
 
 # Optional theming

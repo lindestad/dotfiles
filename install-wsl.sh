@@ -111,6 +111,7 @@ fi
 resolve_install_flags no no
 
 echo "==> Installing apt packages..."
+ensure_carapace_apt_repo
 install_apt "${APT_PKGS[@]}" "${APT_PKGS_OPTIONAL[@]}"
 
 echo "==> Installing Rust and cargo tools..."

@@ -292,6 +292,22 @@ ensure_vivid_cargo() {
   cargo install --locked vivid
 }
 
+ensure_carapace_apt_repo() {
+  # carapace-bin is not in the Debian/Ubuntu repos; add the upstream Gemfury
+  # apt repo so it can be installed via apt-get like everything else.
+  if have carapace; then
+    return
+  fi
+
+  local list="/etc/apt/sources.list.d/fury-carapace.list"
+  if [[ -f "$list" ]]; then
+    return
+  fi
+
+  echo "==> Adding carapace-bin apt repo (apt.fury.io)..."
+  echo 'deb [trusted=yes] https://apt.fury.io/rsteube/ /' | sudo tee "$list" >/dev/null
+}
+
 ensure_carapace_nushell_init() {
   if ! have carapace; then
     return
