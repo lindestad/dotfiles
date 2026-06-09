@@ -4,7 +4,7 @@
 # Shell options
 set -o notify
 set -o noclobber
-set -o vi        # vi-style keybindings; use 'set -o emacs' if you prefer
+set -o vi        # vi-style keybindings;
 
 # History
 HISTFILE=${HOME}/.zsh_history
@@ -70,7 +70,7 @@ export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense'
 
 # true  = lazy-load carapace on first Tab (faster shell startup)
 # false = load carapace eagerly at shell startup
-CARAPACE_LAZY=true
+CARAPACE_LAZY=false
 
 if command -v carapace >/dev/null 2>&1; then
   if [[ "$CARAPACE_LAZY" == true ]]; then
@@ -133,6 +133,8 @@ fi
 if command -v helix >/dev/null 2>&1; then
   alias hx='helix'
 fi
+alias h='hx'
+alias n='nvim'
 
 # ripgrep, fd common flags (optional)
 alias rg='rg --hidden --glob "!.git"'
@@ -158,18 +160,10 @@ alias push='git push'
 alias gco='git checkout'
 alias co='git checkout'
 alias gm='git merge'
+alias gc='git commit'
 alias gcm='git commit -m'
 alias gcam='git commit -am'
-
-# gc <message...> (requires a non-empty message)
-gc() {
-  if (( $# == 0 )); then
-    print -u2 "Commit message cannot be empty."
-    print -u2 "Usage: gc Add login form"
-    return 2
-  fi
-  git commit -m "$*"
-}
+alias gsh='git show HEAD'
 
 ####--------------------------------------------------
 #### Yazi wrapper: cd to last dir on exit

@@ -58,7 +58,7 @@ export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense'
 
 # true  = lazy-load carapace on first Tab (faster shell startup)
 # false = load carapace eagerly at shell startup
-CARAPACE_LAZY=true
+CARAPACE_LAZY=false
 
 if command -v carapace >/dev/null 2>&1; then
   if [ "$CARAPACE_LAZY" = true ]; then
@@ -112,6 +112,8 @@ fi
 if ! command -v hx >/dev/null 2>&1 && command -v helix >/dev/null 2>&1; then
   alias hx='helix'
 fi
+alias h='hx'
+alias n='nvim'
 
 alias rg='rg --hidden --glob "!.git"'
 alias fd='fd --hidden --exclude .git'
@@ -135,16 +137,10 @@ alias push='git push'
 alias gco='git checkout'
 alias co='git checkout'
 alias gm='git merge'
+alias gc='git commit'
 alias gcm='git commit -m'
 alias gcam='git commit -am'
-
-gc() {
-  if [ "$#" -eq 0 ]; then
-    git commit
-  else
-    git commit -m "$*"
-  fi
-}
+alias gsh='git show HEAD'
 
 y() {
   local tmp newdir
