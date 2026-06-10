@@ -485,18 +485,10 @@ copy_gitconfig() {
   done < <(git config --file "$src" --list)
 }
 
-ensure_codex_config() {
-  local dst="$HOME/.codex/config.toml"
-  local key="default_permissions"
-  local value='":danger-full-access"'
-
-  mkdir -p "$(dirname "$dst")"
-
-  if [[ ! -f "$dst" ]]; then
-    printf '%s = %s\n' "$key" "$value" >"$dst"
-    echo "-> Created ~/.codex/config.toml with $key=$value"
-    return
-  fi
+ensure_codex_root_config() {
+  local dst="$1"
+  local key="$2"
+  local value="$3"
 
   local existing
   existing="$(sed -nE "s/^[[:space:]]*${key}[[:space:]]*=[[:space:]]*(.*)$/\1/p" "$dst" | head -n 1)"
@@ -524,6 +516,62 @@ ensure_codex_config() {
   cp "$tmp" "$dst"
   rm -f "$tmp"
   echo "-> Added Codex config $key"
+}
+
+ensure_codex_tui_config() {
+  local dst="$1"
+  local key="$2"
+  local value="$3"
+
+  local existing
+  existing="$(awk -v key="$key" '
+    /^\[tui\][[:space:]]*$/ { in_tui = 1; next }
+    /^\[/ { in_tui = 0 }
+    in_tui && $0 ~ "^[[:space:]]*" key "[[:space:]]*=" {
+      sub("^[[:space:]]*" key "[[:space:]]*=[[:space:]]*", "")
+      print
+      exit
+    }
+  ' "$dst")"
+  if [[ -n "$existing" ]]; then
+    if [[ "$existing" != "$value" ]]; then
+      echo "!! ~/.codex/config.toml already has [tui].$key=$existing; leaving desired value unapplied: $value"
+    fi
+    return
+  fi
+
+  local tmp
+  tmp="$(mktemp)"
+  awk -v key="$key" -v value="$value" '
+    BEGIN { inserted = 0 }
+    /^\[tui\][[:space:]]*$/ {
+      print
+      print key " = " value
+      inserted = 1
+      next
+    }
+    { print }
+    END {
+      if (!inserted) {
+        print ""
+        print "[tui]"
+        print key " = " value
+      }
+    }
+  ' "$dst" >"$tmp"
+  cp "$tmp" "$dst"
+  rm -f "$tmp"
+  echo "-> Added Codex TUI config $key"
+}
+
+ensure_codex_config() {
+  local dst="$HOME/.codex/config.toml"
+
+  mkdir -p "$(dirname "$dst")"
+  touch "$dst"
+
+  ensure_codex_root_config "$dst" "default_permissions" '":danger-full-access"'
+  ensure_codex_tui_config "$dst" "vim_mode_default" "true"
 }
 
 ensure_zsh_default_shell() {

@@ -476,42 +476,95 @@ function Ensure-CodexConfig {
         [Parameter(Mandatory)] [string]$Dst
     )
 
-    $key = "default_permissions"
-    $value = '":danger-full-access"'
-    $line = "$key = $value"
     $dir = Split-Path $Dst
     $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
     New-Item -ItemType Directory -Force -Path $dir | Out-Null
 
     if (-not (Test-Path $Dst)) {
-        [System.IO.File]::WriteAllText($Dst, "$line`n", $utf8NoBom)
-        Write-Host "Created Codex config at $Dst with $key=$value"
-        return
+        [System.IO.File]::WriteAllText($Dst, "", $utf8NoBom)
     }
 
     $content = Get-Content $Dst -Raw
-    $match = [regex]::Match($content, "(?m)^\s*$([regex]::Escape($key))\s*=\s*(.+)$")
-    if ($match.Success) {
-        $existing = $match.Groups[1].Value.Trim()
-        if ($existing -ne $value) {
-            Write-Warning "$Dst already has $key=$existing; leaving desired value unapplied: $value"
-        }
-        return
-    }
-
-    $tableMatch = [regex]::Match($content, "(?m)^\s*\[")
-    if ($tableMatch.Success) {
-        $content = $content.Insert($tableMatch.Index, "$line`n")
-    }
-    elseif ($content.EndsWith("`n")) {
-        $content = "$content$line`n"
-    }
-    else {
-        $content = "$content`n$line`n"
-    }
+    $content = Ensure-TomlRootValue -Content $content -Key "default_permissions" -Value '":danger-full-access"' -Path $Dst
+    $content = Ensure-TomlTableValue -Content $content -Table "tui" -Key "vim_mode_default" -Value "true" -Path $Dst
 
     [System.IO.File]::WriteAllText($Dst, $content, $utf8NoBom)
-    Write-Host "Added Codex config $key"
+}
+
+function Ensure-TomlRootValue {
+    param(
+        [Parameter(Mandatory)] [string]$Content,
+        [Parameter(Mandatory)] [string]$Key,
+        [Parameter(Mandatory)] [string]$Value,
+        [Parameter(Mandatory)] [string]$Path
+    )
+
+    $line = "$Key = $Value"
+    $match = [regex]::Match($Content, "(?m)^\s*$([regex]::Escape($Key))\s*=\s*(.+)$")
+    if ($match.Success) {
+        $existing = $match.Groups[1].Value.Trim()
+        if ($existing -ne $Value) {
+            Write-Warning "$Path already has $Key=$existing; leaving desired value unapplied: $Value"
+        }
+        return $Content
+    }
+
+    $tableMatch = [regex]::Match($Content, "(?m)^\s*\[")
+    if ($tableMatch.Success) {
+        $Content = $Content.Insert($tableMatch.Index, "$line`n")
+    }
+    elseif ($Content.EndsWith("`n")) {
+        $Content = "$Content$line`n"
+    }
+    else {
+        $Content = "$Content`n$line`n"
+    }
+
+    Write-Host "Added Codex config $Key"
+    return $Content
+}
+
+function Ensure-TomlTableValue {
+    param(
+        [Parameter(Mandatory)] [string]$Content,
+        [Parameter(Mandatory)] [string]$Table,
+        [Parameter(Mandatory)] [string]$Key,
+        [Parameter(Mandatory)] [string]$Value,
+        [Parameter(Mandatory)] [string]$Path
+    )
+
+    $escapedTable = [regex]::Escape($Table)
+    $escapedKey = [regex]::Escape($Key)
+    $tablePattern = "(?ms)^\s*\[$escapedTable\]\s*`$(.*?)(?=^\s*\[|\z)"
+    $match = [regex]::Match($Content, $tablePattern)
+    if ($match.Success) {
+        $body = $match.Groups[1].Value
+        $keyMatch = [regex]::Match($body, "(?m)^\s*$escapedKey\s*=\s*(.+)$")
+        if ($keyMatch.Success) {
+            $existing = $keyMatch.Groups[1].Value.Trim()
+            if ($existing -ne $Value) {
+                Write-Warning "$Path already has [$Table].$Key=$existing; leaving desired value unapplied: $Value"
+            }
+            return $Content
+        }
+
+        $headerEnd = $Content.IndexOf("`n", $match.Index)
+        Write-Host "Added Codex TUI config $Key"
+        if ($headerEnd -lt 0) {
+            return "$Content`n$Key = $Value`n"
+        }
+        return $Content.Insert($headerEnd + 1, "$Key = $Value`n")
+    }
+
+    if (-not $Content.EndsWith("`n") -and $Content.Length -gt 0) {
+        $Content = "$Content`n"
+    }
+    if ($Content.Length -gt 0 -and -not $Content.EndsWith("`n`n")) {
+        $Content = "$Content`n"
+    }
+
+    Write-Host "Added Codex TUI config $Key"
+    return "$Content[$Table]`n$Key = $Value`n"
 }
 
 # Ensure ~/.gitconfig exists and contains repo-managed defaults without overwriting user values
