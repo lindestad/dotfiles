@@ -14,6 +14,9 @@ DNF_PKGS=(
   unzip
   gcc
   make
+  perl-FindBin
+  perl-IPC-Cmd
+  perl-Time-Piece
   pkgconf-pkg-config
   openssl-devel
   fontconfig
