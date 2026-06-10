@@ -471,9 +471,55 @@ function Merge-GitConfig {
     }
 }
 
+function Ensure-CodexConfig {
+    param(
+        [Parameter(Mandatory)] [string]$Dst
+    )
+
+    $key = "default_permissions"
+    $value = '":danger-full-access"'
+    $line = "$key = $value"
+    $dir = Split-Path $Dst
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    New-Item -ItemType Directory -Force -Path $dir | Out-Null
+
+    if (-not (Test-Path $Dst)) {
+        [System.IO.File]::WriteAllText($Dst, "$line`n", $utf8NoBom)
+        Write-Host "Created Codex config at $Dst with $key=$value"
+        return
+    }
+
+    $content = Get-Content $Dst -Raw
+    $match = [regex]::Match($content, "(?m)^\s*$([regex]::Escape($key))\s*=\s*(.+)$")
+    if ($match.Success) {
+        $existing = $match.Groups[1].Value.Trim()
+        if ($existing -ne $value) {
+            Write-Warning "$Dst already has $key=$existing; leaving desired value unapplied: $value"
+        }
+        return
+    }
+
+    $tableMatch = [regex]::Match($content, "(?m)^\s*\[")
+    if ($tableMatch.Success) {
+        $content = $content.Insert($tableMatch.Index, "$line`n")
+    }
+    elseif ($content.EndsWith("`n")) {
+        $content = "$content$line`n"
+    }
+    else {
+        $content = "$content`n$line`n"
+    }
+
+    [System.IO.File]::WriteAllText($Dst, $content, $utf8NoBom)
+    Write-Host "Added Codex config $key"
+}
+
 # Ensure ~/.gitconfig exists and contains repo-managed defaults without overwriting user values
 $srcGitCfg = Join-Path $Dotfiles "config/git/gitconfig"
 $dstGitCfg = Join-Path $UserHome ".gitconfig"
 Merge-GitConfig -Src $srcGitCfg -Dst $dstGitCfg
+
+$dstCodexCfg = Join-Path $UserHome ".codex/config.toml"
+Ensure-CodexConfig -Dst $dstCodexCfg
 
 Write-Host "Windows config links completed."

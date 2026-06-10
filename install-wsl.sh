@@ -136,6 +136,7 @@ echo "==> Creating WSL config symlinks..."
 link_pairs "${LINKS[@]}"
 
 copy_gitconfig
+ensure_codex_config
 
 ensure_zsh_default_shell
 

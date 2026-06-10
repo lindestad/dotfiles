@@ -112,6 +112,7 @@ echo "==> Creating config symlinks..."
 link_pairs "${LINKS[@]}"
 ensure_local_bin
 copy_gitconfig
+ensure_codex_config
 ensure_zsh_default_shell
 
 if [[ "$INSTALL_KANATA" == "yes" && -n "$KANATA_CONFIG_SRC" ]]; then

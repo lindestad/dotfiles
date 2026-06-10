@@ -485,6 +485,47 @@ copy_gitconfig() {
   done < <(git config --file "$src" --list)
 }
 
+ensure_codex_config() {
+  local dst="$HOME/.codex/config.toml"
+  local key="default_permissions"
+  local value='":danger-full-access"'
+
+  mkdir -p "$(dirname "$dst")"
+
+  if [[ ! -f "$dst" ]]; then
+    printf '%s = %s\n' "$key" "$value" >"$dst"
+    echo "-> Created ~/.codex/config.toml with $key=$value"
+    return
+  fi
+
+  local existing
+  existing="$(sed -nE "s/^[[:space:]]*$key[[:space:]]*=[[:space:]]*(.*)$/\1/p" "$dst" | head -n 1)"
+  if [[ -n "$existing" ]]; then
+    if [[ "$existing" != "$value" ]]; then
+      echo "!! ~/.codex/config.toml already has $key=$existing; leaving desired value unapplied: $value"
+    fi
+    return
+  fi
+
+  local tmp
+  tmp="$(mktemp)"
+  awk -v line="$key = $value" '
+    !inserted && /^[[:space:]]*\[/ {
+      print line
+      inserted = 1
+    }
+    { print }
+    END {
+      if (!inserted) {
+        print line
+      }
+    }
+  ' "$dst" >"$tmp"
+  cp "$tmp" "$dst"
+  rm -f "$tmp"
+  echo "-> Added Codex config $key"
+}
+
 ensure_zsh_default_shell() {
   if ! have zsh; then
     echo ">> zsh is not installed; leaving default shell unchanged."
