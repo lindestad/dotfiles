@@ -499,7 +499,7 @@ ensure_codex_config() {
   fi
 
   local existing
-  existing="$(sed -nE "s/^[[:space:]]*$key[[:space:]]*=[[:space:]]*(.*)$/\1/p" "$dst" | head -n 1)"
+  existing="$(sed -nE "s/^[[:space:]]*${key}[[:space:]]*=[[:space:]]*(.*)$/\1/p" "$dst" | head -n 1)"
   if [[ -n "$existing" ]]; then
     if [[ "$existing" != "$value" ]]; then
       echo "!! ~/.codex/config.toml already has $key=$existing; leaving desired value unapplied: $value"
