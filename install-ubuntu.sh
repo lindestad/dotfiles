@@ -96,6 +96,7 @@ fi
 ensure_shell_shims
 ensure_rust_toolchain
 ensure_starship
+ensure_zellij_cargo
 ensure_typst_cli
 ensure_node_lts
 ensure_uv

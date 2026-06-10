@@ -123,6 +123,7 @@ ensure_bottom
 ensure_typst_cli
 ensure_yazi_cargo
 ensure_vivid_cargo
+ensure_zellij_cargo
 ensure_carapace_fedora
 ensure_node_lts
 ensure_uv

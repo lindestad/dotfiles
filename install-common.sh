@@ -130,6 +130,7 @@ add_common_cli_links() {
     "$DOTFILES_DIR/config/nvim|$HOME/.config/nvim"
     "$DOTFILES_DIR/config/starship/zsh/starship.toml|$HOME/.config/starship.toml"
     "$DOTFILES_DIR/config/yazi|$HOME/.config/yazi"
+    "$DOTFILES_DIR/config/zellij|$HOME/.config/zellij"
   )
 }
 
@@ -370,6 +371,16 @@ ensure_kanata_cargo() {
   ensure_rust_toolchain
   echo "==> Installing Kanata with cargo..."
   cargo install kanata
+}
+
+ensure_zellij_cargo() {
+  if have zellij; then
+    return
+  fi
+
+  ensure_rust_toolchain
+  echo "==> Installing Zellij with cargo..."
+  cargo install --locked zellij
 }
 
 install_fonts() {

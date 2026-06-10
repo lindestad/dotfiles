@@ -126,6 +126,7 @@ ensure_yazi_cargo
 ensure_typst_cli
 ensure_node_lts
 ensure_uv
+ensure_zellij_cargo
 ensure_helix
 ensure_vivid_cargo
 ensure_carapace_nushell_init

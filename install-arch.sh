@@ -35,6 +35,7 @@ PACMAN_PKGS=(
   shellcheck
   uutils-coreutils
   vivid
+  zellij
   python
   python-pipx
   typst

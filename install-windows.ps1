@@ -12,6 +12,7 @@ $apps = @(
     "sharkdp.bat",
     "junegunn.fzf",
     "ajeetdsouza.zoxide",
+    "Clement.bottom",
     "ImageMagick.ImageMagick",
     "sxyazi.yazi",
     "oschwartz10612.Poppler",
