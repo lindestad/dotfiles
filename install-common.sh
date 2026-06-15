@@ -274,6 +274,80 @@ ensure_typst_cli() {
   cargo install --locked typst-cli
 }
 
+ensure_neovim_release() {
+  local machine nvim_arch
+  machine="$(uname -m)"
+  case "$machine" in
+    x86_64|amd64) nvim_arch="x86_64" ;;
+    aarch64|arm64) nvim_arch="arm64" ;;
+    *)
+      echo ">> Unsupported Neovim release architecture: $machine"
+      return 1
+      ;;
+  esac
+
+  if ! have curl || ! have tar; then
+    echo ">> curl and tar are required to install upstream Neovim."
+    return 1
+  fi
+
+  ensure_local_bin
+
+  local url latest_version current_version tmp_dir archive extracted install_root install_dir bin_link ts
+  url="https://github.com/neovim/neovim/releases/latest/download/nvim-linux-${nvim_arch}.tar.gz"
+  install_root="$HOME/.local/opt"
+  install_dir="$install_root/nvim-linux-${nvim_arch}"
+  bin_link="$HOME/.local/bin/nvim"
+
+  latest_version="$(curl -fsSL https://api.github.com/repos/neovim/neovim/releases/latest 2>/dev/null \
+    | sed -nE 's/^[[:space:]]*"tag_name":[[:space:]]*"v?([^"]+)".*/\1/p' \
+    | head -n1 || true)"
+  if have nvim && [[ -n "$latest_version" ]]; then
+    current_version="$(nvim --version | sed -nE '1s/^NVIM v([^[:space:]]+).*/\1/p')"
+    if [[ "$current_version" == "$latest_version" ]]; then
+      echo "== Neovim is already latest stable ($current_version)."
+      return
+    fi
+  fi
+
+  tmp_dir="$(mktemp -d)"
+  archive="$tmp_dir/nvim.tar.gz"
+  extracted="$tmp_dir/nvim-linux-${nvim_arch}"
+
+  echo "==> Installing latest stable Neovim from upstream release..."
+  if ! curl -fL "$url" -o "$archive"; then
+    echo ">> Failed to download Neovim release: $url"
+    return 1
+  fi
+  if ! tar -C "$tmp_dir" -xzf "$archive"; then
+    echo ">> Failed to extract Neovim release archive."
+    return 1
+  fi
+  if [[ ! -x "$extracted/bin/nvim" ]]; then
+    echo ">> Neovim release archive did not contain bin/nvim."
+    return 1
+  fi
+
+  mkdir -p "$install_root"
+  if [[ -e "$install_dir" || -L "$install_dir" ]]; then
+    ts="$(date +%Y%m%d-%H%M%S)"
+    mv "$install_dir" "${install_dir}.bak.${ts}"
+  fi
+  mv "$extracted" "$install_dir"
+
+  if [[ -L "$bin_link" ]]; then
+    ln -sfn "$install_dir/bin/nvim" "$bin_link"
+  elif [[ -e "$bin_link" ]]; then
+    ts="$(date +%Y%m%d-%H%M%S)"
+    mv "$bin_link" "${bin_link}.bak.${ts}"
+    ln -s "$install_dir/bin/nvim" "$bin_link"
+  else
+    ln -s "$install_dir/bin/nvim" "$bin_link"
+  fi
+
+  "$bin_link" --version | head -n 1
+}
+
 ensure_yazi_cargo() {
   if have yazi && have ya; then
     return

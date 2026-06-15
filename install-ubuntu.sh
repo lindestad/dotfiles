@@ -23,7 +23,6 @@ APT_PKGS_COMMON=(
   p7zip-full
   jq
   bat
-  neovim
   htop
   btop
   btm
@@ -94,6 +93,7 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
   install_apt "${NIRI_APT_PKGS[@]}"
 fi
 ensure_shell_shims
+ensure_neovim_release || install_apt neovim
 ensure_rust_toolchain
 ensure_starship
 ensure_zellij_cargo

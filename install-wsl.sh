@@ -26,7 +26,6 @@ APT_PKGS=(
   p7zip-full
   jq
   bat
-  neovim
   htop
   btop
   btm
@@ -120,6 +119,7 @@ ensure_rust_toolchain
 
 ensure_local_bin
 ensure_shell_shims
+ensure_neovim_release || install_apt neovim
 ensure_starship
 ensure_bottom
 ensure_yazi_cargo
