@@ -25,3 +25,13 @@ style = "Bold Italic"
 [terminal.shell]
 program = "/usr/bin/zsh"
 args = ["-l"]
+
+[keyboard]
+bindings = [
+  # Alacritty on Windows does not reliably emit Ctrl-/ to WSL.
+  # Send Ctrl-_ (0x1f), which Neovim maps as the terminal toggle.
+  { key = "/", mods = "Control", chars = "\u001F" },
+  { key = "/", mods = "Control|Shift", chars = "\u001F" },
+  { key = "7", mods = "Control", chars = "\u001F" },
+  { key = "7", mods = "Control|Shift", chars = "\u001F" },
+]
