@@ -99,7 +99,6 @@ ensure_starship
 ensure_zellij_cargo
 ensure_typst_cli
 ensure_node_lts
-ensure_uv
 install_fonts
 
 KANATA_CONFIG_SRC=""
@@ -123,5 +122,7 @@ fi
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
   run_sensors_detect
 fi
+
+ensure_uv_tools ty ruff
 
 echo "==> Done."

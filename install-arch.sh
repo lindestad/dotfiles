@@ -124,4 +124,6 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
   run_sensors_detect
 fi
 
+ensure_uv_tools ty ruff
+
 echo "==> Done."

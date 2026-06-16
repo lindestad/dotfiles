@@ -203,6 +203,31 @@ function Ensure-Pipx {
     $env:Path = "$userScripts;$pipxBin;$env:Path"
 }
 
+function Ensure-UvTools {
+    param(
+        [Parameter(Mandatory)] [string[]]$Tools
+    )
+
+    $uv = Get-WinGetLinkedCommand -Name "uv"
+    if (-not $uv) {
+        $commands = ($Tools | ForEach-Object { "uv tool install --upgrade $_" }) -join "; "
+        Write-Warning "uv not found yet. Start a new shell and run: $commands"
+        return
+    }
+
+    foreach ($tool in $Tools) {
+        Write-Host ""
+        Write-Host "==> Installing/upgrading uv tool: $tool" -ForegroundColor Cyan
+        & $uv tool install --upgrade $tool
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "uv tool install --upgrade $tool exited with code $LASTEXITCODE"
+        }
+    }
+
+    $uvToolBin = Join-Path $env:USERPROFILE ".local\bin"
+    $env:Path = "$uvToolBin;$env:Path"
+}
+
 Ensure-NodeLts
 Ensure-Pipx
 Enable-StarshipPowerShellProfile
@@ -663,5 +688,7 @@ Merge-GitConfig -Src $srcGitCfg -Dst $dstGitCfg
 
 $dstCodexCfg = Join-Path $UserHome ".codex/config.toml"
 Ensure-CodexConfig -Dst $dstCodexCfg
+
+Ensure-UvTools -Tools @("ty", "ruff")
 
 Write-Host "Windows config links completed."

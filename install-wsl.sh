@@ -125,7 +125,6 @@ ensure_bottom
 ensure_yazi_cargo
 ensure_typst_cli
 ensure_node_lts
-ensure_uv
 ensure_zellij_cargo
 ensure_helix
 ensure_vivid_cargo
@@ -139,5 +138,7 @@ copy_gitconfig
 ensure_codex_config
 
 ensure_zsh_default_shell
+
+ensure_uv_tools ty ruff
 
 echo "==> Done."

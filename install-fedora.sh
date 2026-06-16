@@ -129,7 +129,6 @@ ensure_vivid_cargo
 ensure_zellij_cargo
 ensure_carapace_fedora
 ensure_node_lts
-ensure_uv
 install_fonts
 
 echo "==> Creating config symlinks..."
@@ -153,5 +152,7 @@ fi
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
   run_sensors_detect
 fi
+
+ensure_uv_tools ty ruff
 
 echo "==> Done."

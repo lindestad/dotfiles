@@ -423,6 +423,8 @@ ensure_node_lts() {
 }
 
 ensure_uv() {
+  export PATH="$HOME/.local/bin:$PATH"
+
   if have uv; then
     return
   fi
@@ -434,6 +436,23 @@ ensure_uv() {
 
   echo "==> Installing uv..."
   curl -LsSf https://astral.sh/uv/install.sh | env UV_NO_MODIFY_PATH=1 sh
+  export PATH="$HOME/.local/bin:$PATH"
+}
+
+ensure_uv_tools() {
+  local tool
+
+  ensure_uv || return
+  if ! have uv; then
+    echo "!! uv is not available; skipping uv tools: $*"
+    return 1
+  fi
+
+  for tool in "$@"; do
+    echo "==> Installing/upgrading uv tool: $tool"
+    uv tool install --upgrade "$tool"
+  done
+
   export PATH="$HOME/.local/bin:$PATH"
 }
 
