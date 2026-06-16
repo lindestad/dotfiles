@@ -29,7 +29,7 @@ font-feature = ss08
 font-feature = ss09
 font-feature = ss10
 
-background-opacity = 0.88
+background-opacity = 0.92
 background-blur = true
 
 # Match the shared Alacritty palette.
