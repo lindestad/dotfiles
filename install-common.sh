@@ -492,7 +492,7 @@ install_fonts() {
 
   echo "==> Installing user fonts..."
   mkdir -p "$dst_dir"
-  for font in "$src_dir"/*.ttf; do
+  for font in "$src_dir"/*.ttf "$src_dir"/*.otf; do
     [[ -e "$font" ]] || continue
     cp -f "$font" "$dst_dir/"
     echo "-> Installed $(basename "$font")"

@@ -327,12 +327,13 @@ function Install-UserFonts {
         "MesloLGS NF Bold Italic.ttf" = "MesloLGS NF Bold Italic (TrueType)"
     }
 
-    foreach ($font in Get-ChildItem -Path $FontDir -Filter "*.ttf") {
+    foreach ($font in Get-ChildItem -Path (Join-Path $FontDir "*") -Include "*.ttf", "*.otf" -File) {
         $destination = Join-Path $fontsDir $font.Name
 
         $registryName = $fontNames[$font.Name]
         if (-not $registryName) {
-            $registryName = "$($font.BaseName) (TrueType)"
+            $fontType = if ($font.Extension -ieq ".otf") { "OpenType" } else { "TrueType" }
+            $registryName = "$($font.BaseName) ($fontType)"
         }
 
         try {
