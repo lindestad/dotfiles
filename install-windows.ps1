@@ -58,13 +58,52 @@ $apps = @(
     "rsteube.Carapace"
 )
 
-for ($i = 0; $i -lt $apps.Count; $i++) {
-    $app = $apps[$i]
-    $packageNumber = "{0:D2}" -f ($i + 1)
+function Invoke-WinGetImport {
+    param(
+        [Parameter(Mandatory)] [string[]]$Packages
+    )
+
+    $uniquePackages = @($Packages | Select-Object -Unique)
+    $importPath = Join-Path ([System.IO.Path]::GetTempPath()) "dotfiles-winget-packages.json"
+    $packageEntries = @($uniquePackages | ForEach-Object {
+        [ordered]@{ PackageIdentifier = $_ }
+    })
+
+    $import = [ordered]@{
+        '$schema' = "https://aka.ms/winget-packages.schema.2.0.json"
+        CreationDate = (Get-Date).ToString("o")
+        Sources = @(
+            [ordered]@{
+                Packages = $packageEntries
+                SourceDetails = [ordered]@{
+                    Argument = "https://cdn.winget.microsoft.com/cache"
+                    Identifier = "Microsoft.Winget.Source_8wekyb3d8bbwe"
+                    Name = "winget"
+                    Type = "Microsoft.PreIndexed.Package"
+                }
+            }
+        )
+    }
+
+    $import | ConvertTo-Json -Depth 8 | Set-Content -Path $importPath -Encoding utf8
+
     Write-Host ""
-    Write-Host "==> [$packageNumber/$($apps.Count)] Installing $app" -ForegroundColor Cyan
-    winget install --id $app --accept-source-agreements --accept-package-agreements -e
+    Write-Host "==> Installing or upgrading $($uniquePackages.Count) winget packages" -ForegroundColor Cyan
+    Write-Host "    Import manifest: $importPath"
+
+    winget import -i $importPath `
+        --ignore-unavailable `
+        --ignore-versions `
+        --accept-source-agreements `
+        --accept-package-agreements `
+        --disable-interactivity
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Warning "winget import exited with code $LASTEXITCODE"
+    }
 }
+
+Invoke-WinGetImport -Packages $apps
 
 function Get-WinGetLinkedCommand {
     param(
