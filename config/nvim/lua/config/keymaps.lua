@@ -25,3 +25,16 @@ vim.keymap.set({ "n", "v" }, "<leader>p", "+p", { desc = "Paste from system clip
 -- Line navigation
 vim.keymap.set({ "n", "v" }, "g-h", "^", { desc = "Start of line" })
 vim.keymap.set({ "n", "v" }, "g-l", "$", { desc = "End of line" })
+
+-- Shift-U: redo (reverse undo). Default U (restore line) is rarely useful.
+vim.keymap.set("n", "U", "<C-r>", { desc = "Redo" })
+
+local function root_terminal()
+  Snacks.terminal.focus(nil, { cwd = LazyVim.root() })
+end
+
+vim.keymap.set({ "n", "t" }, "<C-/>", root_terminal, { desc = "Terminal (Root Dir)" })
+vim.keymap.set({ "n", "t" }, "<C-S-/>", root_terminal, { desc = "which_key_ignore" })
+vim.keymap.set({ "n", "t" }, "<C-_>", root_terminal, { desc = "which_key_ignore" })
+vim.keymap.set({ "n", "t" }, "<C-7>", root_terminal, { desc = "which_key_ignore" })
+vim.keymap.set({ "n", "t" }, "<C-S-7>", root_terminal, { desc = "which_key_ignore" })
