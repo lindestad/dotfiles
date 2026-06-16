@@ -152,6 +152,28 @@ zd() {
   zellij --session "$session_name" --new-session-with-layout dev
 }
 
+zdclean() {
+  local days="${1:-14}"
+  case "$days" in
+    ''|*[!0-9]*)
+      echo "usage: zdclean [days]"
+      return 2
+      ;;
+  esac
+
+  local session_info_dir="${XDG_CACHE_HOME:-$HOME/.cache}/zellij/contract_version_1/session_info"
+  [ -d "$session_info_dir" ] || return 0
+
+  find "$session_info_dir" -mindepth 2 -maxdepth 2 -type f \
+    -path "*/dev-*/session-metadata.kdl" -mtime +"$days" \
+    -exec sh -c '
+      for metadata; do
+        session_name=$(basename "$(dirname "$metadata")")
+        zellij delete-session "$session_name"
+      done
+    ' sh {} +
+}
+
 # Git aliases (mirroring your Nushell ones)
 alias gs='git status'
 alias ga='git add'

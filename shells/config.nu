@@ -114,6 +114,31 @@ def --env zd [session?: string] {
   zellij --session $session_name --new-session-with-layout dev
 }
 
+def --env zdclean [days: int = 14] {
+  if $days < 0 {
+    error make { msg: "usage: zdclean [days]" }
+  }
+
+  let session_info_dir = (
+    $env.XDG_CACHE_HOME?
+    | default ($env.HOME | path join ".cache")
+    | path join "zellij" "contract_version_1" "session_info"
+  )
+  if not ($session_info_dir | path exists) {
+    return
+  }
+
+  let cutoff = (date now) - ($days * 1day)
+  glob ($session_info_dir | path join "dev-*" "session-metadata.kdl")
+  | each { |metadata|
+      let file = (ls $metadata | first)
+      if $file.modified < $cutoff {
+        let session_name = ($metadata | path dirname | path basename)
+        zellij delete-session $session_name
+      }
+    }
+}
+
 
 # AUTOCOMPLETIONS
 # Check the path is correct

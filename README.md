@@ -73,6 +73,7 @@ The shell configs keep plain `zellij` unchanged and add two shortcuts:
 
 - `zp` attaches to a shared editable persistent session named `work`, creating it if needed. Set `ZELLIJ_PERSISTENT_SESSION` or pass a name, e.g. `zp laptop`.
 - `zd` starts a fresh dev session with the `dev` layout: two side-by-side panes plus the usual tab/status bars. Pass a name if you want one, e.g. `zd api`.
+- `zdclean` deletes `dev-*` sessions whose saved metadata is older than 14 days. Pass another cutoff in days if needed, e.g. `zdclean 30`.
 
 ---
 
