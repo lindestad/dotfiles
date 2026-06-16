@@ -3,3 +3,6 @@
 -- Add any additional options here
 
 vim.opt.wrap = true
+
+-- Use ty as LazyVim's Python language server.
+vim.g.lazyvim_python_lsp = "ty"
