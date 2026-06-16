@@ -19,8 +19,15 @@ vim.keymap.set("n", "<S-Tab>", function()
 end)
 
 -- Clipboard yanks/pastes with leader shortcuts
-vim.keymap.set({ "n", "v" }, "<leader>y", "+y", { desc = "Copy to system clipboard" })
-vim.keymap.set({ "n", "v" }, "<leader>p", "+p", { desc = "Paste from system clipboard" })
+vim.keymap.set({ "n", "x" }, "<leader>y", [["+y]], { desc = "Copy to system clipboard" })
+vim.keymap.set({ "n", "x" }, "<leader>p", [["+p]], { desc = "Paste from system clipboard" })
+
+vim.keymap.set("n", "<leader>a", "GVgg", { desc = "Select all" })
+vim.keymap.set("n", "<leader>Y", function()
+  local view = vim.fn.winsaveview()
+  vim.cmd([[silent %yank +]])
+  vim.fn.winrestview(view)
+end, { desc = "Copy buffer to system clipboard" })
 
 -- Line navigation
 vim.keymap.set({ "n", "v" }, "g-h", "^", { desc = "Start of line" })
