@@ -58,7 +58,11 @@ $apps = @(
     "rsteube.Carapace"
 )
 
-foreach ($app in $apps) {
+for ($i = 0; $i -lt $apps.Count; $i++) {
+    $app = $apps[$i]
+    $packageNumber = "{0:D2}" -f ($i + 1)
+    Write-Host ""
+    Write-Host "==> [$packageNumber/$($apps.Count)] Installing $app" -ForegroundColor Cyan
     winget install --id $app --accept-source-agreements --accept-package-agreements -e
 }
 
