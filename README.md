@@ -75,6 +75,8 @@ The shell configs keep plain `zellij` unchanged and add two shortcuts:
 - `zd` starts a fresh dev session with the `dev` layout: two side-by-side panes plus the usual tab/status bars. Pass a name if you want one, e.g. `zd api`.
 - `zdclean` deletes `dev-*` sessions whose saved metadata is older than 14 days. Pass another cutoff in days if needed, e.g. `zdclean 30`.
 
+On Linux, the shell configs set `ZELLIJ_SOCKET_DIR` to `/run/user/$UID/zellij` when that runtime directory exists, so desktop and SSH shells attach to the same live session namespace.
+
 ---
 
 ## Compatibility

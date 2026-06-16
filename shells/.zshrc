@@ -16,6 +16,15 @@ setopt SHARE_HISTORY INC_APPEND_HISTORY HIST_IGNORE_DUPS HIST_IGNORE_SPACE
 export PATH="$HOME/go/bin:$HOME/.cargo/bin:$HOME/.local/bin:$PATH"
 export STARSHIP_CONFIG="$HOME/.config/starship.toml"
 
+# Keep desktop and SSH clients pointed at the same Zellij socket namespace.
+if [ -z "${ZELLIJ_SOCKET_DIR:-}" ]; then
+  _zellij_runtime_dir="/run/user/$(id -u 2>/dev/null)"
+  if [ -d "$_zellij_runtime_dir" ]; then
+    export ZELLIJ_SOCKET_DIR="$_zellij_runtime_dir/zellij"
+  fi
+  unset _zellij_runtime_dir
+fi
+
 # Editor
 export EDITOR=hx
 export VISUAL=hx

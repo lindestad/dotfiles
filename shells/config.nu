@@ -3,6 +3,12 @@ if ($nu.os-info.family == "windows") and ("C:/Program Files/Git/usr/bin/file.exe
   $env.YAZI_FILE_ONE = "C:/Program Files/Git/usr/bin/file.exe"
 }
 
+# Keep desktop and SSH clients pointed at the same Zellij socket namespace.
+let zellij_runtime_dir = (["/run/user" (id -u | str trim)] | path join)
+if ($env.ZELLIJ_SOCKET_DIR? == null) and ($zellij_runtime_dir | path exists) {
+  $env.ZELLIJ_SOCKET_DIR = ($zellij_runtime_dir | path join "zellij")
+}
+
 $env.config.show_banner = false
 $env.config.buffer_editor = "hx"
 mkdir ($nu.data-dir | path join "vendor/autoload")

@@ -29,6 +29,15 @@ export VISUAL=hx
 export LESS='-R'
 export LESSHISTFILE=-
 
+# Keep desktop and SSH clients pointed at the same Zellij socket namespace.
+if [ -z "${ZELLIJ_SOCKET_DIR:-}" ]; then
+  _zellij_runtime_dir="/run/user/$(id -u 2>/dev/null)"
+  if [ -d "$_zellij_runtime_dir" ]; then
+    export ZELLIJ_SOCKET_DIR="$_zellij_runtime_dir/zellij"
+  fi
+  unset _zellij_runtime_dir
+fi
+
 # Yazi requires file.exe on Windows. Git for Windows ships one.
 if [ -x "/c/Program Files/Git/usr/bin/file.exe" ]; then
   export YAZI_FILE_ONE="C:/Program Files/Git/usr/bin/file.exe"
