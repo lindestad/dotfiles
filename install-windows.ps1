@@ -1,3 +1,28 @@
+function Test-IsAdministrator {
+    $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+    $principal = [Security.Principal.WindowsPrincipal]::new($identity)
+    return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+}
+
+function Request-Administrator {
+    if (Test-IsAdministrator) { return }
+
+    $answer = Read-Host "This installer creates symlinks and works best as Administrator. Restart elevated now? Y/n"
+    if ($answer -match '^[Nn]$') {
+        Write-Warning "Continuing without elevation; symlink creation may fall back to copying files."
+        return
+    }
+
+    $hostExe = (Get-Process -Id $PID).Path
+    if (-not $hostExe) { $hostExe = "powershell.exe" }
+    $scriptPath = $PSCommandPath
+    $arguments = "-NoExit -NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`""
+    Start-Process -FilePath $hostExe -ArgumentList $arguments -Verb RunAs
+    exit
+}
+
+Request-Administrator
+
 $apps = @(
     "Helix.Helix",
     "Neovim.Neovim",
@@ -236,14 +261,26 @@ function Install-UserFonts {
 
     foreach ($font in Get-ChildItem -Path $FontDir -Filter "*.ttf") {
         $destination = Join-Path $fontsDir $font.Name
-        Copy-Item $font.FullName $destination -Force
 
         $registryName = $fontNames[$font.Name]
         if (-not $registryName) {
             $registryName = "$($font.BaseName) (TrueType)"
         }
-        New-ItemProperty -Path $registryPath -Name $registryName -Value $destination -PropertyType String -Force | Out-Null
-        Write-Host "Installed font $($font.Name)"
+
+        try {
+            if (Test-Path $destination) {
+                Write-Host "Font already present: $($font.Name)"
+            }
+            else {
+                Copy-Item $font.FullName $destination -Force -ErrorAction Stop
+                Write-Host "Installed font $($font.Name)"
+            }
+
+            New-ItemProperty -Path $registryPath -Name $registryName -Value $destination -PropertyType String -Force -ErrorAction Stop | Out-Null
+        }
+        catch {
+            Write-Warning "Could not install font $($font.Name): $($_.Exception.Message)"
+        }
     }
 }
 
@@ -359,17 +396,24 @@ function New-SafeLink {
 
     if ($needsLink) {
         try {
-            New-Item -ItemType SymbolicLink -Path $Dst -Target $Src | Out-Null
+            New-Item -ItemType SymbolicLink -Path $Dst -Target $Src -ErrorAction Stop | Out-Null
+            Write-Host "Linked $Src --> $Dst"
         }
         catch {
-            if (Test-Path $Src -PathType Container) {
-                Copy-Item $Src $Dst -Recurse -Force
+            Write-Warning "Could not create symlink $Dst; copying instead. $($_.Exception.Message)"
+            try {
+                if (Test-Path $Src -PathType Container) {
+                    Copy-Item $Src $Dst -Recurse -Force -ErrorAction Stop
+                }
+                else {
+                    Copy-Item $Src $Dst -Force -ErrorAction Stop
+                }
+                Write-Host "Copied $Src --> $Dst"
             }
-            else {
-                Copy-Item $Src $Dst -Force
+            catch {
+                Write-Warning "Could not copy $Src to $Dst. $($_.Exception.Message)"
             }
         }
-        Write-Host "Linked $Src --> $Dst"
     }
     else {
         Write-Host "Already linked: $Dst"
@@ -415,6 +459,7 @@ Install-UserFonts -FontDir (Join-Path $Dotfiles "fonts")
 
 # Links specific to Windows setup
 New-SafeLink -Src (Join-Path $Dotfiles "config/codex/AGENTS.md") -Dst (Join-Path $UserHome ".codex/AGENTS.md")
+New-SafeLink -Src (Join-Path $Dotfiles "config/alacritty/alacritty-windows.toml") -Dst (Join-Path $Roaming "alacritty/alacritty.toml")
 New-SafeLink -Src (Join-Path $Dotfiles "config/copilot/copilot-instructions.md") -Dst (Join-Path $UserHome ".copilot/copilot-instructions.md")
 New-SafeLink -Src (Join-Path $Dotfiles "config/git/ignore") -Dst (Join-Path $UserHome ".config/git/ignore")
 New-SafeLink -Src (Join-Path $Dotfiles "config/helix/config.toml") -Dst (Join-Path $Roaming "helix/config.toml")
@@ -485,6 +530,7 @@ function Ensure-CodexConfig {
     }
 
     $content = Get-Content $Dst -Raw
+    if ($null -eq $content) { $content = "" }
     $content = Ensure-TomlRootValue -Content $content -Key "default_permissions" -Value '":danger-full-access"' -Path $Dst
     $content = Ensure-TomlTableValue -Content $content -Table "tui" -Key "vim_mode_default" -Value "true" -Path $Dst
 
@@ -493,7 +539,7 @@ function Ensure-CodexConfig {
 
 function Ensure-TomlRootValue {
     param(
-        [Parameter(Mandatory)] [string]$Content,
+        [Parameter(Mandatory)] [AllowEmptyString()] [string]$Content,
         [Parameter(Mandatory)] [string]$Key,
         [Parameter(Mandatory)] [string]$Value,
         [Parameter(Mandatory)] [string]$Path
@@ -526,7 +572,7 @@ function Ensure-TomlRootValue {
 
 function Ensure-TomlTableValue {
     param(
-        [Parameter(Mandatory)] [string]$Content,
+        [Parameter(Mandatory)] [AllowEmptyString()] [string]$Content,
         [Parameter(Mandatory)] [string]$Table,
         [Parameter(Mandatory)] [string]$Key,
         [Parameter(Mandatory)] [string]$Value,

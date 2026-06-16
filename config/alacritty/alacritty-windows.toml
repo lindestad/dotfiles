@@ -1,0 +1,72 @@
+[window]
+decorations = "None"
+padding = { x = 4, y = 1 }
+dynamic_padding = true
+
+[font]
+size = 13
+
+[font.normal]
+family = "MesloLGS NF"
+style = "Regular"
+
+[font.bold]
+family = "MesloLGS NF"
+style = "Bold"
+
+[font.italic]
+family = "MesloLGS NF"
+style = "Italic"
+
+[font.bold_italic]
+family = "MesloLGS NF"
+style = "Bold Italic"
+
+[terminal.shell]
+program = "wsl.exe"
+args = ["-d", "Ubuntu", "--cd", "~"]
+
+[env]
+TERM = "xterm-256color"
+
+[colors.primary]
+foreground = "#bfbdb6"
+background = "#020305"
+
+[colors.cursor]
+text = "#0b0e14"
+cursor = "#bfbdb6"
+
+[colors.selection]
+text = "#bfbdb6"
+background = "#1b3a5b"
+
+[colors.normal]
+black = "#101317"
+red = "#d91a25"
+green = "#47cc1d"
+yellow = "#f9af4f"
+blue = "#229be0"
+magenta = "#9e43fa"
+cyan = "#67e0d6"
+white = "#c7c7c7"
+
+[colors.bright]
+black = "#686868"
+red = "#f07178"
+green = "#aad94c"
+yellow = "#ffb454"
+blue = "#59c2ff"
+magenta = "#d2a6ff"
+cyan = "#95e6cb"
+white = "#ffffff"
+
+[keyboard]
+bindings = [
+  # Alacritty on Windows does not reliably emit Ctrl-/ to WSL.
+  # Send Ctrl-_ (0x1f), which Neovim maps as the terminal toggle.
+  { key = "/", mods = "Control", chars = "\u001F" },
+  { key = "/", mods = "Control|Shift", chars = "\u001F" },
+  { key = "7", mods = "Control", chars = "\u001F" },
+  { key = "7", mods = "Control|Shift", chars = "\u001F" },
+]
