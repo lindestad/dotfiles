@@ -267,10 +267,10 @@ function Set-WindowsTerminalGitBashDefault {
             $settings.profiles | Add-Member -NotePropertyName defaults -NotePropertyValue ([pscustomobject]@{}) -Force
         }
         if ($null -eq $settings.profiles.defaults.font) {
-            $settings.profiles.defaults | Add-Member -NotePropertyName font -NotePropertyValue ([pscustomobject]@{ face = "MesloLGS NF" }) -Force
+            $settings.profiles.defaults | Add-Member -NotePropertyName font -NotePropertyValue ([pscustomobject]@{ face = "MonaspiceNe Nerd Font" }) -Force
         }
         else {
-            $settings.profiles.defaults.font | Add-Member -NotePropertyName face -NotePropertyValue "MesloLGS NF" -Force
+            $settings.profiles.defaults.font | Add-Member -NotePropertyName face -NotePropertyValue "MonaspiceNe Nerd Font" -Force
         }
 
         $profileList = @($settings.profiles.list)
@@ -282,7 +282,7 @@ function Set-WindowsTerminalGitBashDefault {
                 commandline = "`"$gitBash`" -i -l"
                 startingDirectory = "%USERPROFILE%"
                 icon = "%PROGRAMFILES%\Git\mingw64\share\git\git-for-windows.ico"
-                font = [pscustomobject]@{ face = "MesloLGS NF" }
+                font = [pscustomobject]@{ face = "MonaspiceNe Nerd Font" }
             }
             $settings.profiles.list = @($profileList + $profile)
         }
@@ -293,10 +293,10 @@ function Set-WindowsTerminalGitBashDefault {
             $profile | Add-Member -NotePropertyName startingDirectory -NotePropertyValue "%USERPROFILE%" -Force
             $profile | Add-Member -NotePropertyName icon -NotePropertyValue "%PROGRAMFILES%\Git\mingw64\share\git\git-for-windows.ico" -Force
             if ($null -eq $profile.font) {
-                $profile | Add-Member -NotePropertyName font -NotePropertyValue ([pscustomobject]@{ face = "MesloLGS NF" }) -Force
+                $profile | Add-Member -NotePropertyName font -NotePropertyValue ([pscustomobject]@{ face = "MonaspiceNe Nerd Font" }) -Force
             }
             else {
-                $profile.font | Add-Member -NotePropertyName face -NotePropertyValue "MesloLGS NF" -Force
+                $profile.font | Add-Member -NotePropertyName face -NotePropertyValue "MonaspiceNe Nerd Font" -Force
             }
         }
 
@@ -320,21 +320,11 @@ function Install-UserFonts {
     New-Item -ItemType Directory -Force -Path $fontsDir | Out-Null
 
     $registryPath = "HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Fonts"
-    $fontNames = @{
-        "MesloLGS NF Regular.ttf"     = "MesloLGS NF Regular (TrueType)"
-        "MesloLGS NF Bold.ttf"        = "MesloLGS NF Bold (TrueType)"
-        "MesloLGS NF Italic.ttf"      = "MesloLGS NF Italic (TrueType)"
-        "MesloLGS NF Bold Italic.ttf" = "MesloLGS NF Bold Italic (TrueType)"
-    }
-
     foreach ($font in Get-ChildItem -Path (Join-Path $FontDir "*") -Include "*.ttf", "*.otf" -File) {
         $destination = Join-Path $fontsDir $font.Name
 
-        $registryName = $fontNames[$font.Name]
-        if (-not $registryName) {
-            $fontType = if ($font.Extension -ieq ".otf") { "OpenType" } else { "TrueType" }
-            $registryName = "$($font.BaseName) ($fontType)"
-        }
+        $fontType = if ($font.Extension -ieq ".otf") { "OpenType" } else { "TrueType" }
+        $registryName = "$($font.BaseName) ($fontType)"
 
         try {
             if (Test-Path $destination) {

@@ -7,19 +7,19 @@ dynamic_padding = true
 size = 13
 
 [font.normal]
-family = "MesloLGS NF"
+family = "MonaspiceNe Nerd Font"
 style = "Regular"
 
 [font.bold]
-family = "MesloLGS NF"
+family = "MonaspiceNe Nerd Font"
 style = "Bold"
 
 [font.italic]
-family = "MesloLGS NF"
+family = "MonaspiceNe Nerd Font"
 style = "Italic"
 
 [font.bold_italic]
-family = "MesloLGS NF"
+family = "MonaspiceNe Nerd Font"
 style = "Bold Italic"
 
 [terminal.shell]
