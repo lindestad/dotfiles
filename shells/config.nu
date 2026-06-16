@@ -92,6 +92,28 @@ def --env svenv [] {
   overlay use .venv/bin/activate.nu
 }
 
+# Zellij session shortcuts
+def --env zp [session?: string] {
+  let session_name = if ($session == null) {
+    $env.ZELLIJ_PERSISTENT_SESSION? | default "work"
+  } else {
+    $session
+  }
+
+  zellij attach --create $session_name
+}
+
+def --env zd [session?: string] {
+  let session_name = if ($session == null) {
+    let stamp = (date now | format date "%Y%m%d-%H%M%S")
+    $"dev-($stamp)"
+  } else {
+    $session
+  }
+
+  zellij --session $session_name --new-session-with-layout dev
+}
+
 
 # AUTOCOMPLETIONS
 # Check the path is correct

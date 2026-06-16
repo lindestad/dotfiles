@@ -119,6 +119,17 @@ alias rg='rg --hidden --glob "!.git"'
 alias fd='fd --hidden --exclude .git'
 alias svenv='source .venv/bin/activate'
 
+# Zellij session shortcuts
+zp() {
+  local session_name="${1:-${ZELLIJ_PERSISTENT_SESSION:-work}}"
+  zellij attach --create "$session_name"
+}
+
+zd() {
+  local session_name="${1:-dev-$(date +%Y%m%d-%H%M%S)}"
+  zellij --session "$session_name" --new-session-with-layout dev
+}
+
 alias gs='git status'
 alias ga='git add'
 alias ga.='git add .'

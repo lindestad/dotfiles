@@ -67,6 +67,13 @@ cd $HOME\dev\dotfiles
 
 The platform-specific scripts are still available for direct use when needed: `install-arch.sh`, `install-ubuntu.sh`, `install-fedora.sh`, `install-wsl.sh`, and `install-windows.ps1`.
 
+## Zellij Sessions
+
+The shell configs keep plain `zellij` unchanged and add two shortcuts:
+
+- `zp` attaches to a shared editable persistent session named `work`, creating it if needed. Set `ZELLIJ_PERSISTENT_SESSION` or pass a name, e.g. `zp laptop`.
+- `zd` starts a fresh dev session with the `dev` layout: two side-by-side panes plus the usual tab/status bars. Pass a name if you want one, e.g. `zd api`.
+
 ---
 
 ## Compatibility
