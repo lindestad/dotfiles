@@ -82,9 +82,41 @@ fi
 
 resolve_install_flags yes yes
 add_alacritty_link
+add_ghostty_link
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
   add_wayland_desktop_links
 fi
+
+ensure_ghostty_ubuntu() {
+  if have ghostty; then
+    return
+  fi
+
+  if apt-cache show ghostty >/dev/null 2>&1; then
+    install_apt ghostty
+    return
+  fi
+
+  echo ">> Ghostty is not available from the configured Ubuntu apt repositories."
+  if [[ "$ASSUME_YES" == "yes" ]]; then
+    echo ">> Skipping community ghostty-ubuntu installer in non-interactive mode."
+    return
+  fi
+  if [[ "$(prompt_yes_no "Install Ghostty from the community ghostty-ubuntu .deb installer?")" != "yes" ]]; then
+    return
+  fi
+  if ! have curl; then
+    echo "!! curl is required to install Ghostty from ghostty-ubuntu."
+    return 1
+  fi
+
+  echo "==> Installing Ghostty from ghostty-ubuntu..."
+  local installer
+  installer="$(mktemp)"
+  curl -fsSL https://raw.githubusercontent.com/mkasberg/ghostty-ubuntu/HEAD/install.sh -o "$installer"
+  bash "$installer"
+  rm -f "$installer"
+}
 
 echo "==> Installing apt packages..."
 install_apt "${APT_PKGS_COMMON[@]}" "${APT_PKGS_OPTIONAL[@]}"
@@ -92,6 +124,7 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
   echo "==> Installing Niri desktop packages..."
   install_apt "${NIRI_APT_PKGS[@]}"
 fi
+ensure_ghostty_ubuntu
 ensure_shell_shims
 ensure_neovim_release || install_apt neovim
 ensure_rust_toolchain

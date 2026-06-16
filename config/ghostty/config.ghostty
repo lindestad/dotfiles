@@ -1,0 +1,23 @@
+# Alacritty-equivalent defaults.
+window-decoration = none
+window-padding-x = 10
+window-padding-y = 20
+window-padding-balance = true
+
+font-family = MesloLGS NF
+font-family-bold = MesloLGS NF
+font-family-italic = MesloLGS NF
+font-family-bold-italic = MesloLGS NF
+font-style = Regular
+font-style-bold = Bold
+font-style-italic = Italic
+font-style-bold-italic = Bold Italic
+font-size = 12
+
+command = direct:/usr/bin/zsh -l
+
+# Send Ctrl-_ (0x1f), which Neovim maps as the terminal toggle.
+keybind = ctrl+/=text:\x1f
+keybind = ctrl+shift+/=text:\x1f
+keybind = ctrl+7=text:\x1f
+keybind = ctrl+shift+7=text:\x1f

@@ -150,6 +150,10 @@ add_alacritty_link() {
   LINKS+=("$DOTFILES_DIR/config/alacritty/alacritty.toml|$HOME/.config/alacritty/alacritty.toml")
 }
 
+add_ghostty_link() {
+  LINKS+=("$DOTFILES_DIR/config/ghostty/config.ghostty|$HOME/.config/ghostty/config.ghostty")
+}
+
 add_wayland_desktop_links() {
   LINKS+=(
     "$DOTFILES_DIR/config/niri|$HOME/.config/niri"

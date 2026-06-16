@@ -20,6 +20,7 @@ These tools are installed on at least one Linux installer and on Windows.
 | git | `git` | `git` | `git` | `git` | `Git.Git` |
 | git-delta | `git-delta` | `git-delta` (optional) | `git-delta` | `git-delta` (optional) | `dandavison.delta` |
 | GitHub CLI | `github-cli` | `gh` | `gh` | `gh` | `GitHub.cli` |
+| Ghostty | `ghostty` | prompted community `.deb` installer | prompted COPR | not installed | not available |
 | helix | `helix` | `helix` (optional) | `helix` | release `.deb` fallback | `Helix.Helix` |
 | imagemagick | `imagemagick` | `imagemagick` | `ImageMagick` | `imagemagick` | `ImageMagick.ImageMagick` |
 | jq | `jq` | `jq` | `jq` | `jq` | `jqlang.jq` |
@@ -127,6 +128,7 @@ These are not package installs, but the installers manage them alongside the too
 | Codex instructions | symlinked | linked/copied |
 | Git config | copied if missing; missing keys merged | copied if missing; missing keys merged |
 | Git global ignore | symlinked | linked/copied |
+| Ghostty | non-WSL Linux only | not linked |
 | Helix | symlinked | linked/copied |
 | Neovim | symlinked | linked/copied |
 | Kanata | optional | optional |

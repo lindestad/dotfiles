@@ -94,6 +94,36 @@ EOF
   ensure_carapace_nushell_init
 }
 
+ensure_ghostty_fedora() {
+  if have ghostty; then
+    return
+  fi
+
+  if dnf -q list --available ghostty >/dev/null 2>&1; then
+    install_dnf ghostty
+    return
+  fi
+
+  echo ">> Ghostty is not available from the configured Fedora repositories."
+  if [[ "$ASSUME_YES" == "yes" ]]; then
+    echo ">> Skipping Ghostty COPR setup in non-interactive mode."
+    return
+  fi
+  if [[ "$(prompt_yes_no "Install Ghostty from the scottames/ghostty COPR?")" != "yes" ]]; then
+    return
+  fi
+
+  if ! dnf copr --help >/dev/null 2>&1; then
+    echo "==> Installing dnf COPR plugin..."
+    sudo dnf install -y dnf-plugins-core
+  fi
+
+  echo "==> Enabling scottames/ghostty COPR..."
+  sudo dnf copr enable -y scottames/ghostty
+  echo "==> Installing Ghostty..."
+  sudo dnf install -y ghostty
+}
+
 LINKS=()
 add_common_cli_links
 add_zsh_link
@@ -110,6 +140,7 @@ fi
 
 resolve_install_flags yes yes
 add_alacritty_link
+add_ghostty_link
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
   add_wayland_desktop_links
 fi
@@ -120,6 +151,7 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
   echo "==> Installing Niri desktop packages..."
   install_dnf "${NIRI_DNF_PKGS[@]}"
 fi
+ensure_ghostty_fedora
 ensure_rust_toolchain
 ensure_starship
 ensure_bottom
