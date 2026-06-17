@@ -29,6 +29,13 @@ export VISUAL=hx
 export LESS='-R'
 export LESSHISTFILE=-
 
+# Work around openai/codex#9370-adjacent shifted text loss in
+# Windows WezTerm -> WSL. Remove after a known-good Codex release.
+# https://github.com/openai/codex/issues/9370
+if [ -n "${WSL_INTEROP:-}" ] && [ "${TERM_PROGRAM:-}" = "WezTerm" ] && [ -z "${CODEX_TUI_DISABLE_KEYBOARD_ENHANCEMENT+x}" ]; then
+  export CODEX_TUI_DISABLE_KEYBOARD_ENHANCEMENT=1
+fi
+
 # Keep desktop and SSH clients pointed at the same Zellij socket namespace.
 if [ -z "${ZELLIJ_SOCKET_DIR:-}" ]; then
   _zellij_runtime_dir="/run/user/$(id -u 2>/dev/null)"
