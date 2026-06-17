@@ -21,6 +21,7 @@ DNF_PKGS=(
   openssl-devel
   fontconfig
   alacritty
+  wezterm
   helix
   eza
   ripgrep
@@ -124,6 +125,36 @@ ensure_ghostty_fedora() {
   sudo dnf install -y ghostty
 }
 
+ensure_wezterm_fedora() {
+  if have wezterm; then
+    return
+  fi
+
+  if dnf -q list --available wezterm >/dev/null 2>&1; then
+    install_dnf wezterm
+    return
+  fi
+
+  echo ">> WezTerm is not available from the configured Fedora repositories."
+  if [[ "$ASSUME_YES" == "yes" ]]; then
+    echo ">> Skipping WezTerm COPR setup in non-interactive mode."
+    return
+  fi
+  if [[ "$(prompt_yes_no "Install WezTerm from the official wezfurlong/wezterm-nightly COPR?")" != "yes" ]]; then
+    return
+  fi
+
+  if ! dnf copr --help >/dev/null 2>&1; then
+    echo "==> Installing dnf COPR plugin..."
+    sudo dnf install -y dnf-plugins-core
+  fi
+
+  echo "==> Enabling wezfurlong/wezterm-nightly COPR..."
+  sudo dnf copr enable -y wezfurlong/wezterm-nightly
+  echo "==> Installing WezTerm..."
+  sudo dnf install -y wezterm
+}
+
 LINKS=()
 add_common_cli_links
 add_zsh_link
@@ -140,6 +171,7 @@ fi
 
 resolve_install_flags yes yes
 add_alacritty_link
+add_wezterm_link
 add_ghostty_link
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
   add_wayland_desktop_links
@@ -151,6 +183,7 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
   echo "==> Installing Niri desktop packages..."
   install_dnf "${NIRI_DNF_PKGS[@]}"
 fi
+ensure_wezterm_fedora
 ensure_ghostty_fedora
 ensure_rust_toolchain
 ensure_starship

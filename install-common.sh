@@ -150,6 +150,10 @@ add_alacritty_link() {
   LINKS+=("$DOTFILES_DIR/config/alacritty/alacritty.toml|$HOME/.config/alacritty/alacritty.toml")
 }
 
+add_wezterm_link() {
+  LINKS+=("$DOTFILES_DIR/config/wezterm/wezterm.lua|$HOME/.config/wezterm/wezterm.lua")
+}
+
 add_ghostty_link() {
   LINKS+=("$DOTFILES_DIR/config/ghostty/config.ghostty|$HOME/.config/ghostty/config.ghostty")
 }

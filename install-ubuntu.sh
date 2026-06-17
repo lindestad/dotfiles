@@ -17,6 +17,7 @@ APT_PKGS_COMMON=(
   pkg-config
   libssl-dev
   fontconfig
+  gpg
   ripgrep
   fd-find
   ffmpeg
@@ -82,10 +83,52 @@ fi
 
 resolve_install_flags yes yes
 add_alacritty_link
+add_wezterm_link
 add_ghostty_link
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
   add_wayland_desktop_links
 fi
+
+ensure_wezterm_ubuntu() {
+  if have wezterm; then
+    return
+  fi
+
+  if apt-cache show wezterm >/dev/null 2>&1; then
+    install_apt wezterm
+    return
+  fi
+
+  echo ">> WezTerm is not available from the configured Ubuntu apt repositories."
+  if [[ "$ASSUME_YES" == "yes" ]]; then
+    echo ">> Skipping WezTerm APT repo setup in non-interactive mode."
+    return
+  fi
+  if [[ "$(prompt_yes_no "Install WezTerm from the official apt.fury.io APT repo?")" != "yes" ]]; then
+    return
+  fi
+  if ! have curl; then
+    echo "!! curl is required to install WezTerm from the official APT repo."
+    return 1
+  fi
+  if ! have gpg; then
+    echo "==> Installing gpg for WezTerm APT repo setup..."
+    install_apt gpg
+  fi
+
+  echo "==> Adding WezTerm APT repo..."
+  local key_file
+  key_file="$(mktemp)"
+  curl -fsSL https://apt.fury.io/wez/gpg.key -o "$key_file"
+  sudo install -d -m 0755 /etc/apt/keyrings
+  sudo gpg --yes --dearmor -o /etc/apt/keyrings/wezterm-fury.gpg "$key_file"
+  rm -f "$key_file"
+  echo "deb [signed-by=/etc/apt/keyrings/wezterm-fury.gpg] https://apt.fury.io/wez/ * *" \
+    | sudo tee /etc/apt/sources.list.d/wezterm.list >/dev/null
+
+  echo "==> Installing WezTerm..."
+  install_apt wezterm
+}
 
 ensure_ghostty_ubuntu() {
   if have ghostty; then
@@ -124,6 +167,7 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
   echo "==> Installing Niri desktop packages..."
   install_apt "${NIRI_APT_PKGS[@]}"
 fi
+ensure_wezterm_ubuntu
 ensure_ghostty_ubuntu
 ensure_shell_shims
 ensure_neovim_release || install_apt neovim

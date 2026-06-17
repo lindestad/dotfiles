@@ -13,6 +13,7 @@ PACMAN_PKGS=(
   curl
   unzip
   fontconfig
+  wezterm
   ghostty
   helix
   eza
@@ -79,6 +80,7 @@ fi
 
 resolve_install_flags yes yes
 add_alacritty_link
+add_wezterm_link
 add_ghostty_link
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
   add_wayland_desktop_links

@@ -33,6 +33,7 @@ These tools are installed on at least one Linux installer and on Windows.
 | Typst CLI | `typst` | cargo fallback | cargo fallback | cargo fallback | `Typst.Typst` |
 | uutils coreutils | `uutils-coreutils` | `uutils-coreutils` (optional) | `uutils-coreutils` (optional) | not installed | `uutils.coreutils` |
 | uv | `uv` | standalone installer | `uv` with standalone fallback | standalone installer | `astral-sh.uv` |
+| WezTerm | `wezterm` | prompted official APT repo | `wezterm` or prompted official COPR | not installed | `wez.wezterm` |
 | yazi | `yazi` | `yazi` (optional) | cargo fallback | `yazi` (optional) | `sxyazi.yazi` |
 | zoxide | `zoxide` | `zoxide` | `zoxide` | `zoxide` | `ajeetdsouza.zoxide` |
 
@@ -134,6 +135,7 @@ These are not package installs, but the installers manage them alongside the too
 | Kanata | optional | optional |
 | Nushell | Ubuntu only | linked/copied |
 | Starship | symlinked | linked/copied |
+| WezTerm | non-WSL Linux only | linked/copied |
 | Windows Terminal | not managed | Git Bash profile/default configured when settings exist |
 | Yazi | symlinked | linked/copied |
 | Zsh | symlinked | not linked |

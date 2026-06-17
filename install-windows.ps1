@@ -53,6 +53,7 @@ $apps = @(
     "dandavison.delta",
     "Microsoft.PowerShell",
     "uutils.coreutils",
+    "wez.wezterm",
     # Kanata is optional; installed only if selected
     # "jtroo.kanata_gui",
     "rsteube.Carapace"
@@ -519,6 +520,7 @@ Install-UserFonts -FontDir (Join-Path $Dotfiles "fonts")
 # Links specific to Windows setup
 New-SafeLink -Src (Join-Path $Dotfiles "config/codex/AGENTS.md") -Dst (Join-Path $UserHome ".codex/AGENTS.md")
 New-SafeLink -Src (Join-Path $Dotfiles "config/alacritty/alacritty-windows.toml") -Dst (Join-Path $Roaming "alacritty/alacritty.toml")
+New-SafeLink -Src (Join-Path $Dotfiles "config/wezterm/wezterm-windows.lua") -Dst (Join-Path $Roaming "wezterm/wezterm.lua")
 New-SafeLink -Src (Join-Path $Dotfiles "config/copilot/copilot-instructions.md") -Dst (Join-Path $UserHome ".copilot/copilot-instructions.md")
 New-SafeLink -Src (Join-Path $Dotfiles "config/git/ignore") -Dst (Join-Path $UserHome ".config/git/ignore")
 New-SafeLink -Src (Join-Path $Dotfiles "config/helix/config.toml") -Dst (Join-Path $Roaming "helix/config.toml")
