@@ -480,46 +480,6 @@ function New-SafeLink {
     }
 }
 
-function Remove-ManagedFileIfSame {
-    param(
-        [Parameter(Mandatory)] [string]$Src,
-        [Parameter(Mandatory)] [string]$Dst,
-        [Parameter(Mandatory)] [string]$Reason
-    )
-
-    if (-not (Test-Path $Dst)) { return }
-
-    try {
-        $existing = Get-Item $Dst -Force
-        $srcFull = [System.IO.Path]::GetFullPath($Src)
-
-        if ($existing.LinkType -eq 'SymbolicLink') {
-            $targets = @($existing.Target | ForEach-Object { [System.IO.Path]::GetFullPath($_) })
-            if ($targets -contains $srcFull) {
-                Remove-Item $Dst -Force
-                Write-Host "Removed obsolete managed link: $Dst"
-                return
-            }
-        }
-
-        if (-not $existing.PSIsContainer) {
-            $srcHash = (Get-FileHash -Algorithm SHA256 -Path $Src).Hash
-            $dstHash = (Get-FileHash -Algorithm SHA256 -Path $Dst).Hash
-            if ($srcHash -eq $dstHash) {
-                Remove-Item $Dst -Force
-                Write-Host "Removed obsolete managed copy: $Dst"
-                return
-            }
-        }
-    }
-    catch {
-        Write-Warning "Could not inspect obsolete managed file $Dst. $($_.Exception.Message)"
-        return
-    }
-
-    Write-Warning "$Reason Leaving existing file untouched: $Dst"
-}
-
 function Ensure-GitBashProfile {
     param(
         [Parameter(Mandatory)] [string]$UserHome
@@ -563,10 +523,6 @@ New-SafeLink -Src (Join-Path $Dotfiles "config/alacritty/alacritty-windows.toml"
 $weztermConfig = Join-Path $Dotfiles "config/wezterm/wezterm-windows.lua"
 New-SafeLink -Src $weztermConfig -Dst (Join-Path $UserHome ".wezterm.lua")
 New-SafeLink -Src $weztermConfig -Dst (Join-Path $UserHome ".config/wezterm/wezterm.lua")
-Remove-ManagedFileIfSame `
-    -Src $weztermConfig `
-    -Dst (Join-Path $Roaming "wezterm/wezterm.lua") `
-    -Reason "WezTerm ignores the old AppData config path."
 New-SafeLink -Src (Join-Path $Dotfiles "config/copilot/copilot-instructions.md") -Dst (Join-Path $UserHome ".copilot/copilot-instructions.md")
 New-SafeLink -Src (Join-Path $Dotfiles "config/git/ignore") -Dst (Join-Path $UserHome ".config/git/ignore")
 New-SafeLink -Src (Join-Path $Dotfiles "config/helix/config.toml") -Dst (Join-Path $Roaming "helix/config.toml")
