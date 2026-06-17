@@ -83,12 +83,4 @@ config.colors = {
   },
 }
 
-config.keys = {
-  -- Send Ctrl-_ (0x1f), which Neovim maps as the terminal toggle.
-  { key = "/", mods = "CTRL", action = wezterm.action.SendString("\x1f") },
-  { key = "/", mods = "CTRL|SHIFT", action = wezterm.action.SendString("\x1f") },
-  { key = "7", mods = "CTRL", action = wezterm.action.SendString("\x1f") },
-  { key = "7", mods = "CTRL|SHIFT", action = wezterm.action.SendString("\x1f") },
-}
-
 return config

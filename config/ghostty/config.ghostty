@@ -60,9 +60,3 @@ palette = 14=#95e6cb
 palette = 15=#ffffff
 
 command = direct:/usr/bin/zsh -l
-
-# Send Ctrl-_ (0x1f), which Neovim maps as the terminal toggle.
-keybind = ctrl+/=text:\x1f
-keybind = ctrl+shift+/=text:\x1f
-keybind = ctrl+7=text:\x1f
-keybind = ctrl+shift+7=text:\x1f
