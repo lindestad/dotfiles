@@ -20,6 +20,8 @@ return {
       -- Add cursors above/below the current line.
       vim.keymap.set({ "n", "x" }, "<M-up>", function() mc.lineAddCursor(-1) end, { desc = "Cursor line above" })
       vim.keymap.set({ "n", "x" }, "<M-down>", function() mc.lineAddCursor(1) end, { desc = "Cursor line below" })
+      vim.keymap.set({ "n", "x" }, "<C-k>", function() mc.lineAddCursor(-1) end, { desc = "Cursor line above" })
+      vim.keymap.set({ "n", "x" }, "<C-j>", function() mc.lineAddCursor(1) end, { desc = "Cursor line below" })
 
       -- Within a visual selection: add cursors to lines, or match by regex.
       vim.keymap.set("x", "I", function() mc.insertVisual() end, { desc = "Cursor at start of each line" })

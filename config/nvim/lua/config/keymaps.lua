@@ -30,8 +30,12 @@ vim.keymap.set("n", "<leader>Y", function()
 end, { desc = "Copy buffer to system clipboard" })
 
 -- Line navigation
-vim.keymap.set({ "n", "v" }, "g-h", "^", { desc = "Start of line" })
-vim.keymap.set({ "n", "v" }, "g-l", "$", { desc = "End of line" })
+vim.keymap.set({ "n", "v" }, "gh", "^", { desc = "Start of line" })
+vim.keymap.set({ "n", "v" }, "gl", "$", { desc = "End of line" })
+
+-- Indent in visual mode (re-select after)
+vim.keymap.set("x", "<Tab>", ">gv", { desc = "Indent right" })
+vim.keymap.set("x", "<S-Tab>", "<gv", { desc = "Indent left" })
 
 -- Shift-U: redo (reverse undo). Default U (restore line) is rarely useful.
 vim.keymap.set("n", "U", "<C-r>", { desc = "Redo" })
