@@ -57,6 +57,25 @@ config.keys = {
   { key = "-", mods = "CTRL", action = wezterm.action.DisableDefaultAssignment },
   { key = "-", mods = "CTRL|SHIFT", action = wezterm.action.DisableDefaultAssignment },
   { key = "_", mods = "CTRL", action = wezterm.action.DisableDefaultAssignment },
+
+  -- Keep common editor/app Ctrl chords out of WezTerm's default key table.
+  { key = "7", mods = "CTRL|SHIFT", action = wezterm.action.DisableDefaultAssignment },
+  { key = "=", mods = "CTRL", action = wezterm.action.DisableDefaultAssignment },
+  { key = "0", mods = "CTRL", action = wezterm.action.DisableDefaultAssignment },
+  { key = "Tab", mods = "CTRL", action = wezterm.action.DisableDefaultAssignment },
+  { key = "Tab", mods = "CTRL|SHIFT", action = wezterm.action.DisableDefaultAssignment },
+  { key = "PageUp", mods = "CTRL", action = wezterm.action.DisableDefaultAssignment },
+  { key = "PageUp", mods = "CTRL|SHIFT", action = wezterm.action.DisableDefaultAssignment },
+  { key = "PageDown", mods = "CTRL", action = wezterm.action.DisableDefaultAssignment },
+  { key = "PageDown", mods = "CTRL|SHIFT", action = wezterm.action.DisableDefaultAssignment },
+  { key = "LeftArrow", mods = "CTRL|SHIFT", action = wezterm.action.DisableDefaultAssignment },
+  { key = "RightArrow", mods = "CTRL|SHIFT", action = wezterm.action.DisableDefaultAssignment },
+  { key = "UpArrow", mods = "CTRL|SHIFT", action = wezterm.action.DisableDefaultAssignment },
+  { key = "DownArrow", mods = "CTRL|SHIFT", action = wezterm.action.DisableDefaultAssignment },
+  { key = "LeftArrow", mods = "CTRL|SHIFT|ALT", action = wezterm.action.DisableDefaultAssignment },
+  { key = "RightArrow", mods = "CTRL|SHIFT|ALT", action = wezterm.action.DisableDefaultAssignment },
+  { key = "UpArrow", mods = "CTRL|SHIFT|ALT", action = wezterm.action.DisableDefaultAssignment },
+  { key = "DownArrow", mods = "CTRL|SHIFT|ALT", action = wezterm.action.DisableDefaultAssignment },
 }
 
 config.colors = {
