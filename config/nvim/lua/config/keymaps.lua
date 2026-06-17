@@ -37,6 +37,11 @@ vim.keymap.set({ "n", "v" }, "gl", "$", { desc = "End of line" })
 vim.keymap.set("x", "<Tab>", ">gv", { desc = "Indent right" })
 vim.keymap.set("x", "<S-Tab>", "<gv", { desc = "Indent left" })
 
+-- Insert mode navigation / editing
+vim.keymap.set("i", "<C-h>", "<Left>", { desc = "Move left" })
+vim.keymap.set("i", "<C-l>", "<Right>", { desc = "Move right" })
+vim.keymap.set("i", "<C-BS>", "<C-w>", { desc = "Delete previous word" })
+
 -- Shift-U: redo (reverse undo). Default U (restore line) is rarely useful.
 vim.keymap.set("n", "U", "<C-r>", { desc = "Redo" })
 
