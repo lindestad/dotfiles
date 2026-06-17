@@ -595,6 +595,7 @@ function Ensure-CodexConfig {
     $content = Get-Content $Dst -Raw
     if ($null -eq $content) { $content = "" }
     $content = Ensure-TomlRootValue -Content $content -Key "default_permissions" -Value '":danger-full-access"' -Path $Dst
+    $content = Ensure-TomlRootValue -Content $content -Key "approval_policy" -Value '"never"' -Path $Dst
     $content = Ensure-TomlTableValue -Content $content -Table "tui" -Key "vim_mode_default" -Value "true" -Path $Dst
 
     [System.IO.File]::WriteAllText($Dst, $content, $utf8NoBom)
