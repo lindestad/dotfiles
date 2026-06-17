@@ -50,6 +50,14 @@ config.default_prog = { "/usr/bin/zsh", "-l" }
 config.enable_kitty_keyboard = true
 config.bold_brightens_ansi_colors = false
 
+config.keys = {
+  -- Ctrl-/ can arrive as Ctrl-_ / Ctrl-Shift-- and hit WezTerm's
+  -- default font-size decrease before Neovim sees it.
+  { key = "-", mods = "CTRL", action = wezterm.action.DisableDefaultAssignment },
+  { key = "-", mods = "CTRL|SHIFT", action = wezterm.action.DisableDefaultAssignment },
+  { key = "_", mods = "CTRL", action = wezterm.action.DisableDefaultAssignment },
+}
+
 config.colors = {
   foreground = "#bfbdb6",
   background = "#020305",
