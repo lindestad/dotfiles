@@ -127,9 +127,9 @@ if command -v eza >/dev/null 2>&1; then
   alias la='eza -la --group-directories-first --icons'
   alias tree='eza --tree --level=5'
   alias lz='eza --grid --long --icons --group-directories-first --git-ignore'
-  alias lza='eza --grid --long --icons --group-directories-first'
+  alias lza='eza -a --grid --long --icons --group-directories-first'
   alias lzt='eza --tree --long --icons --group-directories-first --git-ignore --git --level=3'
-  alias lzta='eza --tree --long --icons --group-directories-first --git --level=3'
+  alias lzta='eza -a --tree --long --icons --group-directories-first --git --level=3'
 fi
 
 # bat as cat (fallback to cat)

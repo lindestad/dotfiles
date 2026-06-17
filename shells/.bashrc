@@ -11,16 +11,16 @@ shopt -s histappend
 
 # Path and prompt config need to exist before tool initialization below.
 case ":$PATH:" in
-  *":$HOME/.cargo/bin:"*) ;;
-  *) export PATH="$HOME/.cargo/bin:$PATH" ;;
+*":$HOME/.cargo/bin:"*) ;;
+*) export PATH="$HOME/.cargo/bin:$PATH" ;;
 esac
 case ":$PATH:" in
-  *":$HOME/.local/bin:"*) ;;
-  *) export PATH="$HOME/.local/bin:$PATH" ;;
+*":$HOME/.local/bin:"*) ;;
+*) export PATH="$HOME/.local/bin:$PATH" ;;
 esac
 case ":$PATH:" in
-  *":$LOCALAPPDATA/Microsoft/WinGet/Links:"*) ;;
-  *) [ -n "${LOCALAPPDATA:-}" ] && export PATH="$LOCALAPPDATA/Microsoft/WinGet/Links:$PATH" ;;
+*":$LOCALAPPDATA/Microsoft/WinGet/Links:"*) ;;
+*) [ -n "${LOCALAPPDATA:-}" ] && export PATH="$LOCALAPPDATA/Microsoft/WinGet/Links:$PATH" ;;
 esac
 
 export STARSHIP_CONFIG="$HOME/.config/starship.toml"
@@ -108,9 +108,9 @@ if command -v eza >/dev/null 2>&1; then
   alias la='eza -la --group-directories-first --icons'
   alias tree='eza --tree --level=5'
   alias lz='eza --grid --long --icons --group-directories-first --git-ignore'
-  alias lza='eza --grid --long --icons --group-directories-first'
+  alias lza='eza -a --grid --long --icons --group-directories-first'
   alias lzt='eza --tree --long --icons --group-directories-first --git-ignore --git --level=3'
-  alias lzta='eza --tree --long --icons --group-directories-first --git --level=3'
+  alias lzta='eza -a --tree --long --icons --group-directories-first --git --level=3'
 fi
 
 if command -v bat >/dev/null 2>&1; then
@@ -142,10 +142,10 @@ zd() {
 zdclean() {
   local days="${1:-14}"
   case "$days" in
-    ''|*[!0-9]*)
-      echo "usage: zdclean [days]"
-      return 2
-      ;;
+  '' | *[!0-9]*)
+    echo "usage: zdclean [days]"
+    return 2
+    ;;
   esac
 
   local session_info_dir="${XDG_CACHE_HOME:-$HOME/.cache}/zellij/contract_version_1/session_info"
