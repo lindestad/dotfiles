@@ -48,6 +48,7 @@ config.harfbuzz_features = {
 
 config.default_prog = { "/usr/bin/zsh", "-l" }
 config.enable_kitty_keyboard = true
+config.bold_brightens_ansi_colors = false
 
 config.colors = {
   foreground = "#bfbdb6",

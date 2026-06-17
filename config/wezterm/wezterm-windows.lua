@@ -48,6 +48,7 @@ config.harfbuzz_features = {
 
 config.default_prog = { "wsl.exe", "-d", "Ubuntu", "--cd", "~" }
 config.enable_kitty_keyboard = true
+config.bold_brightens_ansi_colors = false
 config.term = "xterm-256color"
 
 config.colors = {
