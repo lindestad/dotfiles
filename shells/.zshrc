@@ -183,7 +183,7 @@ zdclean() {
     ' sh {} +
 }
 
-# Git aliases (mirroring your Nushell ones)
+# Git aliases
 alias gs='git status'
 alias ga='git add'
 alias "ga."='git add .'
@@ -193,6 +193,8 @@ alias gba='git branch --all'
 alias gbr='git branch --remote'
 alias gd='git diff'
 alias gdc='git diff --cached'
+alias gds='git diff --staged'
+alias gdh='git diff HEAD'
 alias gf='git fetch'
 alias gl='git log --oneline --graph'
 alias gr='git rebase'
