@@ -1,7 +1,7 @@
 local wezterm = require("wezterm")
 local config = wezterm.config_builder()
 
-config.window_decorations = "NONE"
+config.window_decorations = "RESIZE"
 config.window_padding = {
   left = 4,
   right = 4,
