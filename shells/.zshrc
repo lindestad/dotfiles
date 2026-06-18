@@ -69,6 +69,9 @@ if [ -f /usr/share/fzf/completion.zsh ]; then
   source /usr/share/fzf/completion.zsh
 fi
 
+# Show ~10 history entries inline rather than full-screen; prompt at top.
+export FZF_CTRL_R_OPTS="--height=~40% --layout=reverse --preview-window=hidden"
+
 ####--------------------------------------------------
 #### Completion (native Zsh)
 ####--------------------------------------------------
