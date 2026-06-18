@@ -4,7 +4,14 @@
 # Shell options
 set -o notify
 set -o noclobber
-set -o vi        # vi-style keybindings;
+bindkey -e               # emacs line-editing (default); explicit so vi mode stays off
+
+# Custom keybindings
+bindkey '^H' backward-char          # Ctrl-H  → move cursor left
+bindkey '^L' forward-char           # Ctrl-L  → move cursor right
+                                    # (Ctrl-L no longer clears screen; use 'clear' if needed)
+bindkey '\e[127;5u' backward-kill-word  # Ctrl-Backspace → delete word behind cursor
+                                        # requires WezTerm to send \x1b[127;5u for this key
 
 # History
 HISTFILE=${HOME}/.zsh_history
