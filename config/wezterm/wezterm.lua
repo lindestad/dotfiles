@@ -51,9 +51,10 @@ config.enable_kitty_keyboard = true
 config.bold_brightens_ansi_colors = false
 
 config.keys = {
-  -- Send the kitty-protocol Ctrl-Backspace sequence unconditionally so zsh
-  -- can bind it without needing to negotiate the full kitty keyboard protocol.
-  { key = "Backspace", mods = "CTRL", action = wezterm.action.SendString("\x1b[127;5u") },
+  -- Ctrl-Backspace → send ESC DEL (\x1b\x7f = Alt-Backspace).
+  -- Zsh emacs mode maps \e\x7f to backward-kill-word by default, and the
+  -- sequence passes through Zellij transparently without KKP negotiation.
+  { key = "Backspace", mods = "CTRL", action = wezterm.action.SendString("\x1b\x7f") },
 
   -- Ctrl-/ can arrive as Ctrl-_ / Ctrl-Shift-- and hit WezTerm's
   -- default font-size decrease before Neovim sees it.

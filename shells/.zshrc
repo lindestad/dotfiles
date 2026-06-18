@@ -7,11 +7,22 @@ set -o noclobber
 bindkey -e               # emacs line-editing (default); explicit so vi mode stays off
 
 # Custom keybindings
-bindkey '^H' backward-char          # Ctrl-H  → move cursor left
-bindkey '^L' forward-char           # Ctrl-L  → move cursor right
+bindkey '^H' backward-char          # Ctrl-H → move cursor left
+bindkey '^L' forward-char           # Ctrl-L → move cursor right
                                     # (Ctrl-L no longer clears screen; use 'clear' if needed)
-bindkey '\e[127;5u' backward-kill-word  # Ctrl-Backspace → delete word behind cursor
-                                        # requires WezTerm to send \x1b[127;5u for this key
+# Ctrl-Backspace → delete word behind cursor.
+# WezTerm sends \x1b\x7f (Alt-Backspace), which emacs mode maps to backward-kill-word
+# and passes through Zellij without KKP negotiation.
+# Ghostty sends the KKP sequence \e[127;5u, so bind that too.
+bindkey '\e[127;5u' backward-kill-word
+
+# Zellij (0.44.x) leaks OSC 4 color-palette query responses into the first
+# pane's stdin at startup (issue #5174, unfixed). Drain any pending bytes
+# before the interactive prompt takes over.
+if [[ -n "$ZELLIJ" ]]; then
+  while read -t 0.1 -r -s _zellij_drain 2>/dev/null; do :; done
+  unset _zellij_drain
+fi
 
 # History
 HISTFILE=${HOME}/.zsh_history
