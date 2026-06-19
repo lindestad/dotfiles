@@ -60,6 +60,7 @@ alias gaa = git add --all
 alias gb = git branch
 alias gba = git branch --all
 alias gbr = git branch --remote
+alias gw = git worktree
 alias gd = git diff
 alias gdc = git diff --cached
 alias gf = git fetch
