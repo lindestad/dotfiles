@@ -175,6 +175,7 @@ ensure_rust_toolchain
 ensure_starship
 ensure_zellij_cargo
 ensure_typst_cli
+ensure_resvg_cargo
 ensure_node_lts
 install_fonts
 

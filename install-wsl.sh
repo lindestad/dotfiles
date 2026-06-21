@@ -124,6 +124,7 @@ ensure_starship
 ensure_bottom
 ensure_yazi_cargo
 ensure_typst_cli
+ensure_resvg_cargo
 ensure_node_lts
 ensure_zellij_cargo
 ensure_helix

@@ -94,6 +94,7 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
 fi
 ensure_rust_toolchain
 ensure_starship
+ensure_resvg_cargo
 ensure_node_lts
 install_fonts
 

@@ -189,6 +189,7 @@ ensure_rust_toolchain
 ensure_starship
 ensure_bottom
 ensure_typst_cli
+ensure_resvg_cargo
 ensure_yazi_cargo
 ensure_vivid_cargo
 ensure_zellij_cargo

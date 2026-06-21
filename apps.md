@@ -53,6 +53,7 @@ These are installed only by the Linux/WSL shell installers.
 | htop | `htop` | `htop` | `htop` | `htop` |
 | OpenSSL headers | not installed | `libssl-dev` | `openssl-devel` | `libssl-dev` |
 | pkg-config | not installed | `pkg-config` | `pkgconf-pkg-config` | `pkg-config` |
+| resvg | cargo fallback | cargo fallback | cargo fallback | cargo fallback |
 | rustup/cargo | install script | install script | install script | install script |
 | unzip | `unzip` | `unzip` | `unzip` | `unzip` |
 | user fonts | bundled fonts copied to `~/.local/share/fonts` | same | same | same |

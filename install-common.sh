@@ -282,6 +282,16 @@ ensure_typst_cli() {
   cargo install --locked typst-cli
 }
 
+ensure_resvg_cargo() {
+  if have resvg; then
+    return
+  fi
+
+  ensure_rust_toolchain
+  echo "==> Installing resvg with cargo..."
+  cargo install --locked resvg
+}
+
 ensure_neovim_release() {
   local machine nvim_arch
   machine="$(uname -m)"
