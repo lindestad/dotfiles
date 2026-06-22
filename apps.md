@@ -12,6 +12,7 @@ These tools are installed on at least one Linux installer and on Windows.
 | Alacritty | not installed | not installed | `alacritty` | not installed | not installed |
 | bat | `bat` | `bat` | `bat` | `bat` | `sharkdp.bat` |
 | carapace | `carapace-bin` (AUR) | `carapace` (optional) | prompted upstream `carapace-bin` RPM repo | `carapace` (optional) | `rsteube.Carapace` |
+| dust | `dust` with cargo fallback | `du-dust` with cargo fallback | `du-dust` with cargo fallback | `du-dust` with cargo fallback | `bootandy.dust` |
 | eza | `eza` | `eza` (optional) | `eza` | `eza` (optional) | `eza-community.eza` |
 | fd | `fd` | `fd-find` | `fd-find` | `fd-find` | `sharkdp.fd` |
 | ffmpeg | `ffmpeg` | `ffmpeg` | `ffmpeg-free` | `ffmpeg` | `Gyan.FFmpeg` |

@@ -17,6 +17,7 @@ PACMAN_PKGS=(
   ghostty
   helix
   eza
+  dust
   ripgrep
   fd
   ffmpeg
@@ -95,6 +96,7 @@ fi
 ensure_rust_toolchain
 ensure_starship
 ensure_resvg_cargo
+ensure_dust_cargo
 ensure_node_lts
 install_fonts
 

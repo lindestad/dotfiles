@@ -20,6 +20,7 @@ APT_PKGS_COMMON=(
   gpg
   ripgrep
   fd-find
+  du-dust
   ffmpeg
   p7zip-full
   jq
@@ -176,6 +177,7 @@ ensure_starship
 ensure_zellij_cargo
 ensure_typst_cli
 ensure_resvg_cargo
+ensure_dust_cargo
 ensure_node_lts
 install_fonts
 

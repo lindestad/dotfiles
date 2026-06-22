@@ -292,6 +292,16 @@ ensure_resvg_cargo() {
   cargo install --locked resvg
 }
 
+ensure_dust_cargo() {
+  if have dust; then
+    return
+  fi
+
+  ensure_rust_toolchain
+  echo "==> Installing dust with cargo..."
+  cargo install --locked du-dust
+}
+
 ensure_neovim_release() {
   local machine nvim_arch
   machine="$(uname -m)"

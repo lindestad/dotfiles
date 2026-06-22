@@ -21,6 +21,7 @@ APT_PKGS=(
   libssl-dev
   ripgrep
   fd-find
+  du-dust
   file
   ffmpeg
   p7zip-full
@@ -125,6 +126,7 @@ ensure_bottom
 ensure_yazi_cargo
 ensure_typst_cli
 ensure_resvg_cargo
+ensure_dust_cargo
 ensure_node_lts
 ensure_zellij_cargo
 ensure_helix

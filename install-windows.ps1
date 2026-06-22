@@ -28,6 +28,7 @@ $apps = @(
     "Neovim.Neovim",
     "Starship.Starship",
     "eza-community.eza",
+    "bootandy.dust",
     "BurntSushi.ripgrep.MSVC",
     "sharkdp.fd",
     "Gyan.FFmpeg",
