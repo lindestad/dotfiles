@@ -13,6 +13,7 @@ have() { command -v "$1" >/dev/null 2>&1; }
 INSTALL_NIRI=""
 INSTALL_KANATA=""
 ASSUME_YES="no"
+DNF_MAKECACHE_DONE="no"
 
 is_wsl() {
   [[ -n "${WSL_DISTRO_NAME:-}" ]] || grep -qiE "(microsoft|wsl)" /proc/version 2>/dev/null
@@ -211,8 +212,20 @@ install_dnf() {
   local pkgs=("$@")
   local available=() missing=()
 
-  sudo dnf makecache -y || true
+  if [[ "${DNF_MAKECACHE_DONE:-no}" != "yes" ]]; then
+    sudo dnf makecache -y || true
+    DNF_MAKECACHE_DONE="yes"
+  fi
+
+  if dnf install --help 2>&1 | grep -q -- '--skip-unavailable'; then
+    echo "==> Installing available dnf packages..."
+    sudo dnf install -y --skip-unavailable "${pkgs[@]}"
+    return
+  fi
+
+  echo "==> Checking dnf package availability..."
   for pkg in "${pkgs[@]}"; do
+    echo "-> Checking $pkg"
     if dnf -q list --installed "$pkg" >/dev/null 2>&1 || dnf -q list --available "$pkg" >/dev/null 2>&1; then
       available+=("$pkg")
     else

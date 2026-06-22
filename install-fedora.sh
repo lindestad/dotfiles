@@ -21,7 +21,6 @@ DNF_PKGS=(
   openssl-devel
   fontconfig
   alacritty
-  wezterm
   helix
   eza
   du-dust
@@ -101,8 +100,9 @@ ensure_ghostty_fedora() {
     return
   fi
 
-  if dnf -q list --available ghostty >/dev/null 2>&1; then
-    install_dnf ghostty
+  echo "==> Installing Ghostty from configured Fedora repositories if available..."
+  install_dnf ghostty
+  if have ghostty; then
     return
   fi
 
@@ -131,8 +131,9 @@ ensure_wezterm_fedora() {
     return
   fi
 
-  if dnf -q list --available wezterm >/dev/null 2>&1; then
-    install_dnf wezterm
+  echo "==> Installing WezTerm from configured Fedora repositories if available..."
+  install_dnf wezterm
+  if have wezterm; then
     return
   fi
 
@@ -154,6 +155,36 @@ ensure_wezterm_fedora() {
   sudo dnf copr enable -y wezfurlong/wezterm-nightly
   echo "==> Installing WezTerm..."
   sudo dnf install -y wezterm
+}
+
+ensure_zellij_fedora() {
+  if have zellij; then
+    zellij --version
+    return
+  fi
+
+  if ! dnf copr --help >/dev/null 2>&1; then
+    echo "==> Installing dnf COPR plugin..."
+    if ! sudo dnf install -y dnf-plugins-core; then
+      echo ">> Could not install dnf COPR plugin; falling back to cargo."
+      ensure_zellij_cargo
+      zellij --version
+      return
+    fi
+  fi
+
+  echo "==> Enabling varlad/zellij COPR..."
+  if sudo dnf copr enable -y varlad/zellij; then
+    echo "==> Installing Zellij..."
+    if sudo dnf install -y zellij && have zellij; then
+      zellij --version
+      return
+    fi
+  fi
+
+  echo ">> Could not install Zellij with dnf; falling back to cargo."
+  ensure_zellij_cargo
+  zellij --version
 }
 
 LINKS=()
@@ -194,7 +225,7 @@ ensure_resvg_cargo
 ensure_dust_cargo
 ensure_yazi_cargo
 ensure_vivid_cargo
-ensure_zellij_cargo
+ensure_zellij_fedora
 ensure_carapace_fedora
 ensure_node_lts
 install_fonts

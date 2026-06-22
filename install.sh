@@ -8,9 +8,7 @@ source "$DOTFILES_DIR/install-common.sh"
 parse_install_flags "$@"
 
 if is_wsl; then
-  resolve_install_flags no no
-  mapfile -t dispatch_args < <(install_flag_args)
-  exec "$DOTFILES_DIR/install-wsl.sh" "${dispatch_args[@]}"
+  exec "$DOTFILES_DIR/install-wsl.sh" "$@"
 fi
 
 if [[ -f /etc/os-release ]]; then
@@ -49,9 +47,7 @@ if [[ -z "$installer" ]]; then
 fi
 
 if [[ -n "$installer" ]]; then
-  resolve_install_flags yes yes
-  mapfile -t dispatch_args < <(install_flag_args)
-  exec "$installer" "${dispatch_args[@]}"
+  exec "$installer" "$@"
 fi
 
 echo "!! Unsupported distro: ${PRETTY_NAME:-${ID:-unknown}}"
