@@ -25,7 +25,7 @@ keybinds clear-defaults=true {
         bind "n" { NewPane; SwitchToMode "locked"; }
         bind "p" { SwitchToMode "normal"; }
         bind "r" { NewPane "right"; SwitchToMode "locked"; }
-        bind "s" { NewPane "stacked"; SwitchToMode "locked"; }
+        bind "s" { NewPane; SwitchToMode "locked"; }
         bind "w" { ToggleFloatingPanes; SwitchToMode "locked"; }
         bind "x" { CloseFocus; SwitchToMode "locked"; }
         bind "z" { TogglePaneFrames; SwitchToMode "locked"; }
@@ -175,8 +175,6 @@ keybinds clear-defaults=true {
         bind "Alt l" { MoveFocusOrTab "right"; }
         bind "Alt n" { NewPane; }
         bind "Alt o" { MoveTab "right"; }
-        bind "Alt p" { TogglePaneInGroup; }
-        bind "Alt Shift p" { ToggleGroupMarking; }
     }
     shared_except "locked" "renametab" "renamepane" {
         bind "Ctrl g" { SwitchToMode "locked"; }
