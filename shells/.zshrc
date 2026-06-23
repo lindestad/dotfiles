@@ -52,13 +52,6 @@ autoload -U colors && colors
 # Advertise 24-bit color so apps like Helix render true-color themes (WSL/Windows Terminal don't set this).
 export COLORTERM=truecolor
 
-# Work around openai/codex#9370-adjacent shifted text loss in
-# Windows WezTerm -> WSL. Remove after a known-good Codex release.
-# https://github.com/openai/codex/issues/9370
-if [ -n "${WSL_INTEROP:-}" ] && [ "${TERM_PROGRAM:-}" = "WezTerm" ] && [ -z "${CODEX_TUI_DISABLE_KEYBOARD_ENHANCEMENT+x}" ]; then
-  export CODEX_TUI_DISABLE_KEYBOARD_ENHANCEMENT=1
-fi
-
 ####--------------------------------------------------
 #### Prompt / tools init
 ####--------------------------------------------------
