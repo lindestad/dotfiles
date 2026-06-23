@@ -44,11 +44,16 @@ These are installed only by the Linux/WSL shell installers.
 
 | Tool | Arch | Ubuntu | Fedora | WSL |
 | --- | --- | --- | --- | --- |
+| browser automation | not installed | not installed | `chromium`, `chromium-headless`, `chromedriver`, `xorg-x11-server-Xvfb` | not installed |
 | bottom/btm | `bottom` | `btm` | cargo fallback | `btm` |
 | btop | `btop` | `btop` | `btop` | `btop` |
-| build tools | not installed | `build-essential` | `gcc`, `make` | `build-essential` |
+| build tools | not installed | `build-essential` | `gcc`, `gcc-c++`, `make`, `cmake` | `build-essential` |
 | ca-certificates | not installed | `ca-certificates` | not installed | `ca-certificates` |
+| containers | not installed | not installed | `podman`, `podman-compose`, `buildah` | not installed |
 | curl | `curl` | `curl` | `curl` | `curl` |
+| database clients/headers | not installed | not installed | `sqlite`, `sqlite-devel`, `postgresql`, `postgresql-devel` | not installed |
+| desktop capture/input | not installed | not installed | `grim`, `slurp`, `wl-clipboard`, `xclip`, `xdotool`, `wtype` | not installed |
+| diagnostics/networking | not installed | not installed | `bind-utils`, `gdb`, `httpie`, `lsof`, `nmap-ncat`, `procps-ng`, `psmisc`, `strace`, `wget` | not installed |
 | file | not installed | `file` | `file` | `file` |
 | fontconfig | `fontconfig` | `fontconfig` | `fontconfig` | `fontconfig` |
 | htop | `htop` | `htop` | `htop` | `htop` |
@@ -59,6 +64,7 @@ These are installed only by the Linux/WSL shell installers.
 | unzip | `unzip` | `unzip` | `unzip` | `unzip` |
 | user fonts | bundled fonts copied to `~/.local/share/fonts` | same | same | same |
 | vivid | `vivid` | `vivid` (optional) | cargo fallback | `vivid` (optional) |
+| workflow CLIs | not installed | not installed | `direnv`, `entr`, `git-lfs`, `hyperfine`, `just`, `shfmt`, `tokei`, `tree`, `yq` | not installed |
 | zsh | `zsh` | `zsh` | `zsh` | `zsh` |
 
 ## Distro-specific

@@ -11,9 +11,12 @@ ensure_not_root
 DNF_PKGS=(
   zsh
   curl
+  wget
   unzip
   gcc
+  gcc-c++
   make
+  cmake
   perl-FindBin
   perl-IPC-Cmd
   perl-Time-Piece
@@ -21,14 +24,20 @@ DNF_PKGS=(
   openssl-devel
   fontconfig
   alacritty
+  chromium
+  chromium-headless
+  chromedriver
+  xorg-x11-server-Xvfb
   helix
   eza
   du-dust
+  file
   ripgrep
   fd-find
   ffmpeg-free
   7zip
   jq
+  yq
   bat
   neovim
   htop
@@ -36,11 +45,42 @@ DNF_PKGS=(
   fzf
   zoxide
   ImageMagick
+  grim
+  slurp
+  wl-clipboard
+  xclip
+  xdotool
+  wtype
   git
+  git-lfs
   gh
   git-delta
   ShellCheck
+  shfmt
+  tree
+  entr
+  direnv
+  just
+  hyperfine
+  tokei
+  httpie
+  lsof
+  strace
+  gdb
+  procps-ng
+  psmisc
+  nmap-ncat
+  bind-utils
+  sqlite
+  sqlite-devel
+  postgresql
+  postgresql-devel
+  podman
+  podman-compose
+  buildah
   python3.12
+  python3-virtualenv
+  python3-pytest
   pipx
   uv
 )
