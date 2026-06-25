@@ -1,0 +1,18 @@
+layout {
+    pane size=1 borderless=true {
+        plugin location="tab-bar"
+    }
+    pane split_direction="vertical" {
+        pane split_direction="horizontal" {
+            pane command="btm"
+            pane command="nvtop"
+        }
+        pane split_direction="horizontal" {
+            pane command="expensive"
+            pane
+        }
+    }
+    pane size=1 borderless=true {
+        plugin location="status-bar"
+    }
+}

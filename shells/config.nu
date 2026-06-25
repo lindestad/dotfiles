@@ -125,6 +125,17 @@ def --env zd [session?: string] {
   zellij --session $session_name --new-session-with-layout dev
 }
 
+def --env zleft [session?: string] {
+  let session_name = if ($session == null) {
+    let stamp = (date now | format date "%Y%m%d-%H%M%S")
+    $"zleft-($stamp)"
+  } else {
+    $session
+  }
+
+  zellij --session $session_name --new-session-with-layout zleft
+}
+
 def --env zdclean [days: int = 14] {
   if $days < 0 {
     error make { msg: "usage: zdclean [days]" }

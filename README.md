@@ -69,10 +69,11 @@ The platform-specific scripts are still available for direct use when needed: `i
 
 ## Zellij Sessions
 
-The shell configs keep plain `zellij` unchanged and add two shortcuts:
+The shell configs keep plain `zellij` unchanged and add a few shortcuts:
 
 - `zp` attaches to a shared editable persistent session named `work`, creating it if needed. Set `ZELLIJ_PERSISTENT_SESSION` or pass a name, e.g. `zp laptop`.
 - `zd` starts a fresh dev session with the `dev` layout: two side-by-side panes plus the usual tab/status bars. Pass a name if you want one, e.g. `zd api`.
+- `zleft` starts a fresh session with four panes: `btm`, `expensive`, `nvtop`, and an empty shell. Pass a name if you want one, e.g. `zleft monitors`.
 - `zdclean` deletes `dev-*` sessions whose saved metadata is older than 14 days. Pass another cutoff in days if needed, e.g. `zdclean 30`.
 
 On Linux, the shell configs set `ZELLIJ_SOCKET_DIR` to `/run/user/$UID/zellij` when that runtime directory exists, so desktop and SSH shells attach to the same live session namespace.

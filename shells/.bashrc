@@ -146,6 +146,11 @@ zd() {
   zellij --session "$session_name" --new-session-with-layout dev
 }
 
+zleft() {
+  local session_name="${1:-zleft-$(date +%Y%m%d-%H%M%S)}"
+  zellij --session "$session_name" --new-session-with-layout zleft
+}
+
 zdclean() {
   local days="${1:-14}"
   case "$days" in
