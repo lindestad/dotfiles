@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - '**.sh'
+      - 'shells/.bashrc'
+      - 'shells/.zshrc'
       - '**.ps1'
       - '**.toml'
       - '**.yaml'
@@ -11,6 +13,8 @@ on:
   pull_request:
     paths:
       - '**.sh'
+      - 'shells/.bashrc'
+      - 'shells/.zshrc'
       - '**.ps1'
       - '**.toml'
       - '**.yaml'
@@ -23,12 +27,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install ShellCheck
-        run: sudo apt-get install -y shellcheck
+      - name: Install shell linters
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck zsh
 
-      - name: Run ShellCheck
+      - name: Run shell checks
         run: |
           find . -type f -name '*.sh' -exec shellcheck {} +
+          shellcheck --shell=bash --exclude=SC1091 shells/.bashrc
+          bash -n shells/.bashrc
+          zsh -n shells/.zshrc
 
   lint-powershell:
     name: PowerShell (PSScriptAnalyzer)
@@ -53,8 +62,14 @@ jobs:
         shell: pwsh
         run: |
           $files = Get-ChildItem -Recurse -Include *.ps1
+          $results = @(
           foreach ($file in $files) {
             Invoke-ScriptAnalyzer -Path $file.FullName -Recurse -Severity Warning,Error
+          }
+          )
+          if ($results.Count -gt 0) {
+            $results | Format-Table -AutoSize
+            exit 1
           }
 
   lint-toml:
