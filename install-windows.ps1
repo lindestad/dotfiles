@@ -488,22 +488,38 @@ function New-SafeLink {
         [Parameter(Mandatory)] [string]$Src,
         [Parameter(Mandatory)] [string]$Dst
     )
+
+    if (-not (Test-Path $Src)) {
+        Write-Warning "Missing source: $Src; skipping $Dst"
+        return
+    }
+
     $dstDir = Split-Path $Dst
     if (-not (Test-Path $dstDir)) { New-Item -ItemType Directory -Force -Path $dstDir | Out-Null }
 
     $needsLink = $true
     if (Test-Path $Dst) {
-        try {
-            $existing = Get-Item $Dst -Force
-            if ($existing.LinkType -eq 'SymbolicLink' -and $existing.Target -eq $Src) {
-                $needsLink = $false
-            }
-            else {
-                Remove-Item $Dst -Force -Recurse
-            }
+        $existing = Get-Item $Dst -Force
+        $linkTarget = @($existing.Target) -join ""
+        $isManagedLink = $existing.LinkType -in @("SymbolicLink", "Junction")
+
+        if ($isManagedLink -and $linkTarget -eq $Src) {
+            $needsLink = $false
         }
-        catch {
+        elseif ($isManagedLink) {
             Remove-Item $Dst -Force -Recurse
+        }
+        else {
+            $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+            $backup = "$Dst.bak.$timestamp"
+            $suffix = 1
+            while (Test-Path $backup) {
+                $backup = "$Dst.bak.$timestamp.$suffix"
+                $suffix++
+            }
+
+            Move-Item $Dst $backup -Force
+            Write-Host "Backed up $Dst --> $backup"
         }
     }
 
