@@ -273,7 +273,22 @@ alias push='git push'
 alias gco='git checkout'
 alias co='git checkout'
 alias gm='git merge'
-alias gc='git commit'
+gc() {
+  if [ "$#" -eq 0 ]; then
+    git commit
+  elif [ "$#" -eq 1 ] && [ "${1#-}" = "$1" ]; then
+    git commit -m "$1"
+  elif [ "${1#-}" = "$1" ]; then
+    echo 'gc: quote multi-word commit messages, e.g. gc "my commit message"' >&2
+    return 2
+  else
+    git commit "$@"
+  fi
+}
+gac() {
+  git add --all || return
+  gc "$@"
+}
 alias gcm='git commit -m'
 alias gcam='git commit -am'
 alias gsh='git show HEAD'
