@@ -65,6 +65,11 @@ if command -v zoxide >/dev/null 2>&1; then
   eval "$(zoxide init zsh)"
 fi
 
+# direnv
+if command -v direnv >/dev/null 2>&1; then
+  eval "$(direnv hook zsh)"
+fi
+
 # fzf keybindings + completion (installed via pacman)
 if [ -f /usr/share/fzf/key-bindings.zsh ]; then
   source /usr/share/fzf/key-bindings.zsh
@@ -75,6 +80,11 @@ fi
 
 # Show ~10 history entries inline rather than full-screen; prompt at top.
 export FZF_CTRL_R_OPTS="--height=~40% --layout=reverse --preview-window=hidden"
+
+# Atuin history
+if command -v atuin >/dev/null 2>&1; then
+  eval "$(atuin init zsh)"
+fi
 
 ####--------------------------------------------------
 #### Completion (native Zsh)
@@ -133,6 +143,25 @@ fi
 # Style specific elements in the completion UI (examples)
 # carapace --style 'carapace.Value=bold,magenta'
 # carapace --style 'carapace.Description='
+
+####--------------------------------------------------
+#### Broot launcher
+####--------------------------------------------------
+if [ -f "$HOME/.config/broot/launcher/zsh/br" ]; then
+  source "$HOME/.config/broot/launcher/zsh/br"
+elif command -v broot >/dev/null 2>&1; then
+  br() {
+    local cmd_file code
+    cmd_file="$(mktemp)" || return
+    broot --outcmd "$cmd_file" "$@"
+    code=$?
+    if [ -s "$cmd_file" ]; then
+      source "$cmd_file"
+    fi
+    rm -f "$cmd_file"
+    return "$code"
+  }
+fi
 
 ####--------------------------------------------------
 #### Aliases & functions

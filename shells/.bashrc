@@ -66,6 +66,14 @@ if command -v fnm >/dev/null 2>&1; then
   eval "$(fnm env --use-on-cd --shell bash)"
 fi
 
+if command -v direnv >/dev/null 2>&1; then
+  eval "$(direnv hook bash)"
+fi
+
+if command -v atuin >/dev/null 2>&1; then
+  eval "$(atuin init bash)"
+fi
+
 ####--------------------------------------------------
 #### Completion
 ####--------------------------------------------------
@@ -103,6 +111,28 @@ if [ -f /usr/share/git/completion/git-completion.bash ]; then
 elif [ -f /etc/bash_completion.d/git ]; then
   # shellcheck disable=SC1091
   source /etc/bash_completion.d/git
+fi
+
+####--------------------------------------------------
+#### Broot launcher
+####--------------------------------------------------
+
+if [ -f "$HOME/.config/broot/launcher/bash/br" ]; then
+  # shellcheck disable=SC1090
+  source "$HOME/.config/broot/launcher/bash/br"
+elif command -v broot >/dev/null 2>&1; then
+  br() {
+    local cmd_file code
+    cmd_file="$(mktemp)" || return
+    broot --outcmd "$cmd_file" "$@"
+    code=$?
+    if [ -s "$cmd_file" ]; then
+      # shellcheck disable=SC1090
+      source "$cmd_file"
+    fi
+    rm -f "$cmd_file"
+    return "$code"
+  }
 fi
 
 ####--------------------------------------------------

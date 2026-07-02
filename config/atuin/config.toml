@@ -1,0 +1,13 @@
+auto_sync = false
+update_check = false
+workspaces = true
+filter_mode = "workspace"
+search_mode = "fuzzy"
+style = "compact"
+inline_height = 24
+show_preview = true
+enter_accept = false
+keymap_mode = "emacs"
+
+[theme]
+name = "ayu-dark"

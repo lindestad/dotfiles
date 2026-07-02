@@ -54,6 +54,16 @@ $apps = @(
     "Microsoft.PowerShell",
     "uutils.coreutils",
     "wez.wezterm",
+    "direnv.direnv",
+    "Casey.Just",
+    "mvdan.shfmt",
+    "MikeFarah.yq",
+    "sharkdp.hyperfine",
+    "Atuinsh.Atuin",
+    "chmln.sd",
+    "ducaale.xh",
+    "dalance.procs",
+    "Dystroy.broot",
     # Kanata is optional; installed only if selected
     # "jtroo.kanata_gui",
     "rsteube.Carapace"
@@ -149,6 +159,14 @@ function Enable-StarshipPowerShellProfile {
     Add-PowerShellProfileLine -Line "if (Get-Command starship -ErrorAction SilentlyContinue) { Invoke-Expression (&starship init powershell) }" -Pattern 'starship init powershell'
 }
 
+function Enable-AtuinPowerShellProfile {
+    Add-PowerShellProfileLine -Line "if (Get-Command atuin -ErrorAction SilentlyContinue) { atuin init powershell | Out-String | Invoke-Expression }" -Pattern 'atuin init powershell'
+}
+
+function Enable-UserLocalBinPowerShellProfile {
+    Add-PowerShellProfileLine -Line '$userLocalBin = Join-Path $HOME ".local\bin"; if (Test-Path $userLocalBin) { $env:Path = "$userLocalBin;$env:Path" }' -Pattern '\.local\\bin'
+}
+
 function Ensure-NodeLts {
     $fnm = Get-WinGetLinkedCommand -Name "fnm"
     if (-not $fnm) {
@@ -229,9 +247,81 @@ function Ensure-UvTools {
     $env:Path = "$uvToolBin;$env:Path"
 }
 
+function Ensure-Watchexec {
+    param(
+        [Parameter(Mandatory)] [string]$UserHome
+    )
+
+    if (Get-Command "watchexec" -ErrorAction SilentlyContinue) { return }
+
+    $binDir = Join-Path $UserHome ".local\bin"
+    $watchexecExe = Join-Path $binDir "watchexec.exe"
+    if (Test-Path $watchexecExe) {
+        $env:Path = "$binDir;$env:Path"
+        return
+    }
+
+    try {
+        Write-Host ""
+        Write-Host "==> Installing watchexec from upstream release" -ForegroundColor Cyan
+        New-Item -ItemType Directory -Force -Path $binDir | Out-Null
+
+        $release = Invoke-RestMethod -Uri "https://api.github.com/repos/watchexec/watchexec/releases/latest"
+        $asset = $release.assets |
+            Where-Object { $_.browser_download_url -match 'x86_64-pc-windows-msvc\.zip$' } |
+            Select-Object -First 1
+        if (-not $asset) {
+            Write-Warning "Could not find a Windows watchexec release asset."
+            return
+        }
+
+        $tmpDir = Join-Path ([System.IO.Path]::GetTempPath()) "dotfiles-watchexec-$([guid]::NewGuid().ToString('N'))"
+        $zipPath = Join-Path $tmpDir "watchexec.zip"
+        New-Item -ItemType Directory -Force -Path $tmpDir | Out-Null
+        Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $zipPath
+        Expand-Archive -Path $zipPath -DestinationPath $tmpDir -Force
+
+        $exe = Get-ChildItem -Path $tmpDir -Recurse -Filter "watchexec.exe" | Select-Object -First 1
+        if (-not $exe) {
+            Write-Warning "watchexec.exe was not found in the release archive."
+            return
+        }
+
+        Copy-Item $exe.FullName $watchexecExe -Force
+        $env:Path = "$binDir;$env:Path"
+        Remove-Item $tmpDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
+    catch {
+        Write-Warning "Could not install watchexec. $($_.Exception.Message)"
+    }
+}
+
+function Ensure-BrootShellIntegration {
+    param(
+        [Parameter(Mandatory)] [string]$UserHome
+    )
+
+    $broot = Get-WinGetLinkedCommand -Name "broot"
+    if (-not $broot) { return }
+
+    $launcherDir = Join-Path $UserHome ".config/broot/launcher/bash"
+    $launcher = Join-Path $launcherDir "br"
+    New-Item -ItemType Directory -Force -Path $launcherDir | Out-Null
+
+    $launcherContent = & $broot --print-shell-function bash 2>$null
+    if ($LASTEXITCODE -eq 0 -and $launcherContent) {
+        $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+        [System.IO.File]::WriteAllText($launcher, (($launcherContent -join "`n") + "`n"), $utf8NoBom)
+    }
+
+    & $broot --set-install-state installed 2>$null | Out-Null
+}
+
 Ensure-NodeLts
 Ensure-Pipx
+Enable-UserLocalBinPowerShellProfile
 Enable-StarshipPowerShellProfile
+Enable-AtuinPowerShellProfile
 
 function Set-WindowsTerminalGitBashDefault {
     $settingsPaths = @(
@@ -477,8 +567,15 @@ $UserHome = [Environment]::GetFolderPath('UserProfile')
 $Roaming = [Environment]::GetFolderPath('ApplicationData')
 
 Install-UserFonts -FontDir (Join-Path $Dotfiles "fonts")
+Ensure-Watchexec -UserHome $UserHome
 
 # Links specific to Windows setup
+New-SafeLink -Src (Join-Path $Dotfiles "config/atuin/config.toml") -Dst (Join-Path $UserHome ".config/atuin/config.toml")
+New-SafeLink -Src (Join-Path $Dotfiles "config/atuin/themes") -Dst (Join-Path $UserHome ".config/atuin/themes")
+$brootConfigDir = Join-Path $Roaming "dystroy/broot/config"
+New-SafeLink -Src (Join-Path $Dotfiles "config/broot/conf.toml") -Dst (Join-Path $brootConfigDir "conf.toml")
+New-SafeLink -Src (Join-Path $Dotfiles "config/broot/skins") -Dst (Join-Path $brootConfigDir "skins")
+Ensure-BrootShellIntegration -UserHome $UserHome
 New-SafeLink -Src (Join-Path $Dotfiles "config/codex/AGENTS.md") -Dst (Join-Path $UserHome ".codex/AGENTS.md")
 New-SafeLink -Src (Join-Path $Dotfiles "config/alacritty/alacritty-windows.toml") -Dst (Join-Path $Roaming "alacritty/alacritty.toml")
 $weztermConfig = Join-Path $Dotfiles "config/wezterm/wezterm-windows.lua"

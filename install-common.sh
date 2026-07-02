@@ -123,6 +123,10 @@ install_flag_args() {
 
 add_common_cli_links() {
   LINKS+=(
+    "$DOTFILES_DIR/config/atuin/config.toml|$HOME/.config/atuin/config.toml"
+    "$DOTFILES_DIR/config/atuin/themes|$HOME/.config/atuin/themes"
+    "$DOTFILES_DIR/config/broot/conf.toml|$HOME/.config/broot/conf.toml"
+    "$DOTFILES_DIR/config/broot/skins|$HOME/.config/broot/skins"
     "$DOTFILES_DIR/config/codex/AGENTS.md|$HOME/.codex/AGENTS.md"
     "$DOTFILES_DIR/config/copilot/copilot-instructions.md|$HOME/.copilot/copilot-instructions.md"
     "$DOTFILES_DIR/config/git/ignore|$HOME/.config/git/ignore"
@@ -314,6 +318,98 @@ ensure_dust_cargo() {
   cargo install --locked du-dust
 }
 
+ensure_cargo_tool() {
+  local command_name="$1" crate_name="$2" label="${3:-$1}"
+  if have "$command_name"; then
+    return
+  fi
+
+  ensure_rust_toolchain
+  echo "==> Installing $label with cargo..."
+  cargo install --locked "$crate_name"
+}
+
+github_latest_asset_url() {
+  local repo="$1" pattern="$2"
+  curl -fsSL "https://api.github.com/repos/$repo/releases/latest" \
+    | sed -nE 's/.*"browser_download_url": "([^"]+)".*/\1/p' \
+    | grep -E "$pattern" \
+    | head -n1
+}
+
+install_github_release_binary() {
+  local label="$1" repo="$2" asset_pattern="$3" bin_name="$4"
+  local asset_url tmp_file
+
+  if ! have curl; then
+    echo "!! curl is required to install $label."
+    return 1
+  fi
+
+  asset_url="$(github_latest_asset_url "$repo" "$asset_pattern" || true)"
+  if [[ -z "$asset_url" ]]; then
+    echo "!! Could not resolve latest $label release asset matching: $asset_pattern"
+    return 1
+  fi
+
+  ensure_local_bin
+  tmp_file="$(mktemp)"
+  echo "==> Installing $label from upstream release..."
+  curl -fL "$asset_url" -o "$tmp_file"
+  install -m 0755 "$tmp_file" "$HOME/.local/bin/$bin_name"
+  rm -f "$tmp_file"
+  export PATH="$HOME/.local/bin:$PATH"
+}
+
+ensure_shfmt_release() {
+  if have shfmt; then
+    return
+  fi
+
+  local machine asset_arch
+  machine="$(uname -m)"
+  case "$machine" in
+    x86_64|amd64) asset_arch="amd64" ;;
+    aarch64|arm64) asset_arch="arm64" ;;
+    *)
+      echo ">> Unsupported shfmt release architecture: $machine"
+      return 1
+      ;;
+  esac
+
+  install_github_release_binary "shfmt" "mvdan/sh" "shfmt_v[0-9.]+_linux_${asset_arch}$" "shfmt"
+}
+
+ensure_yq_mikefarah() {
+  if have yq && yq --version 2>/dev/null | grep -qi 'github.com/mikefarah/yq'; then
+    return
+  fi
+
+  local machine asset_arch
+  machine="$(uname -m)"
+  case "$machine" in
+    x86_64|amd64) asset_arch="amd64" ;;
+    aarch64|arm64) asset_arch="arm64" ;;
+    *)
+      echo ">> Unsupported yq release architecture: $machine"
+      return 1
+      ;;
+  esac
+
+  install_github_release_binary "Mike Farah yq" "mikefarah/yq" "yq_linux_${asset_arch}$" "yq"
+}
+
+ensure_modern_cli_cargo_tools() {
+  ensure_cargo_tool just just
+  ensure_cargo_tool hyperfine hyperfine
+  ensure_cargo_tool watchexec watchexec-cli
+  ensure_cargo_tool atuin atuin
+  ensure_cargo_tool sd sd
+  ensure_cargo_tool xh xh
+  ensure_cargo_tool procs procs
+  ensure_cargo_tool broot broot
+}
+
 ensure_neovim_release() {
   local machine nvim_arch
   machine="$(uname -m)"
@@ -503,6 +599,27 @@ ensure_zellij_cargo() {
   ensure_rust_toolchain
   echo "==> Installing Zellij with cargo..."
   cargo install --locked zellij
+}
+
+ensure_broot_launcher() {
+  if ! have broot; then
+    return
+  fi
+
+  local shell_name launcher_dir launcher_file
+  for shell_name in bash zsh; do
+    launcher_dir="$HOME/.config/broot/launcher/$shell_name"
+    launcher_file="$launcher_dir/br"
+    mkdir -p "$launcher_dir"
+    if broot --print-shell-function "$shell_name" >"$launcher_file"; then
+      chmod 0644 "$launcher_file"
+    else
+      rm -f "$launcher_file"
+      echo ">> Could not generate broot launcher for $shell_name."
+    fi
+  done
+
+  broot --set-install-state installed >/dev/null 2>&1 || true
 }
 
 install_fonts() {

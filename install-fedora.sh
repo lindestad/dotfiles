@@ -62,6 +62,8 @@ DNF_PKGS=(
   direnv
   just
   hyperfine
+  atuin
+  procs
   tokei
   httpie
   lsof
@@ -259,6 +261,9 @@ ensure_rust_toolchain
 ensure_starship
 ensure_bottom
 ensure_typst_cli
+ensure_shfmt_release
+ensure_yq_mikefarah
+ensure_modern_cli_cargo_tools
 ensure_resvg_cargo
 ensure_dust_cargo
 ensure_yazi_cargo
@@ -270,6 +275,7 @@ install_fonts
 
 echo "==> Creating config symlinks..."
 link_pairs "${LINKS[@]}"
+ensure_broot_launcher
 ensure_local_bin
 copy_gitconfig
 ensure_codex_config

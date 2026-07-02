@@ -10,9 +10,12 @@ These are the main package and tool installs managed by the platform installers.
 | --- | --- | --- | --- | --- | --- |
 | 7zip/p7zip | `p7zip` | `p7zip-full` | `7zip` | `p7zip-full` | `7zip.7zip` |
 | Alacritty | not installed | not installed | `alacritty` | not installed | not installed |
+| Atuin | `atuin` | `atuin` or cargo fallback | `atuin` | `atuin` or cargo fallback | `Atuinsh.Atuin` |
 | bat | `bat` | `bat` | `bat` | `bat` | `sharkdp.bat` |
 | bottom/btm | `bottom` | `btm` | cargo fallback | `btm` | `Clement.bottom` |
+| Broot | `broot` | `broot` or cargo fallback | cargo fallback | `broot` or cargo fallback | `Dystroy.broot` |
 | carapace | `carapace-bin` (AUR) | `carapace` (optional) | prompted upstream `carapace-bin` RPM repo | `carapace` (optional) | `rsteube.Carapace` |
+| direnv | `direnv` | `direnv` | `direnv` | `direnv` | `direnv.direnv` |
 | dust | `dust` with cargo fallback | `du-dust` with cargo fallback | `du-dust` with cargo fallback | `du-dust` with cargo fallback | `bootandy.dust` |
 | eza | `eza` | `eza` (optional) | `eza` | `eza` (optional) | `eza-community.eza` |
 | fd | `fd` | `fd-find` | `fd-find` | `fd-find` | `sharkdp.fd` |
@@ -26,19 +29,26 @@ These are the main package and tool installs managed by the platform installers.
 | helix | `helix` | `helix` (optional) | `helix` | release `.deb` fallback | `Helix.Helix` |
 | imagemagick | `imagemagick` | `imagemagick` | `ImageMagick` | `imagemagick` | `ImageMagick.ImageMagick` |
 | jq | `jq` | `jq` | `jq` | `jq` | `jqlang.jq` |
+| just | `just` | `just` or cargo fallback | `just` | `just` or cargo fallback | `Casey.Just` |
 | Neovim | `neovim` | upstream release with `neovim` fallback | `neovim` | upstream release with `neovim` fallback | `Neovim.Neovim` |
 | Node.js LTS | via fnm | via fnm | via fnm | via fnm | via fnm |
 | pipx | `python-pipx` | `pipx` | `pipx` | `pipx` | installed with `py -3.12 -m pip install --user pipx` |
+| procs | `procs` | `procs` or cargo fallback | `procs` | `procs` or cargo fallback | `dalance.procs` |
 | Python | `python` | `python3`, `python3.12`, `python3.12-venv` | `python3.12` | `python3`, `python3.12`, `python3.12-venv` | `Python.Python.3.12` |
 | ripgrep | `ripgrep` | `ripgrep` | `ripgrep` | `ripgrep` | `BurntSushi.ripgrep.MSVC` |
+| sd | `sd` | `sd` or cargo fallback | cargo fallback | `sd` or cargo fallback | `chmln.sd` |
 | ShellCheck | `shellcheck` | `shellcheck` | `ShellCheck` | `shellcheck` | `koalaman.shellcheck` |
+| shfmt | `shfmt` | `shfmt` or release fallback | `shfmt` | `shfmt` or release fallback | `mvdan.shfmt` |
 | starship | cargo fallback | cargo fallback | cargo fallback | cargo fallback | `Starship.Starship` |
 | Typst CLI | `typst` | cargo fallback | cargo fallback | cargo fallback | `Typst.Typst` |
 | uutils coreutils | `uutils-coreutils` | `uutils-coreutils` (optional) | `uutils-coreutils` (optional) | not installed | `uutils.coreutils` |
 | uv | `uv` | standalone installer | `uv` with standalone fallback | standalone installer | `astral-sh.uv` |
 | uv tools | `ty`, `ruff` | `ty`, `ruff` | `ty`, `ruff` | `ty`, `ruff` | `ty`, `ruff` |
+| watchexec | `watchexec` | `watchexec` or cargo fallback | cargo fallback | `watchexec` or cargo fallback | upstream release fallback |
 | WezTerm | `wezterm` | prompted official APT repo | `wezterm` or prompted official COPR | not installed | `wez.wezterm` |
+| xh | `xh` | `xh` or cargo fallback | cargo fallback | `xh` or cargo fallback | `ducaale.xh` |
 | yazi | `yazi` | `yazi` (optional) | cargo fallback | `yazi` (optional) | `sxyazi.yazi` |
+| yq | `yq` | Mike Farah release fallback | `yq` | Mike Farah release fallback | `MikeFarah.yq` |
 | Zellij | `zellij` | cargo fallback | COPR with cargo fallback | cargo fallback | not installed |
 | zoxide | `zoxide` | `zoxide` | `zoxide` | `zoxide` | `ajeetdsouza.zoxide` |
 
@@ -67,7 +77,7 @@ These are installed only by the Linux/WSL shell installers.
 | unzip | `unzip` | `unzip` | `unzip` | `unzip` |
 | user fonts | bundled fonts copied to `~/.local/share/fonts` | same | same | same |
 | vivid | `vivid` | `vivid` (optional) | cargo fallback | `vivid` (optional) |
-| workflow CLIs | not installed | not installed | `direnv`, `entr`, `git-lfs`, `hyperfine`, `just`, `shfmt`, `tokei`, `tree`, `yq` | not installed |
+| Fedora workflow extras | not installed | not installed | `entr`, `git-lfs`, `tokei`, `tree` | not installed |
 | zsh | `zsh` | `zsh` | `zsh` | `zsh` |
 
 ## Distro-specific
@@ -135,7 +145,9 @@ These are not package installs, but the installers manage them alongside the too
 | Config | Linux/WSL | Windows |
 | --- | --- | --- |
 | Alacritty | non-WSL Linux only | linked/copied |
+| Atuin config + themes | symlinked | linked/copied |
 | Bash profile | Ubuntu only | `.bashrc` linked/copied; `.bash_profile` created if no login profile exists |
+| Broot config + skins | symlinked; launchers generated when `broot` is installed | linked/copied to the Broot AppData config directory; Git Bash launcher generated when `broot` is installed |
 | Codex instructions | symlinked | linked/copied |
 | Git config | copied if missing; missing keys merged | copied if missing; missing keys merged |
 | Git global ignore | symlinked | linked/copied |

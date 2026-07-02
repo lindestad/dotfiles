@@ -36,6 +36,9 @@ APT_PKGS=(
   git
   gh
   shellcheck
+  shfmt
+  direnv
+  hyperfine
   python3
   python3.12
   python3.12-venv
@@ -48,6 +51,13 @@ APT_PKGS_OPTIONAL=(
   yazi
   git-delta
   vivid
+  just
+  watchexec
+  atuin
+  sd
+  xh
+  procs
+  broot
 )
 
 LINKS=()
@@ -125,6 +135,9 @@ ensure_starship
 ensure_bottom
 ensure_yazi_cargo
 ensure_typst_cli
+ensure_shfmt_release
+ensure_yq_mikefarah
+ensure_modern_cli_cargo_tools
 ensure_resvg_cargo
 ensure_dust_cargo
 ensure_node_lts
@@ -135,6 +148,7 @@ install_fonts
 
 echo "==> Creating WSL config symlinks..."
 link_pairs "${LINKS[@]}"
+ensure_broot_launcher
 
 copy_gitconfig
 ensure_codex_config

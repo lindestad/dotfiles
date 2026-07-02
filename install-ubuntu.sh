@@ -34,6 +34,9 @@ APT_PKGS_COMMON=(
   git
   gh
   shellcheck
+  shfmt
+  direnv
+  hyperfine
   python3
   python3.12
   python3.12-venv
@@ -64,6 +67,13 @@ APT_PKGS_OPTIONAL=(
   vivid
   cliphist
   carapace
+  just
+  watchexec
+  atuin
+  sd
+  xh
+  procs
+  broot
 )
 
 LINKS=()
@@ -175,6 +185,9 @@ ensure_rust_toolchain
 ensure_starship
 ensure_zellij_cargo
 ensure_typst_cli
+ensure_shfmt_release
+ensure_yq_mikefarah
+ensure_modern_cli_cargo_tools
 ensure_resvg_cargo
 ensure_dust_cargo
 ensure_node_lts
@@ -188,6 +201,7 @@ fi
 
 echo "==> Creating config symlinks..."
 link_pairs "${LINKS[@]}"
+ensure_broot_launcher
 ensure_local_bin
 copy_gitconfig
 ensure_codex_config

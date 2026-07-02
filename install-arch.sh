@@ -36,9 +36,20 @@ PACMAN_PKGS=(
   github-cli
   git-delta
   shellcheck
+  shfmt
   uutils-coreutils
   vivid
   zellij
+  direnv
+  just
+  yq
+  hyperfine
+  watchexec
+  atuin
+  sd
+  xh
+  procs
+  broot
   python
   python-pipx
   typst
@@ -95,6 +106,9 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
 fi
 ensure_rust_toolchain
 ensure_starship
+ensure_shfmt_release
+ensure_yq_mikefarah
+ensure_modern_cli_cargo_tools
 ensure_resvg_cargo
 ensure_dust_cargo
 ensure_node_lts
@@ -114,6 +128,7 @@ fi
 
 echo "==> Creating config symlinks..."
 link_pairs "${LINKS[@]}"
+ensure_broot_launcher
 ensure_local_bin
 copy_gitconfig
 ensure_codex_config
