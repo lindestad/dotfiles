@@ -243,7 +243,13 @@ zdclean() {
 
 # Git aliases
 alias gs='git status'
-alias ga='git add'
+ga() {
+  if [ "$#" -eq 0 ]; then
+    git add --all
+  else
+    git add "$@"
+  fi
+}
 alias "ga."='git add .'
 alias gaa='git add --all'
 alias gb='git branch'
