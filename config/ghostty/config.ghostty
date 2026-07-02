@@ -46,6 +46,11 @@ selection-background = #1b3a5b
 custom-shader = shaders/warp.glsl
 custom-shader = shaders/rectangle-boom.glsl
 
+# Keyboard
+# Ctrl-Backspace otherwise arrives as Ctrl-H in Ghostty. Send ESC DEL, which
+# shells and editors commonly interpret as backward-kill-word / Meta-Backspace.
+keybind = ctrl+backspace=text:\x1b\x7f
+
 # Color scheme
 palette = 0=#101317
 palette = 1=#d91a25

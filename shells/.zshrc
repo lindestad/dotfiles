@@ -13,7 +13,9 @@ bindkey '^L' forward-char           # Ctrl-L → move cursor right
 # Ctrl-Backspace → delete word behind cursor.
 # WezTerm sends \x1b\x7f (Alt-Backspace), which emacs mode maps to backward-kill-word
 # and passes through Zellij without KKP negotiation.
-# Ghostty sends the KKP sequence \e[127;5u, so bind that too.
+# Ghostty is configured to send the same sequence for Ctrl-Backspace.
+bindkey '\e\x7f' backward-kill-word
+# Some terminals can send the KKP sequence for Ctrl-Backspace, so bind that too.
 bindkey '\e[127;5u' backward-kill-word
 
 # Zellij (0.44.x) leaks OSC 4 color-palette query responses into the first
