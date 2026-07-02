@@ -1,10 +1,17 @@
-# Alacritty-equivalent defaults.
+# Window style
 window-decoration = none
 window-padding-x = 10
 window-padding-y = 0
 window-padding-balance = true
 window-padding-color = extend
 
+background-opacity = 0.92
+background-blur = true
+
+foreground = #bfbdb6
+background = #020305
+
+# Font
 font-family = MonaspiceNe Nerd Font
 font-family-bold = MonaspiceNe Nerd Font
 font-family-italic = MonaspiceNe Nerd Font
@@ -14,7 +21,6 @@ font-style-bold = Bold
 font-style-italic = Italic
 font-style-bold-italic = Bold Italic
 font-size = 13
-
 font-feature = calt
 font-feature = liga
 font-feature = dlig
@@ -29,19 +35,18 @@ font-feature = ss08
 font-feature = ss09
 font-feature = ss10
 
-background-opacity = 0.92
-background-blur = true
-
-# Match the shared Alacritty palette.
-foreground = #bfbdb6
-background = #020305
-
+# Cursor, selection
 cursor-text = #0b0e14
 cursor-color = #bfbdb6
 
 selection-foreground = #bfbdb6
 selection-background = #1b3a5b
 
+# Cursor shaders
+custom-shader = shaders/warp.glsl
+custom shader = shaders/rectangle-boom.glsl
+
+# Color scheme
 palette = 0=#101317
 palette = 1=#d91a25
 palette = 2=#47cc1d
@@ -59,4 +64,5 @@ palette = 13=#d2a6ff
 palette = 14=#95e6cb
 palette = 15=#ffffff
 
+# Exec
 command = direct:/usr/bin/zsh -l
