@@ -1,6 +1,7 @@
 name: Lint
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - '**.sh'
@@ -20,12 +21,30 @@ on:
       - '**.yaml'
       - '**.yml'
 
+permissions:
+  contents: read
+
 jobs:
+  lint-workflows:
+    name: actionlint (GitHub Actions)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install actionlint
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | bash
+
+      - name: Run actionlint
+        run: ./actionlint
+
   lint-shell:
     name: ShellCheck (Bash)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install shell linters
         run: |
@@ -41,30 +60,27 @@ jobs:
 
   lint-powershell:
     name: PowerShell (PSScriptAnalyzer)
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - name: Checkout only workflows and PowerShell installer
-        uses: actions/checkout@v4
+      - name: Checkout PowerShell scripts
+        uses: actions/checkout@v5
         with:
-          fetch-depth: 0
           sparse-checkout: |
-            .github/workflows
-            install.ps1
-            install-windows.ps1
-            config/kanata/add_to_startup_windows.ps1
+            *.ps1
           sparse-checkout-cone-mode: false
 
       - name: Install PSScriptAnalyzer
         shell: pwsh
-        run: Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
+        run: Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser -Repository PSGallery
 
       - name: Run PowerShell Analysis
         shell: pwsh
         run: |
-          $files = Get-ChildItem -Recurse -Include *.ps1
+          $files = Get-ChildItem -Path . -Recurse -File -Filter *.ps1
           $results = @(
           foreach ($file in $files) {
-            Invoke-ScriptAnalyzer -Path $file.FullName -Recurse -Severity Warning,Error
+            Invoke-ScriptAnalyzer -Path $file.FullName -Severity Warning,Error
           }
           )
           if ($results.Count -gt 0) {
@@ -75,8 +91,16 @@ jobs:
   lint-toml:
     name: Taplo (TOML)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: docker://docker.io/tamasfe/taplo:latest
+      - uses: actions/checkout@v5
+
+      - name: Validate TOML files
+        uses: docker://docker.io/tamasfe/taplo:latest
         with:
-          args: lint --no-auto-config .
+          args: lint --no-auto-config **/*.toml
+
+      - name: Validate Yazi theme schema
+        uses: docker://docker.io/tamasfe/taplo:latest
+        with:
+          args: lint --no-auto-config --schema https://yazi-rs.github.io/schemas/theme.json config/yazi/theme.toml config/yazi/flavors/**/*.toml
