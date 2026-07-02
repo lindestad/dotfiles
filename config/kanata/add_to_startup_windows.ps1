@@ -1,3 +1,11 @@
+function Write-Status {
+    param(
+        [Parameter(Mandatory)] [AllowEmptyString()] [string]$Message
+    )
+
+    Write-Information -MessageData $Message -InformationAction Continue
+}
+
 $KanataExe = try { (Get-Command kanata_gui.exe -ErrorAction Stop).Source } catch { $null }
 
 # winget installs kanata with a versioned name (e.g. kanata_windows_gui_winIOv2_x64.exe);
@@ -42,10 +50,10 @@ if ($KanataExe -and (Test-Path $KanataExe)) {
         $Shortcut.WorkingDirectory = Split-Path $KanataExe
         $Shortcut.Arguments = $ArgString
         $Shortcut.Save()
-        Write-Host "Kanata startup shortcut created/updated."
+        Write-Status "Kanata startup shortcut created/updated."
     }
     else {
-        Write-Host "Kanata startup shortcut already up to date."
+        Write-Status "Kanata startup shortcut already up to date."
     }
 
     # --- Start Menu Shortcut ---
@@ -66,15 +74,15 @@ if ($KanataExe -and (Test-Path $KanataExe)) {
         $Shortcut.WorkingDirectory = Split-Path $KanataExe
         $Shortcut.Arguments = $ArgString
         $Shortcut.Save()
-        Write-Host "Kanata start menu shortcut created/updated."
+        Write-Status "Kanata start menu shortcut created/updated."
     }
     else {
-        Write-Host "Kanata start menu shortcut already up to date."
+        Write-Status "Kanata start menu shortcut already up to date."
     }
 
     Start-Sleep -Seconds 2
 }
 else {
-    Write-Host "Kanata not found in PATH. Make sure it's installed via winget and on your PATH."
+    Write-Status "Kanata not found in PATH. Make sure it's installed via winget and on your PATH."
     Start-Sleep -Seconds 10
 }

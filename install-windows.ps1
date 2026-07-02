@@ -23,6 +23,14 @@ function Request-Administrator {
 
 Request-Administrator
 
+function Write-Status {
+    param(
+        [Parameter(Mandatory)] [AllowEmptyString()] [string]$Message
+    )
+
+    Write-Information -MessageData $Message -InformationAction Continue
+}
+
 $apps = @(
     "Helix.Helix",
     "Neovim.Neovim",
@@ -100,9 +108,9 @@ function Invoke-WinGetImport {
 
     $import | ConvertTo-Json -Depth 8 | Set-Content -Path $importPath -Encoding utf8
 
-    Write-Host ""
-    Write-Host "==> Installing or upgrading $($uniquePackages.Count) winget packages" -ForegroundColor Cyan
-    Write-Host "    Import manifest: $importPath"
+    Write-Status ""
+    Write-Status "==> Installing or upgrading $($uniquePackages.Count) winget packages"
+    Write-Status "    Import manifest: $importPath"
 
     winget import -i $importPath `
         --ignore-unavailable `
@@ -169,7 +177,7 @@ function Enable-UserLocalBinPowerShellProfile {
     Add-PowerShellProfileLine -Line '$userLocalBin = Join-Path $HOME ".local\bin"; if (Test-Path $userLocalBin) { $env:Path = "$userLocalBin;$env:Path" }' -Pattern '\.local\\bin'
 }
 
-function Ensure-NodeLts {
+function Install-NodeLtsVersion {
     $fnm = Get-WinGetLinkedCommand -Name "fnm"
     if (-not $fnm) {
         Write-Warning "fnm not found yet. Start a new shell and run: fnm install --lts; fnm default lts-latest"
@@ -185,7 +193,7 @@ function Ensure-NodeLts {
     Enable-FnmPowerShellProfile
 }
 
-function Ensure-Pipx {
+function Install-Pipx {
     $py = Get-Command "py" -ErrorAction SilentlyContinue
     $python = Get-Command "python" -ErrorAction SilentlyContinue
     $python312 = Join-Path $env:LOCALAPPDATA "Programs\Python\Python312\python.exe"
@@ -224,7 +232,7 @@ function Ensure-Pipx {
     $env:Path = "$userScripts;$pipxBin;$env:Path"
 }
 
-function Ensure-UvTools {
+function Install-UvTool {
     param(
         [Parameter(Mandatory)] [string[]]$Tools
     )
@@ -237,8 +245,8 @@ function Ensure-UvTools {
     }
 
     foreach ($tool in $Tools) {
-        Write-Host ""
-        Write-Host "==> Installing/upgrading uv tool: $tool" -ForegroundColor Cyan
+        Write-Status ""
+        Write-Status "==> Installing/upgrading uv tool: $tool"
         & $uv tool install --upgrade $tool
         if ($LASTEXITCODE -ne 0) {
             Write-Warning "uv tool install --upgrade $tool exited with code $LASTEXITCODE"
@@ -249,7 +257,7 @@ function Ensure-UvTools {
     $env:Path = "$uvToolBin;$env:Path"
 }
 
-function Ensure-Watchexec {
+function Install-Watchexec {
     param(
         [Parameter(Mandatory)] [string]$UserHome
     )
@@ -264,8 +272,8 @@ function Ensure-Watchexec {
     }
 
     try {
-        Write-Host ""
-        Write-Host "==> Installing watchexec from upstream release" -ForegroundColor Cyan
+        Write-Status ""
+        Write-Status "==> Installing watchexec from upstream release"
         New-Item -ItemType Directory -Force -Path $binDir | Out-Null
 
         $release = Invoke-RestMethod -Uri "https://api.github.com/repos/watchexec/watchexec/releases/latest"
@@ -298,7 +306,7 @@ function Ensure-Watchexec {
     }
 }
 
-function Ensure-BrootShellIntegration {
+function Install-BrootShellIntegration {
     param(
         [Parameter(Mandatory)] [string]$UserHome
     )
@@ -319,13 +327,16 @@ function Ensure-BrootShellIntegration {
     & $broot --set-install-state installed 2>$null | Out-Null
 }
 
-Ensure-NodeLts
-Ensure-Pipx
+Install-NodeLtsVersion
+Install-Pipx
 Enable-UserLocalBinPowerShellProfile
 Enable-StarshipPowerShellProfile
 Enable-AtuinPowerShellProfile
 
 function Set-WindowsTerminalGitBashDefault {
+    [CmdletBinding(SupportsShouldProcess)]
+    param()
+
     $settingsPaths = @(
         (Join-Path $env:LOCALAPPDATA "Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"),
         (Join-Path $env:LOCALAPPDATA "Packages\Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe\LocalState\settings.json"),
@@ -366,10 +377,14 @@ function Set-WindowsTerminalGitBashDefault {
             $settings.profiles.defaults.font | Add-Member -NotePropertyName face -NotePropertyValue "MonaspiceNe Nerd Font" -Force
         }
 
+        if (-not $PSCmdlet.ShouldProcess($settingsPath, "Set Windows Terminal default profile to Git Bash")) {
+            continue
+        }
+
         $profileList = @($settings.profiles.list)
-        $profile = $profileList | Where-Object { $_.guid -eq $profileGuid -or $_.name -eq "Git Bash" } | Select-Object -First 1
-        if (-not $profile) {
-            $profile = [pscustomobject]@{
+        $gitBashProfile = $profileList | Where-Object { $_.guid -eq $profileGuid -or $_.name -eq "Git Bash" } | Select-Object -First 1
+        if (-not $gitBashProfile) {
+            $gitBashProfile = [pscustomobject]@{
                 guid = $profileGuid
                 name = "Git Bash"
                 commandline = "`"$gitBash`" -i -l"
@@ -377,29 +392,29 @@ function Set-WindowsTerminalGitBashDefault {
                 icon = "%PROGRAMFILES%\Git\mingw64\share\git\git-for-windows.ico"
                 font = [pscustomobject]@{ face = "MonaspiceNe Nerd Font" }
             }
-            $settings.profiles.list = @($profileList + $profile)
+            $settings.profiles.list = @($profileList + $gitBashProfile)
         }
         else {
-            $profile | Add-Member -NotePropertyName guid -NotePropertyValue $profileGuid -Force
-            $profile | Add-Member -NotePropertyName name -NotePropertyValue "Git Bash" -Force
-            $profile | Add-Member -NotePropertyName commandline -NotePropertyValue "`"$gitBash`" -i -l" -Force
-            $profile | Add-Member -NotePropertyName startingDirectory -NotePropertyValue "%USERPROFILE%" -Force
-            $profile | Add-Member -NotePropertyName icon -NotePropertyValue "%PROGRAMFILES%\Git\mingw64\share\git\git-for-windows.ico" -Force
-            if ($null -eq $profile.font) {
-                $profile | Add-Member -NotePropertyName font -NotePropertyValue ([pscustomobject]@{ face = "MonaspiceNe Nerd Font" }) -Force
+            $gitBashProfile | Add-Member -NotePropertyName guid -NotePropertyValue $profileGuid -Force
+            $gitBashProfile | Add-Member -NotePropertyName name -NotePropertyValue "Git Bash" -Force
+            $gitBashProfile | Add-Member -NotePropertyName commandline -NotePropertyValue "`"$gitBash`" -i -l" -Force
+            $gitBashProfile | Add-Member -NotePropertyName startingDirectory -NotePropertyValue "%USERPROFILE%" -Force
+            $gitBashProfile | Add-Member -NotePropertyName icon -NotePropertyValue "%PROGRAMFILES%\Git\mingw64\share\git\git-for-windows.ico" -Force
+            if ($null -eq $gitBashProfile.font) {
+                $gitBashProfile | Add-Member -NotePropertyName font -NotePropertyValue ([pscustomobject]@{ face = "MonaspiceNe Nerd Font" }) -Force
             }
             else {
-                $profile.font | Add-Member -NotePropertyName face -NotePropertyValue "MonaspiceNe Nerd Font" -Force
+                $gitBashProfile.font | Add-Member -NotePropertyName face -NotePropertyValue "MonaspiceNe Nerd Font" -Force
             }
         }
 
         $settings | Add-Member -NotePropertyName defaultProfile -NotePropertyValue $profileGuid -Force
         $settings | ConvertTo-Json -Depth 100 | Set-Content -Path $settingsPath -Encoding utf8
-        Write-Host "Set Windows Terminal default profile to Git Bash in $settingsPath"
+        Write-Status "Set Windows Terminal default profile to Git Bash in $settingsPath"
     }
 }
 
-function Install-UserFonts {
+function Install-UserFont {
     param(
         [Parameter(Mandatory)] [string]$FontDir
     )
@@ -421,11 +436,11 @@ function Install-UserFonts {
 
         try {
             if (Test-Path $destination) {
-                Write-Host "Font already present: $($font.Name)"
+                Write-Status "Font already present: $($font.Name)"
             }
             else {
                 Copy-Item $font.FullName $destination -Force -ErrorAction Stop
-                Write-Host "Installed font $($font.Name)"
+                Write-Status "Installed font $($font.Name)"
             }
 
             New-ItemProperty -Path $registryPath -Name $registryName -Value $destination -PropertyType String -Force -ErrorAction Stop | Out-Null
@@ -436,25 +451,25 @@ function Install-UserFonts {
     }
 }
 
-function Prompt-YesNo([string]$Question) {
+function Read-YesNo([string]$Question) {
     while ($true) {
         $ans = Read-Host "$Question y/N"
         if ([string]::IsNullOrWhiteSpace($ans)) { return $false }
         switch -Regex ($ans) {
             '^[Yy]$' { return $true }
             '^[Nn]$' { return $false }
-            default { Write-Host "Please answer y or n." }
+            default { Write-Status "Please answer y or n." }
         }
     }
 }
 
 # Optional: Kanata
-$installKanata = Prompt-YesNo "Install Kanata (Keyboard remapping)?"
+$installKanata = Read-YesNo "Install Kanata (Keyboard remapping)?"
 $chosenKanataCfg = $null
 if ($installKanata) {
     winget install --id "jtroo.kanata_gui" --accept-source-agreements --accept-package-agreements -e
 
-    $isoToAnsi = Prompt-YesNo "Remap ISO to ANSI like? Warning, remaps Enter key."
+    $isoToAnsi = Read-YesNo "Remap ISO to ANSI like? Warning, remaps Enter key."
     $repo = Split-Path -Parent $MyInvocation.MyCommand.Definition
     if ($isoToAnsi) {
         $chosenKanataCfg = Join-Path $repo "config/kanata/config_iso_to_ansi.kbd"
@@ -479,11 +494,12 @@ if ($installKanata) {
     .\config\kanata\add_to_startup_windows.ps1
 }
 else {
-    Write-Host "Skipping Kanata install."
+    Write-Status "Skipping Kanata install."
 }
 
 # --- Windows symlinks (inline, no external symlink.ps1) ---
 function New-SafeLink {
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)] [string]$Src,
         [Parameter(Mandatory)] [string]$Dst
@@ -491,6 +507,10 @@ function New-SafeLink {
 
     if (-not (Test-Path $Src)) {
         Write-Warning "Missing source: $Src; skipping $Dst"
+        return
+    }
+
+    if (-not $PSCmdlet.ShouldProcess($Dst, "Create link from $Src")) {
         return
     }
 
@@ -519,14 +539,14 @@ function New-SafeLink {
             }
 
             Move-Item $Dst $backup -Force
-            Write-Host "Backed up $Dst --> $backup"
+            Write-Status "Backed up $Dst --> $backup"
         }
     }
 
     if ($needsLink) {
         try {
             New-Item -ItemType SymbolicLink -Path $Dst -Target $Src -ErrorAction Stop | Out-Null
-            Write-Host "Linked $Src --> $Dst"
+            Write-Status "Linked $Src --> $Dst"
         }
         catch {
             Write-Warning "Could not create symlink $Dst; copying instead. $($_.Exception.Message)"
@@ -537,7 +557,7 @@ function New-SafeLink {
                 else {
                     Copy-Item $Src $Dst -Force -ErrorAction Stop
                 }
-                Write-Host "Copied $Src --> $Dst"
+                Write-Status "Copied $Src --> $Dst"
             }
             catch {
                 Write-Warning "Could not copy $Src to $Dst. $($_.Exception.Message)"
@@ -545,22 +565,23 @@ function New-SafeLink {
         }
     }
     else {
-        Write-Host "Already linked: $Dst"
+        Write-Status "Already linked: $Dst"
     }
 }
 
-function Ensure-GitBashProfile {
+function Set-GitBashProfile {
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)] [string]$UserHome
     )
 
     $bashProfile = Join-Path $UserHome ".bash_profile"
     $bashLogin = Join-Path $UserHome ".bash_login"
-    $profile = Join-Path $UserHome ".profile"
+    $posixProfile = Join-Path $UserHome ".profile"
     $bashrc = Join-Path $UserHome ".bashrc"
 
-    if ((Test-Path $bashProfile) -or (Test-Path $bashLogin) -or (Test-Path $profile)) {
-        Write-Host "Existing Bash login profile detected; leaving as-is."
+    if ((Test-Path $bashProfile) -or (Test-Path $bashLogin) -or (Test-Path $posixProfile)) {
+        Write-Status "Existing Bash login profile detected; leaving as-is."
         return
     }
 
@@ -576,16 +597,18 @@ if [ -f ~/.bashrc ]; then
 fi
 '@
     $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
-    [System.IO.File]::WriteAllText($bashProfile, $content, $utf8NoBom)
-    Write-Host "Created $bashProfile"
+    if ($PSCmdlet.ShouldProcess($bashProfile, "Create Bash login profile")) {
+        [System.IO.File]::WriteAllText($bashProfile, $content, $utf8NoBom)
+        Write-Status "Created $bashProfile"
+    }
 }
 
 $Dotfiles = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $UserHome = [Environment]::GetFolderPath('UserProfile')
 $Roaming = [Environment]::GetFolderPath('ApplicationData')
 
-Install-UserFonts -FontDir (Join-Path $Dotfiles "fonts")
-Ensure-Watchexec -UserHome $UserHome
+Install-UserFont -FontDir (Join-Path $Dotfiles "fonts")
+Install-Watchexec -UserHome $UserHome
 
 # Links specific to Windows setup
 New-SafeLink -Src (Join-Path $Dotfiles "config/atuin/config.toml") -Dst (Join-Path $UserHome ".config/atuin/config.toml")
@@ -593,7 +616,7 @@ New-SafeLink -Src (Join-Path $Dotfiles "config/atuin/themes") -Dst (Join-Path $U
 $brootConfigDir = Join-Path $Roaming "dystroy/broot/config"
 New-SafeLink -Src (Join-Path $Dotfiles "config/broot/conf.toml") -Dst (Join-Path $brootConfigDir "conf.toml")
 New-SafeLink -Src (Join-Path $Dotfiles "config/broot/skins") -Dst (Join-Path $brootConfigDir "skins")
-Ensure-BrootShellIntegration -UserHome $UserHome
+Install-BrootShellIntegration -UserHome $UserHome
 New-SafeLink -Src (Join-Path $Dotfiles "config/codex/AGENTS.md") -Dst (Join-Path $UserHome ".codex/AGENTS.md")
 New-SafeLink -Src (Join-Path $Dotfiles "config/alacritty/alacritty-windows.toml") -Dst (Join-Path $Roaming "alacritty/alacritty.toml")
 $weztermConfig = Join-Path $Dotfiles "config/wezterm/wezterm-windows.lua"
@@ -605,7 +628,7 @@ New-SafeLink -Src (Join-Path $Dotfiles "config/helix/config.toml") -Dst (Join-Pa
 New-SafeLink -Src (Join-Path $Dotfiles "config/helix/languages.toml") -Dst (Join-Path $Roaming "helix/languages.toml")
 New-SafeLink -Src (Join-Path $Dotfiles "config/nvim") -Dst (Join-Path $UserHome ".config/nvim")
 New-SafeLink -Src (Join-Path $Dotfiles "shells/.bashrc") -Dst (Join-Path $UserHome ".bashrc")
-Ensure-GitBashProfile -UserHome $UserHome
+Set-GitBashProfile -UserHome $UserHome
 New-SafeLink -Src (Join-Path $Dotfiles "config/starship/windows/starship.toml") -Dst (Join-Path $UserHome ".config/starship.toml")
 New-SafeLink -Src (Join-Path $Dotfiles "config/yazi") -Dst (Join-Path $Roaming "yazi/config")
 Set-WindowsTerminalGitBashDefault
@@ -623,7 +646,7 @@ function Merge-GitConfig {
 
     if (-not (Test-Path $Dst)) {
         Copy-Item $Src $Dst -Force
-        Write-Host "Copied gitconfig to $Dst"
+        Write-Status "Copied gitconfig to $Dst"
         return
     }
 
@@ -649,15 +672,20 @@ function Merge-GitConfig {
         }
         else {
             & git config --global $key $value
-            Write-Host "Added git config $key"
+            Write-Status "Added git config $key"
         }
     }
 }
 
-function Ensure-CodexConfig {
+function Set-CodexConfig {
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)] [string]$Dst
     )
+
+    if (-not $PSCmdlet.ShouldProcess($Dst, "Update Codex config")) {
+        return
+    }
 
     $dir = Split-Path $Dst
     $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
@@ -669,14 +697,14 @@ function Ensure-CodexConfig {
 
     $content = Get-Content $Dst -Raw
     if ($null -eq $content) { $content = "" }
-    $content = Ensure-TomlRootValue -Content $content -Key "default_permissions" -Value '":danger-full-access"' -Path $Dst
-    $content = Ensure-TomlRootValue -Content $content -Key "approval_policy" -Value '"never"' -Path $Dst
-    $content = Ensure-TomlTableValue -Content $content -Table "tui" -Key "vim_mode_default" -Value "true" -Path $Dst
+    $content = Get-TomlRootValueContent -Content $content -Key "default_permissions" -Value '":danger-full-access"' -Path $Dst
+    $content = Get-TomlRootValueContent -Content $content -Key "approval_policy" -Value '"never"' -Path $Dst
+    $content = Get-TomlTableValueContent -Content $content -Table "tui" -Key "vim_mode_default" -Value "true" -Path $Dst
 
     [System.IO.File]::WriteAllText($Dst, $content, $utf8NoBom)
 }
 
-function Ensure-TomlRootValue {
+function Get-TomlRootValueContent {
     param(
         [Parameter(Mandatory)] [AllowEmptyString()] [string]$Content,
         [Parameter(Mandatory)] [string]$Key,
@@ -705,11 +733,11 @@ function Ensure-TomlRootValue {
         $Content = "$Content`n$line`n"
     }
 
-    Write-Host "Added Codex config $Key"
+    Write-Status "Added Codex config $Key"
     return $Content
 }
 
-function Ensure-TomlTableValue {
+function Get-TomlTableValueContent {
     param(
         [Parameter(Mandatory)] [AllowEmptyString()] [string]$Content,
         [Parameter(Mandatory)] [string]$Table,
@@ -734,7 +762,7 @@ function Ensure-TomlTableValue {
         }
 
         $headerEnd = $Content.IndexOf("`n", $match.Index)
-        Write-Host "Added Codex TUI config $Key"
+        Write-Status "Added Codex TUI config $Key"
         if ($headerEnd -lt 0) {
             return "$Content`n$Key = $Value`n"
         }
@@ -748,7 +776,7 @@ function Ensure-TomlTableValue {
         $Content = "$Content`n"
     }
 
-    Write-Host "Added Codex TUI config $Key"
+    Write-Status "Added Codex TUI config $Key"
     return "$Content[$Table]`n$Key = $Value`n"
 }
 
@@ -758,8 +786,8 @@ $dstGitCfg = Join-Path $UserHome ".gitconfig"
 Merge-GitConfig -Src $srcGitCfg -Dst $dstGitCfg
 
 $dstCodexCfg = Join-Path $UserHome ".codex/config.toml"
-Ensure-CodexConfig -Dst $dstCodexCfg
+Set-CodexConfig -Dst $dstCodexCfg
 
-Ensure-UvTools -Tools @("ty", "ruff")
+Install-UvTool -Tools @("ty", "ruff")
 
-Write-Host "Windows config links completed."
+Write-Status "Windows config links completed."
