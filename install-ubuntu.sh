@@ -167,9 +167,22 @@ ensure_ghostty_ubuntu() {
   fi
 
   echo "==> Installing Ghostty from ghostty-ubuntu..."
-  local installer
+  local installer release_tag installer_url
+  release_tag="$(github_latest_release_tag "mkasberg/ghostty-ubuntu" || true)"
+  if [[ -z "$release_tag" ]]; then
+    echo "!! Could not resolve latest ghostty-ubuntu release tag."
+    return 1
+  fi
+  case "$release_tag" in
+    *[!A-Za-z0-9._-]*)
+      echo "!! Refusing unexpected ghostty-ubuntu release tag: $release_tag"
+      return 1
+      ;;
+  esac
+
+  installer_url="https://raw.githubusercontent.com/mkasberg/ghostty-ubuntu/${release_tag}/install.sh"
   installer="$(mktemp)"
-  curl -fsSL https://raw.githubusercontent.com/mkasberg/ghostty-ubuntu/HEAD/install.sh -o "$installer"
+  curl -fsSL "$installer_url" -o "$installer"
   bash "$installer"
   rm -f "$installer"
 }
@@ -191,6 +204,7 @@ ensure_typst_cli
 ensure_shfmt_release
 ensure_yq_mikefarah
 ensure_lazygit_release
+ensure_carapace_release
 ensure_modern_cli_cargo_tools
 ensure_resvg_cargo
 ensure_dust_cargo

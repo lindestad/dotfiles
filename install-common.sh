@@ -337,6 +337,13 @@ github_latest_asset_url() {
     | head -n1
 }
 
+github_latest_release_tag() {
+  local repo="$1"
+  curl -fsSL "https://api.github.com/repos/$repo/releases/latest" \
+    | sed -nE 's/^[[:space:]]*"tag_name":[[:space:]]*"([^"]+)".*/\1/p' \
+    | head -n1
+}
+
 install_github_release_binary() {
   local label="$1" repo="$2" asset_pattern="$3" bin_name="$4"
   local asset_url tmp_file
@@ -449,6 +456,26 @@ ensure_lazygit_release() {
   install_github_release_archive_binary "lazygit" "jesseduffield/lazygit" "lazygit_[0-9.]+_linux_${asset_arch}\\.tar\\.gz$" "lazygit"
 }
 
+ensure_carapace_release() {
+  if have carapace; then
+    return
+  fi
+
+  local machine asset_arch
+  machine="$(uname -m)"
+  case "$machine" in
+    x86_64|amd64) asset_arch="amd64" ;;
+    aarch64|arm64) asset_arch="arm64" ;;
+    i386|i686) asset_arch="386" ;;
+    *)
+      echo ">> Unsupported carapace-bin release architecture: $machine"
+      return 1
+      ;;
+  esac
+
+  install_github_release_archive_binary "carapace-bin" "carapace-sh/carapace-bin" "carapace-bin_[0-9.]+_linux_${asset_arch}\\.tar\\.gz$" "carapace"
+}
+
 ensure_modern_cli_cargo_tools() {
   ensure_cargo_tool just just
   ensure_cargo_tool hyperfine hyperfine
@@ -553,22 +580,6 @@ ensure_vivid_cargo() {
   ensure_rust_toolchain
   echo "==> Installing vivid with cargo..."
   cargo install --locked vivid
-}
-
-ensure_carapace_apt_repo() {
-  # carapace-bin is not in the Debian/Ubuntu repos; add the upstream Gemfury
-  # apt repo so it can be installed via apt-get like everything else.
-  if have carapace; then
-    return
-  fi
-
-  local list="/etc/apt/sources.list.d/fury-carapace.list"
-  if [[ -f "$list" ]]; then
-    return
-  fi
-
-  echo "==> Adding carapace-bin apt repo (apt.fury.io)..."
-  echo 'deb [trusted=yes] https://apt.fury.io/rsteube/ /' | sudo tee "$list" >/dev/null
 }
 
 ensure_fnm() {

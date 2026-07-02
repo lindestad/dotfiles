@@ -125,7 +125,6 @@ fi
 resolve_install_flags no no
 
 echo "==> Installing apt packages..."
-ensure_carapace_apt_repo
 install_apt "${APT_PKGS[@]}" "${APT_PKGS_OPTIONAL[@]}"
 
 echo "==> Installing Rust and cargo tools..."
@@ -141,6 +140,7 @@ ensure_typst_cli
 ensure_shfmt_release
 ensure_yq_mikefarah
 ensure_lazygit_release
+ensure_carapace_release
 ensure_modern_cli_cargo_tools
 ensure_resvg_cargo
 ensure_dust_cargo

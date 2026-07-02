@@ -109,34 +109,6 @@ DNF_PKGS_OPTIONAL=(
   uutils-coreutils
 )
 
-ensure_carapace_fedora() {
-  if have carapace; then
-    return
-  fi
-
-  echo ">> carapace is not available from Fedora's default repos."
-  if [[ "$ASSUME_YES" == "yes" ]]; then
-    echo ">> Skipping carapace-bin RPM repo setup in non-interactive mode."
-    return
-  fi
-  if [[ "$(prompt_yes_no "Install carapace-bin from the upstream Gemfury RPM repo?")" != "yes" ]]; then
-    return
-  fi
-
-  echo "==> Adding carapace-bin Gemfury RPM repo..."
-  sudo tee /etc/yum.repos.d/carapace-fury.repo >/dev/null <<'EOF'
-[carapace-fury]
-name=carapace-bin Gemfury RPM repository
-baseurl=https://yum.fury.io/rsteube/
-enabled=1
-gpgcheck=0
-EOF
-
-  echo "==> Installing carapace-bin..."
-  sudo dnf makecache -y || true
-  sudo dnf install -y carapace-bin
-}
-
 ensure_ghostty_fedora() {
   if have ghostty; then
     return
@@ -266,13 +238,13 @@ ensure_typst_cli
 ensure_shfmt_release
 ensure_yq_mikefarah
 ensure_lazygit_release
+ensure_carapace_release
 ensure_modern_cli_cargo_tools
 ensure_resvg_cargo
 ensure_dust_cargo
 ensure_yazi_cargo
 ensure_vivid_cargo
 ensure_zellij_fedora
-ensure_carapace_fedora
 ensure_node_lts
 install_fonts
 

@@ -14,7 +14,7 @@ These are the main package and tool installs managed by the platform installers.
 | bat | `bat` | `bat` | `bat` | `bat` | `sharkdp.bat` |
 | bottom/btm | `bottom` | `btm` | cargo fallback | `btm` | `Clement.bottom` |
 | Broot | `broot` | `broot` or cargo fallback | cargo fallback | `broot` or cargo fallback | `Dystroy.broot` |
-| carapace | `carapace-bin` (AUR) | `carapace` (optional) | prompted upstream `carapace-bin` RPM repo | `carapace` (optional) | `rsteube.Carapace` |
+| carapace | `carapace-bin` (AUR) | `carapace` or release fallback | release fallback | `carapace` or release fallback | `rsteube.Carapace` |
 | direnv | `direnv` | `direnv` | `direnv` | `direnv` | `direnv.direnv` |
 | dust | `dust` with cargo fallback | `du-dust` with cargo fallback | `du-dust` with cargo fallback | `du-dust` with cargo fallback | `bootandy.dust` |
 | eza | `eza` | `eza` (optional) | `eza` | `eza` (optional) | `eza-community.eza` |
