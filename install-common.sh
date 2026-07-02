@@ -361,6 +361,37 @@ install_github_release_binary() {
   export PATH="$HOME/.local/bin:$PATH"
 }
 
+install_github_release_archive_binary() {
+  local label="$1" repo="$2" asset_pattern="$3" bin_name="$4"
+  local asset_url tmp_dir archive
+
+  if ! have curl || ! have tar; then
+    echo "!! curl and tar are required to install $label."
+    return 1
+  fi
+
+  asset_url="$(github_latest_asset_url "$repo" "$asset_pattern" || true)"
+  if [[ -z "$asset_url" ]]; then
+    echo "!! Could not resolve latest $label release asset matching: $asset_pattern"
+    return 1
+  fi
+
+  ensure_local_bin
+  tmp_dir="$(mktemp -d)"
+  archive="$tmp_dir/archive.tar.gz"
+  echo "==> Installing $label from upstream release..."
+  curl -fL "$asset_url" -o "$archive"
+  tar -C "$tmp_dir" -xzf "$archive"
+  if [[ ! -x "$tmp_dir/$bin_name" ]]; then
+    echo "!! $label release archive did not contain executable $bin_name."
+    rm -rf "$tmp_dir"
+    return 1
+  fi
+  install -m 0755 "$tmp_dir/$bin_name" "$HOME/.local/bin/$bin_name"
+  rm -rf "$tmp_dir"
+  export PATH="$HOME/.local/bin:$PATH"
+}
+
 ensure_shfmt_release() {
   if have shfmt; then
     return
@@ -399,6 +430,25 @@ ensure_yq_mikefarah() {
   install_github_release_binary "Mike Farah yq" "mikefarah/yq" "yq_linux_${asset_arch}$" "yq"
 }
 
+ensure_lazygit_release() {
+  if have lazygit; then
+    return
+  fi
+
+  local machine asset_arch
+  machine="$(uname -m)"
+  case "$machine" in
+    x86_64|amd64) asset_arch="x86_64" ;;
+    aarch64|arm64) asset_arch="arm64" ;;
+    *)
+      echo ">> Unsupported lazygit release architecture: $machine"
+      return 1
+      ;;
+  esac
+
+  install_github_release_archive_binary "lazygit" "jesseduffield/lazygit" "lazygit_[0-9.]+_linux_${asset_arch}\\.tar\\.gz$" "lazygit"
+}
+
 ensure_modern_cli_cargo_tools() {
   ensure_cargo_tool just just
   ensure_cargo_tool hyperfine hyperfine
@@ -408,6 +458,7 @@ ensure_modern_cli_cargo_tools() {
   ensure_cargo_tool xh xh
   ensure_cargo_tool procs procs
   ensure_cargo_tool broot broot
+  ensure_cargo_tool gitui gitui
 }
 
 ensure_neovim_release() {

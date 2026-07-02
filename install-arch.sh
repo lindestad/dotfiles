@@ -50,6 +50,8 @@ PACMAN_PKGS=(
   xh
   procs
   broot
+  lazygit
+  gitui
   python
   python-pipx
   typst
@@ -108,6 +110,7 @@ ensure_rust_toolchain
 ensure_starship
 ensure_shfmt_release
 ensure_yq_mikefarah
+ensure_lazygit_release
 ensure_modern_cli_cargo_tools
 ensure_resvg_cargo
 ensure_dust_cargo

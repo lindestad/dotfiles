@@ -64,6 +64,8 @@ DNF_PKGS=(
   hyperfine
   atuin
   procs
+  lazygit
+  gitui
   tokei
   httpie
   lsof
@@ -263,6 +265,7 @@ ensure_bottom
 ensure_typst_cli
 ensure_shfmt_release
 ensure_yq_mikefarah
+ensure_lazygit_release
 ensure_modern_cli_cargo_tools
 ensure_resvg_cargo
 ensure_dust_cargo

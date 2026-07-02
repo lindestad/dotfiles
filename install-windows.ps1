@@ -64,6 +64,8 @@ $apps = @(
     "ducaale.xh",
     "dalance.procs",
     "Dystroy.broot",
+    "JesseDuffield.lazygit",
+    "StephanDilly.gitui",
     # Kanata is optional; installed only if selected
     # "jtroo.kanata_gui",
     "rsteube.Carapace"

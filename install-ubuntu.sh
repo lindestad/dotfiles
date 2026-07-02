@@ -14,6 +14,7 @@ APT_PKGS_COMMON=(
   unzip
   ca-certificates
   build-essential
+  cmake
   pkg-config
   libssl-dev
   fontconfig
@@ -74,6 +75,8 @@ APT_PKGS_OPTIONAL=(
   xh
   procs
   broot
+  lazygit
+  gitui
 )
 
 LINKS=()
@@ -187,6 +190,7 @@ ensure_zellij_cargo
 ensure_typst_cli
 ensure_shfmt_release
 ensure_yq_mikefarah
+ensure_lazygit_release
 ensure_modern_cli_cargo_tools
 ensure_resvg_cargo
 ensure_dust_cargo

@@ -25,11 +25,13 @@ These are the main package and tool installs managed by the platform installers.
 | git | `git` | `git` | `git` | `git` | `Git.Git` |
 | git-delta | `git-delta` | `git-delta` (optional) | `git-delta` | `git-delta` (optional) | `dandavison.delta` |
 | GitHub CLI | `github-cli` | `gh` | `gh` | `gh` | `GitHub.cli` |
+| GitUI | `gitui` | `gitui` or cargo fallback | `gitui` with cargo fallback | `gitui` or cargo fallback | `StephanDilly.gitui` |
 | Ghostty | `ghostty` | prompted community `.deb` installer | prompted COPR | not installed | not available |
 | helix | `helix` | `helix` (optional) | `helix` | release `.deb` fallback | `Helix.Helix` |
 | imagemagick | `imagemagick` | `imagemagick` | `ImageMagick` | `imagemagick` | `ImageMagick.ImageMagick` |
 | jq | `jq` | `jq` | `jq` | `jq` | `jqlang.jq` |
 | just | `just` | `just` or cargo fallback | `just` | `just` or cargo fallback | `Casey.Just` |
+| lazygit | `lazygit` | `lazygit` or release fallback | `lazygit` or release fallback | `lazygit` or release fallback | `JesseDuffield.lazygit` |
 | Neovim | `neovim` | upstream release with `neovim` fallback | `neovim` | upstream release with `neovim` fallback | `Neovim.Neovim` |
 | Node.js LTS | via fnm | via fnm | via fnm | via fnm | via fnm |
 | pipx | `python-pipx` | `pipx` | `pipx` | `pipx` | installed with `py -3.12 -m pip install --user pipx` |
@@ -60,7 +62,7 @@ These are installed only by the Linux/WSL shell installers.
 | --- | --- | --- | --- | --- |
 | browser automation | not installed | not installed | `chromium`, `chromium-headless`, `chromedriver`, `xorg-x11-server-Xvfb` | not installed |
 | btop | `btop` | `btop` | `btop` | `btop` |
-| build tools | not installed | `build-essential` | `gcc`, `gcc-c++`, `make`, `cmake` | `build-essential` |
+| build tools | not installed | `build-essential`, `cmake` | `gcc`, `gcc-c++`, `make`, `cmake` | `build-essential`, `cmake` |
 | ca-certificates | not installed | `ca-certificates` | not installed | `ca-certificates` |
 | containers | not installed | not installed | `podman`, `podman-compose`, `buildah` | not installed |
 | curl | `curl` | `curl` | `curl` | `curl` |
