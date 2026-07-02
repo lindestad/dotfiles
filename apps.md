@@ -4,13 +4,14 @@ This tracks the packages and post-install tools managed by the platform installe
 
 ## Cross-platform
 
-These tools are installed on at least one Linux installer and on Windows.
+These are the main package and tool installs managed by the platform installers.
 
 | Tool | Arch | Ubuntu | Fedora | WSL | Windows |
 | --- | --- | --- | --- | --- | --- |
 | 7zip/p7zip | `p7zip` | `p7zip-full` | `7zip` | `p7zip-full` | `7zip.7zip` |
 | Alacritty | not installed | not installed | `alacritty` | not installed | not installed |
 | bat | `bat` | `bat` | `bat` | `bat` | `sharkdp.bat` |
+| bottom/btm | `bottom` | `btm` | cargo fallback | `btm` | `Clement.bottom` |
 | carapace | `carapace-bin` (AUR) | `carapace` (optional) | prompted upstream `carapace-bin` RPM repo | `carapace` (optional) | `rsteube.Carapace` |
 | dust | `dust` with cargo fallback | `du-dust` with cargo fallback | `du-dust` with cargo fallback | `du-dust` with cargo fallback | `bootandy.dust` |
 | eza | `eza` | `eza` (optional) | `eza` | `eza` (optional) | `eza-community.eza` |
@@ -25,6 +26,7 @@ These tools are installed on at least one Linux installer and on Windows.
 | helix | `helix` | `helix` (optional) | `helix` | release `.deb` fallback | `Helix.Helix` |
 | imagemagick | `imagemagick` | `imagemagick` | `ImageMagick` | `imagemagick` | `ImageMagick.ImageMagick` |
 | jq | `jq` | `jq` | `jq` | `jq` | `jqlang.jq` |
+| Neovim | `neovim` | upstream release with `neovim` fallback | `neovim` | upstream release with `neovim` fallback | `Neovim.Neovim` |
 | Node.js LTS | via fnm | via fnm | via fnm | via fnm | via fnm |
 | pipx | `python-pipx` | `pipx` | `pipx` | `pipx` | installed with `py -3.12 -m pip install --user pipx` |
 | Python | `python` | `python3`, `python3.12`, `python3.12-venv` | `python3.12` | `python3`, `python3.12`, `python3.12-venv` | `Python.Python.3.12` |
@@ -34,8 +36,10 @@ These tools are installed on at least one Linux installer and on Windows.
 | Typst CLI | `typst` | cargo fallback | cargo fallback | cargo fallback | `Typst.Typst` |
 | uutils coreutils | `uutils-coreutils` | `uutils-coreutils` (optional) | `uutils-coreutils` (optional) | not installed | `uutils.coreutils` |
 | uv | `uv` | standalone installer | `uv` with standalone fallback | standalone installer | `astral-sh.uv` |
+| uv tools | `ty`, `ruff` | `ty`, `ruff` | `ty`, `ruff` | `ty`, `ruff` | `ty`, `ruff` |
 | WezTerm | `wezterm` | prompted official APT repo | `wezterm` or prompted official COPR | not installed | `wez.wezterm` |
 | yazi | `yazi` | `yazi` (optional) | cargo fallback | `yazi` (optional) | `sxyazi.yazi` |
+| Zellij | `zellij` | cargo fallback | COPR with cargo fallback | cargo fallback | not installed |
 | zoxide | `zoxide` | `zoxide` | `zoxide` | `zoxide` | `ajeetdsouza.zoxide` |
 
 ## Linux-only
@@ -45,7 +49,6 @@ These are installed only by the Linux/WSL shell installers.
 | Tool | Arch | Ubuntu | Fedora | WSL |
 | --- | --- | --- | --- | --- |
 | browser automation | not installed | not installed | `chromium`, `chromium-headless`, `chromedriver`, `xorg-x11-server-Xvfb` | not installed |
-| bottom/btm | `bottom` | `btm` | cargo fallback | `btm` |
 | btop | `btop` | `btop` | `btop` | `btop` |
 | build tools | not installed | `build-essential` | `gcc`, `gcc-c++`, `make`, `cmake` | `build-essential` |
 | ca-certificates | not installed | `ca-certificates` | not installed | `ca-certificates` |
@@ -131,12 +134,12 @@ These are not package installs, but the installers manage them alongside the too
 
 | Config | Linux/WSL | Windows |
 | --- | --- | --- |
-| Alacritty | non-WSL Linux only | not linked |
+| Alacritty | non-WSL Linux only | linked/copied |
 | Bash profile | Ubuntu only | `.bashrc` linked/copied; `.bash_profile` created if no login profile exists |
 | Codex instructions | symlinked | linked/copied |
 | Git config | copied if missing; missing keys merged | copied if missing; missing keys merged |
 | Git global ignore | symlinked | linked/copied |
-| Ghostty | non-WSL Linux only | not linked |
+| Ghostty config + shaders | non-WSL Linux only | not linked |
 | Helix | symlinked | linked/copied |
 | Neovim | symlinked | linked/copied |
 | Kanata | optional | optional |
