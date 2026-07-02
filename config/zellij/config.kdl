@@ -1,9 +1,9 @@
 keybinds clear-defaults=true {
     normal {
-        bind "h" { MoveFocus "left"; SwitchToMode "locked"; }
-        bind "j" { MoveFocus "down"; SwitchToMode "locked"; }
-        bind "k" { MoveFocus "up"; SwitchToMode "locked"; }
-        bind "l" { MoveFocus "right"; SwitchToMode "locked"; }
+        bind "h" "Ctrl h" { MoveFocus "left"; SwitchToMode "locked"; }
+        bind "j" "Ctrl j" { MoveFocus "down"; SwitchToMode "locked"; }
+        bind "k" "Ctrl k" { MoveFocus "up"; SwitchToMode "locked"; }
+        bind "l" "Ctrl l" { MoveFocus "right"; SwitchToMode "locked"; }
         bind "1" { GoToTab 1; SwitchToMode "locked"; }
         bind "2" { GoToTab 2; SwitchToMode "locked"; }
         bind "3" { GoToTab 3; SwitchToMode "locked"; }
