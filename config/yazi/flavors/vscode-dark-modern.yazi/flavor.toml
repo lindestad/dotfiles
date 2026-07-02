@@ -29,11 +29,8 @@ bright_magenta = "#C586C0"
 bright_cyan = "#4EC9B0"
 bright_white = "#FFFFFF"
 
-[manager]
+[mgr]
 cwd = { fg = "cyan" }
-# Hovered
-hovered         = { fg = "#D4D4D4", bg = "#264F78" }
-preview_hovered = { underline = true }
 # Find
 find_keyword  = { fg = "#DCDCAA", bold = true, italic = true, underline = true }
 find_position = { fg = "#C586C0", bg = "#1F1F1F", bold = true, italic = true }
@@ -42,10 +39,6 @@ marker_copied   = { fg = "#73C991", bg = "#73C991" }
 marker_cut      = { fg = "#F44747", bg = "#F44747" }
 marker_marked   = { fg = "#4EC9B0", bg = "#4EC9B0" }
 marker_selected = { fg = "#D7BA7D", bg = "#D7BA7D" }
-# Tab
-tab_active   = { fg = "#D4D4D4", bg = "#1F1F1F" }
-tab_inactive = { fg = "#D4D4D4", bg = "#2D2D2D" }
-tab_width    = 1
 # Count
 count_copied   = { fg = "#1F1F1F", bg = "#73C991" }
 count_cut      = { fg = "#1F1F1F", bg = "#F44747" }
@@ -55,50 +48,34 @@ border_symbol = "│"
 border_style  = { fg = "#444444" }
 # Highlighting
 syntect_theme = "./tmtheme.xml"
-# Cursor
-cursor_symbol = "█"
-cursor = { fg = "#1F1F1F", bg = "#AEAFAD" }
-# Executable
-exe_symbol = ""
-exe = { fg = "#4EC9B0", bg = "#1F1F1F" }
-# Regular
-file_symbol = ""
-file = { }
-# Directory
-folder_symbol = ""
-folder = { fg = "#569CD6", bg = "#1F1F1F" }
-# Hidden
-hidden_symbol = ""
-hidden = { fg = "#808080" }
-# Link
-link_symbol = ""
-link = { fg = "#4EC9B0", bg = "#1F1F1F" }
-# Link (broken)
-broken_symbol = ""
-broken = { fg = "#F44747", bg = "#3A1212" }
-# Selected
-selected = { fg = "#FFFFFF", bg = "#264F78" }
+
+[tabs]
+active = { fg = "#D4D4D4", bg = "#1F1F1F" }
+inactive = { fg = "#D4D4D4", bg = "#2D2D2D" }
 
 [status]
-separator_open  = ""
-separator_close = ""
-separator_style = { fg = "#444444", bg = "#444444" }
-# Mode
-mode_normal = { fg = "#1F1F1F", bg = "#569CD6", bold = true }
-mode_select = { fg = "#1F1F1F", bg = "#FFAF00", bold = true }
-mode_unset  = { fg = "#1F1F1F", bg = "#F44747", bold = true }
+sep_left = { open = "", close = "" }
+sep_right = { open = "", close = "" }
 # Progress
 progress_label  = { bold = true }
 progress_normal = { fg = "#569CD6", bg = "#1F1F1F" }
 progress_error  = { fg = "#F44747", bg = "#1F1F1F" }
 # Permissions
-permissions_t = { fg = "#6A9955" }
-permissions_r = { fg = "#D7BA7D" }
-permissions_w = { fg = "#F44747" }
-permissions_x = { fg = "#4EC9B0" }
-permissions_s = { fg = "#808080" }
+perm_type = { fg = "#6A9955" }
+perm_read = { fg = "#D7BA7D" }
+perm_write = { fg = "#F44747" }
+perm_exec = { fg = "#4EC9B0" }
+perm_sep = { fg = "#808080" }
 
-[select]
+[mode]
+normal_main = { fg = "#1F1F1F", bg = "#569CD6", bold = true }
+normal_alt = { fg = "#1F1F1F", bg = "#569CD6", bold = true }
+select_main = { fg = "#1F1F1F", bg = "#FFAF00", bold = true }
+select_alt = { fg = "#1F1F1F", bg = "#FFAF00", bold = true }
+unset_main = { fg = "#1F1F1F", bg = "#F44747", bold = true }
+unset_alt = { fg = "#1F1F1F", bg = "#F44747", bold = true }
+
+[pick]
 border   = { fg = "#569CD6" }
 active   = { fg = "#C586C0", bold = true }
 inactive = {}
@@ -109,7 +86,7 @@ title    = {}
 value    = {}
 selected = { reversed = true }
 
-[completion]
+[cmp]
 border   = { fg = "#569CD6" }
 active   = { bg = "#264F78" }
 inactive = {}
@@ -174,7 +151,7 @@ rules = [
 ]
 
 [icon]
-rules = [
+prepend_dirs = [
     { name = "Desktop", text = "" },
     { name = "Documents", text = "" },
     { name = "Downloads", text = "" },

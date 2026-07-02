@@ -5,9 +5,6 @@
 [mgr]
 cwd = { fg = "#81c8be" }
 
-# Hovered
-hovered         = { reversed = true }
-preview_hovered = { underline = true }
 
 # Find
 find_keyword  = { fg = "#e5c890", bold = true, italic = true, underline = true }
@@ -19,10 +16,6 @@ marker_cut      = { fg = "#e78284", bg = "#e78284" }
 marker_marked   = { fg = "#81c8be", bg = "#81c8be" }
 marker_selected = { fg = "#e5c890", bg = "#e5c890" }
 
-# Tab
-tab_active   = { reversed = true }
-tab_inactive = {}
-tab_width    = 1
 
 # Count
 count_copied   = { fg = "#303446", bg = "#a6d189" }

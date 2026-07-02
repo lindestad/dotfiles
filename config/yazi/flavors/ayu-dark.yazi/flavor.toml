@@ -1,10 +1,7 @@
-[manager]
+[mgr]
 cwd = { fg = "#5c6773" }
 
 # tab
-tab_active = { fg = "#0a0e14", bg = "#c2a05c", bold = true }
-tab_inactive = { fg = "#5c6773", bg = "#0a0e14" }
-tab_width = 1
 
 # find
 find_keyword = { fg = "#1f6f88", bold = true, italic = true, underline = true }
@@ -24,6 +21,10 @@ count_selected = { fg = "#0a0e14", bg = "#c2a05c" }
 # border
 border_symbol = " "
 
+[tabs]
+active = { fg = "#0a0e14", bg = "#c2a05c", bold = true }
+inactive = { fg = "#5c6773", bg = "#0a0e14" }
+
 [mode]
 normal_main = { fg = "#0a0e14", bg = "#c2a05c", bold = true }
 normal_alt = { fg = "#1f6f88", bg = "#2d3640", bold = true }
@@ -36,9 +37,8 @@ unset_alt = { fg = "#0a0e14", bg = "#a85361", bold = true }
 
 
 [status]
-separator_open = ""
-separator_close = ""
-separator_style = { bg = "#2d3640", fg = "#c2a05c" }
+sep_left = { open = "", close = "" }
+sep_right = { open = "", close = "" }
 
 # Progress
 progress_label = { fg = "#0a0e14", bold = true }
@@ -52,7 +52,7 @@ perm_exec = { fg = "#7e9350" }
 perm_read = { fg = "#1f6f88" }
 perm_sep = { fg = "#5c6773" }
 
-[select]
+[pick]
 border = { fg = "#c2a05c" }
 active = { fg = "#a85361", bold = true }
 inactive = { fg = "#5c6773", bg = "#0a0e14" }
@@ -61,7 +61,7 @@ inactive = { fg = "#5c6773", bg = "#0a0e14" }
 border = { fg = "#c2a05c" }
 value = { fg = "#5c6773" }
 
-[completion]
+[cmp]
 border = { fg = "#c2a05c", bg = "#0a0e14" }
 
 [tasks]

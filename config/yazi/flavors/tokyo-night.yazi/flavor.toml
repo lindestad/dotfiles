@@ -5,9 +5,6 @@
 [mgr]
 cwd = { fg = "#7aa2f7" }
 
-# Hovered
-hovered         = { reversed = true }
-preview_hovered = { underline = true }
 
 # Find
 find_keyword  = { fg = "#f7768e", bold = true, italic = true, underline = true }

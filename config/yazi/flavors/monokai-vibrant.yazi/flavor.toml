@@ -7,15 +7,10 @@
 #19D1E5
 #528bff
 
-[manager]
+[mgr]
 cwd = { fg = "white" }
 
-hovered         = { reversed = true }
-preview_hovered = { reversed = true }
 
-tab_active   = { reversed = true }
-tab_inactive = {}
-tab_width    = 1
 
 # default bg
 count_copied   = { fg = "#1f1f28", bg = "#81F900" }
@@ -29,6 +24,10 @@ find_keyword  = { bg = "white", fg = "#FF3F4F", bold = true, italic = false, und
 border_symbol = "│"
 border_style  = { bg = "#292B30", fg = "#333341" }
 
+[tabs]
+active = { reversed = true }
+inactive = {}
+
 [which]
 cols = 2
 separator = " | "
@@ -39,24 +38,27 @@ cand = { fg = "white" }
 desc = { fg = "#565666" }
 
 [status]
-separator_open  = ""
-separator_close = ""
-separator_style = { fg = "reset", bg = "#363646" }
+sep_left = { open = "", close = "" }
+sep_right = { open = "", close = "" }
 
-# default bg
-mode_normal = { fg = "#1f1f28", bg = "white", bold = true }
-mode_select = { fg = "#1f1f28", bg = "#FF3F4F", bold = true }
-mode_unset  = { fg = "#1f1f28", bg = "#FFD945", bold = true }
 
 progress_label  = { fg = "#19D1E5", bg = "#363646", bold = true }
 progress_normal = { fg = "#363646", bg = "#1f1f28" }
 progress_error  = { fg = "#363646", bg = "#1f1f28" }
 
-permissions_t = { fg = "#81F900" }
-permissions_r = { fg = "#FFD945" }
-permissions_w = { fg = "#FF3F4F" }
-permissions_x = { fg = "#FF9700" }
-permissions_s = { fg = "#19D1E5" }
+perm_type = { fg = "#81F900" }
+perm_read = { fg = "#FFD945" }
+perm_write = { fg = "#FF3F4F" }
+perm_exec = { fg = "#FF9700" }
+perm_sep = { fg = "#19D1E5" }
+
+[mode]
+normal_main = { fg = "#1f1f28", bg = "white", bold = true }
+normal_alt = { fg = "#1f1f28", bg = "white", bold = true }
+select_main = { fg = "#1f1f28", bg = "#FF3F4F", bold = true }
+select_alt = { fg = "#1f1f28", bg = "#FF3F4F", bold = true }
+unset_main = { fg = "#1f1f28", bg = "#FFD945", bold = true }
+unset_alt = { fg = "#1f1f28", bg = "#FFD945", bold = true }
 
 [input]
 border   = { fg = "#7fb4ca" } # blue
@@ -64,7 +66,7 @@ title    = {}
 value    = {}
 selected = { reversed = true }
 
-[completion]
+[cmp]
 border   = { fg = "#7fb4ca" } # blue
 active   = { reversed = true }
 inactive = {}
