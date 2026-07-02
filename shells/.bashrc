@@ -24,8 +24,8 @@ case ":$PATH:" in
 esac
 
 export STARSHIP_CONFIG="$HOME/.config/starship.toml"
-export EDITOR=hx
-export VISUAL=hx
+export EDITOR=nvim
+export VISUAL=nvim
 export LESS='-R'
 export LESSHISTFILE=-
 

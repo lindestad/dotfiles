@@ -44,8 +44,8 @@ if [ -z "${ZELLIJ_SOCKET_DIR:-}" ]; then
 fi
 
 # Editor
-export EDITOR=hx
-export VISUAL=hx
+export EDITOR=nvim
+export VISUAL=nvim
 
 # Colors
 autoload -U colors && colors
