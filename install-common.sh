@@ -171,7 +171,7 @@ add_wayland_desktop_links() {
 }
 
 install_pacman() {
-  sudo pacman -Sy --needed --noconfirm "$@"
+  sudo pacman -Syu --needed --noconfirm "$@"
 }
 
 aur_helper() {
