@@ -152,7 +152,10 @@ add_wezterm_link() {
 }
 
 add_ghostty_link() {
-  LINKS+=("$DOTFILES_DIR/config/ghostty/config.ghostty|$HOME/.config/ghostty/config.ghostty")
+  LINKS+=(
+    "$DOTFILES_DIR/config/ghostty/config.ghostty|$HOME/.config/ghostty/config.ghostty"
+    "$DOTFILES_DIR/config/ghostty/shaders|$HOME/.config/ghostty/shaders"
+  )
 }
 
 add_wayland_desktop_links() {

@@ -44,7 +44,7 @@ selection-background = #1b3a5b
 
 # Cursor shaders
 custom-shader = shaders/warp.glsl
-custom shader = shaders/rectangle-boom.glsl
+custom-shader = shaders/rectangle-boom.glsl
 
 # Color scheme
 palette = 0=#101317
