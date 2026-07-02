@@ -184,5 +184,20 @@ disabled = false
 [custom.giturl]
 description = "Display symbol for remote Git server"
 format = "at $output "
-command = '''nu -c "let r = (try { git ls-remote --get-url } catch { '' }); if ($r | str contains 'github') { echo ' ' } else if ($r | str contains 'gitlab') { echo ' ' } else if ($r | str contains 'bitbucket') { echo ' ' } else if ($r | str contains 'git') { echo ' ' } else { echo ' ' }"'''
-when = 'git rev-parse --is-inside-work-tree'
+command = """
+$remote = try { git ls-remote --get-url 2>$null } catch { '' }
+if ($remote -like '*github*') {
+  ''
+} elseif ($remote -like '*gitlab*') {
+  ''
+} elseif ($remote -like '*bitbucket*') {
+  ''
+} elseif ($remote -like '*git*') {
+  ''
+} else {
+  ''
+}
+"""
+when = true
+require_repo = true
+shell = ['powershell.exe', '-NoProfile', '-Command', '-']

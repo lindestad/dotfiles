@@ -122,7 +122,6 @@ These winget packages are only in `install-windows.ps1`.
 | Tool | Winget ID |
 | --- | --- |
 | less | `jftuga.less` |
-| Nushell | `Nushell.Nushell` |
 | Poppler | `oschwartz10612.Poppler` |
 | PowerShell | `Microsoft.PowerShell` |
 
@@ -141,7 +140,6 @@ These are not package installs, but the installers manage them alongside the too
 | Helix | symlinked | linked/copied |
 | Neovim | symlinked | linked/copied |
 | Kanata | optional | optional |
-| Nushell | Ubuntu only | linked/copied |
 | Starship | symlinked | linked/copied |
 | WezTerm | non-WSL Linux only | linked/copied to `.wezterm.lua` and `.config/wezterm/wezterm.lua` |
 | Windows Terminal | not managed | Git Bash profile/default configured when settings exist |

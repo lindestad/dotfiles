@@ -107,7 +107,6 @@ DNF_PKGS_OPTIONAL=(
 
 ensure_carapace_fedora() {
   if have carapace; then
-    ensure_carapace_nushell_init
     return
   fi
 
@@ -132,7 +131,6 @@ EOF
   echo "==> Installing carapace-bin..."
   sudo dnf makecache -y || true
   sudo dnf install -y carapace-bin
-  ensure_carapace_nushell_init
 }
 
 ensure_ghostty_fedora() {

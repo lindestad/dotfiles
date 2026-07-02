@@ -143,10 +143,6 @@ add_bash_link() {
   LINKS+=("$DOTFILES_DIR/shells/.bashrc|$HOME/.bashrc")
 }
 
-add_nushell_link() {
-  LINKS+=("$DOTFILES_DIR/shells/config.nu|$HOME/.config/nushell/config.nu")
-}
-
 add_alacritty_link() {
   LINKS+=("$DOTFILES_DIR/config/alacritty/alacritty.toml|$HOME/.config/alacritty/alacritty.toml")
 }
@@ -423,17 +419,6 @@ ensure_carapace_apt_repo() {
 
   echo "==> Adding carapace-bin apt repo (apt.fury.io)..."
   echo 'deb [trusted=yes] https://apt.fury.io/rsteube/ /' | sudo tee "$list" >/dev/null
-}
-
-ensure_carapace_nushell_init() {
-  if ! have carapace; then
-    return
-  fi
-
-  local cache_dir="$HOME/.cache/carapace"
-  mkdir -p "$cache_dir"
-  echo "==> Generating carapace Nushell completions..."
-  carapace _carapace nushell > "$cache_dir/init.nu"
 }
 
 ensure_fnm() {

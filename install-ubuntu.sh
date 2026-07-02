@@ -69,7 +69,6 @@ APT_PKGS_OPTIONAL=(
 LINKS=()
 add_common_cli_links
 add_bash_link
-add_nushell_link
 add_zsh_link
 
 if is_wsl; then

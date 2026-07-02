@@ -5,7 +5,6 @@ on:
     paths:
       - '**.sh'
       - '**.ps1'
-      - '**.nu'
       - '**.toml'
       - '**.yaml'
       - '**.yml'
@@ -13,7 +12,6 @@ on:
     paths:
       - '**.sh'
       - '**.ps1'
-      - '**.nu'
       - '**.toml'
       - '**.yaml'
       - '**.yml'
@@ -67,17 +65,3 @@ jobs:
       - uses: docker://docker.io/tamasfe/taplo:latest
         with:
           args: lint --no-auto-config .
-
-  # Nushell linting (no official tool yet)
-  # Can run basic syntax check using nushell itself:
-  # lint-nushell:
-  #   name: Nushell Syntax Check
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Check Nushell scripts
-  #       run: |
-  #         for f in $(find . -name '*.nu'); do
-  #           echo "Checking $f"
-  #           nu -c "source $f"
-  #         done

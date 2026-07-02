@@ -131,7 +131,6 @@ ensure_node_lts
 ensure_zellij_cargo
 ensure_helix
 ensure_vivid_cargo
-ensure_carapace_nushell_init
 install_fonts
 
 echo "==> Creating WSL config symlinks..."
