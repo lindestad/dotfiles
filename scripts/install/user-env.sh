@@ -9,7 +9,8 @@ fi
 install_fonts() {
   local src_dir="$DOTFILES_DIR/fonts"
   local dst_dir="$HOME/.local/share/fonts"
-  local font
+  local changed="no"
+  local font dst
 
   if [[ ! -d "$src_dir" ]]; then
     echo ">> Font directory not found: $src_dir"
@@ -20,9 +21,21 @@ install_fonts() {
   mkdir -p "$dst_dir"
   for font in "$src_dir"/*.ttf "$src_dir"/*.otf; do
     [[ -e "$font" ]] || continue
-    cp -f "$font" "$dst_dir/"
+    dst="$dst_dir/$(basename "$font")"
+    if [[ -f "$dst" ]] && cmp -s "$font" "$dst"; then
+      echo "== Font already current: $(basename "$font")"
+      continue
+    fi
+
+    cp -f "$font" "$dst"
+    changed="yes"
     echo "-> Installed $(basename "$font")"
   done
+
+  if [[ "$changed" != "yes" ]]; then
+    echo "== User fonts already current."
+    return
+  fi
 
   if have fc-cache; then
     fc-cache -f "$dst_dir"
