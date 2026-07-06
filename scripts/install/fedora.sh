@@ -98,11 +98,14 @@ NIRI_DNF_PKGS=(
   NetworkManager-applet
   pavucontrol
   niri
-  waybar
   fuzzel
   swayidle
-  swaylock
   wl-clipboard
+  noctalia-shell
+  power-profiles-daemon
+  upower
+  wlsunset
+  xfce-polkit
 )
 
 DNF_PKGS_OPTIONAL=(
@@ -226,8 +229,9 @@ fi
 echo "==> Installing dnf packages..."
 install_dnf "${DNF_PKGS[@]}" "${DNF_PKGS_OPTIONAL[@]}"
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
-  echo "==> Installing Niri desktop packages..."
+  echo "==> Installing Niri + Noctalia desktop packages..."
   install_dnf "${NIRI_DNF_PKGS[@]}"
+  ensure_noctalia_fedora
 fi
 ensure_wezterm_fedora
 ensure_ghostty_fedora

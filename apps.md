@@ -111,12 +111,16 @@ These are installed when the Linux installer runs with `--niri`.
 | fuzzel | `fuzzel` | `fuzzel` | `fuzzel` |
 | network applet | `network-manager-applet` | `network-manager-gnome` | `NetworkManager-applet` |
 | niri | `niri` | `niri` | `niri` |
+| Noctalia Shell | AUR: `noctalia-shell` | Noctalia APT repo: `noctalia-shell` where supported | `noctalia-shell` |
 | pavucontrol | `pavucontrol` | `pavucontrol` | `pavucontrol` |
+| polkit auth agent | not installed | not installed | `xfce-polkit` |
+| power profiles | `power-profiles-daemon` | `power-profiles-daemon` | `power-profiles-daemon` |
 | sensors | `lm_sensors` | `lm-sensors` | `lm_sensors` |
 | swayidle | `swayidle` | `swayidle` | `swayidle` |
-| swaylock | `swaylock` | `swaylock` | `swaylock` |
-| waybar | `waybar` | `waybar` | `waybar` |
+| upower | `upower` | `upower` | `upower` |
+| wlsunset | `wlsunset` | `wlsunset` | `wlsunset` |
 | wl-clipboard | `wl-clipboard` | `wl-clipboard` | `wl-clipboard` |
+| xdg desktop portal | not installed | `xdg-desktop-portal` | not installed |
 
 ## Optional Keyboard Remapping
 

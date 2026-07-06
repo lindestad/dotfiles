@@ -28,7 +28,7 @@ This repo manages:
 - shell, terminal, editor, file manager, prompt, and Git configuration
 - bundled fonts and platform-specific config linking
 - optional Kanata keyboard remapping
-- optional Niri desktop configuration on supported Linux installs
+- optional Niri + Noctalia desktop configuration on supported Linux installs
 - package installs for the tools used by the dotfiles
 
 See [apps.md](./apps.md) for the package inventory and platform-specific package names.
@@ -54,7 +54,7 @@ The installer prompts for optional components when no flags are provided. Use fl
 
 Optional components:
 
-- `--niri` installs and links the Niri desktop stack: niri, waybar, fuzzel, swaylock/swayidle, and related Wayland utilities.
+- `--niri` installs and links the Niri + Noctalia desktop stack: niri, noctalia-shell, fuzzel, swayidle, and related Wayland utilities.
 - `--kanata` installs or links Kanata keyboard remapping config where supported.
 
 ### Windows (PowerShell)

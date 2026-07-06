@@ -67,15 +67,20 @@ NIRI_PACMAN_PKGS=(
   network-manager-applet
   pavucontrol
   niri
-  waybar
   fuzzel
   swayidle
-  swaylock
   wl-clipboard
+  power-profiles-daemon
+  upower
+  wlsunset
 )
 
 AUR_PKGS=(
   carapace-bin
+)
+
+NIRI_AUR_PKGS=(
+  noctalia-shell
 )
 
 LINKS=()
@@ -103,7 +108,7 @@ fi
 echo "==> Installing pacman packages..."
 install_pacman "${PACMAN_PKGS[@]}"
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
-  echo "==> Installing Niri desktop packages..."
+  echo "==> Installing Niri + Noctalia desktop packages..."
   install_pacman "${NIRI_PACMAN_PKGS[@]}"
 fi
 ensure_rust_toolchain
@@ -120,6 +125,10 @@ install_fonts
 if ((${#AUR_PKGS[@]})); then
   echo "==> Installing AUR packages (if helper found)..."
   install_aur "${AUR_PKGS[@]}"
+fi
+if [[ "$INSTALL_NIRI" == "yes" ]] && ((${#NIRI_AUR_PKGS[@]})); then
+  echo "==> Installing Niri + Noctalia AUR packages (if helper found)..."
+  install_aur "${NIRI_AUR_PKGS[@]}"
 fi
 
 KANATA_CONFIG_SRC=""

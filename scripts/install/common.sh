@@ -55,8 +55,8 @@ usage() {
 Usage: $(basename "$0") [options]
 
 Options:
-  --niri        Install the Niri desktop stack (niri, waybar, fuzzel, swaylock)
-  --no-niri     Skip the Niri desktop stack
+  --niri        Install the Niri + Noctalia desktop stack
+  --no-niri     Skip the Niri + Noctalia desktop stack
   --kanata      Install/link Kanata keyboard remapping config
   --no-kanata   Skip Kanata
   -y, --yes     Use non-interactive defaults for unspecified options
@@ -89,13 +89,13 @@ resolve_install_flags() {
 
   if [[ "$support_niri" == "no" ]]; then
     if [[ "$INSTALL_NIRI" == "yes" ]]; then
-      echo ">> Niri desktop stack is not supported by this installer; skipping."
+      echo ">> Niri + Noctalia desktop stack is not supported by this installer; skipping."
     fi
     INSTALL_NIRI="no"
   elif [[ -z "$INSTALL_NIRI" ]]; then
     if [[ "$ASSUME_YES" == "yes" ]]; then
       INSTALL_NIRI="no"
-    elif [[ "$(prompt_yes_no "Install Niri desktop stack (niri/waybar/fuzzel/swaylock)?")" == "yes" ]]; then
+    elif [[ "$(prompt_yes_no "Install Niri + Noctalia desktop stack?")" == "yes" ]]; then
       INSTALL_NIRI="yes"
     else
       INSTALL_NIRI="no"
@@ -119,7 +119,7 @@ resolve_install_flags() {
 
   echo "==> Optional components: niri=$INSTALL_NIRI, kanata=$INSTALL_KANATA"
   if [[ "$support_niri" != "no" && "$INSTALL_NIRI" == "no" ]]; then
-    echo ">> Skipping Niri desktop stack. Re-run with --niri to install niri/waybar/fuzzel/swaylock."
+    echo ">> Skipping Niri + Noctalia desktop stack. Re-run with --niri to install it."
   fi
   if [[ "$support_kanata" != "no" && "$INSTALL_KANATA" == "no" ]]; then
     echo ">> Skipping Kanata. Re-run with --kanata to install/link keyboard remapping config."

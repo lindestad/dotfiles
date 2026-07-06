@@ -13,9 +13,92 @@ add_wayland_desktop_links() {
     "$DOTFILES_DIR/config/niri/config.kdl|$HOME/.config/niri/config.kdl"
     "$DOTFILES_DIR/config/niri/keybinds.kdl|$HOME/.config/niri/keybinds.kdl"
     "$DOTFILES_DIR/config/niri/local.example.kdl|$HOME/.config/niri/local.example.kdl"
-    "$DOTFILES_DIR/config/waybar|$HOME/.config/waybar"
     "$DOTFILES_DIR/config/fuzzel/fuzzel.ini|$HOME/.config/fuzzel/fuzzel.ini"
   )
+}
+
+ensure_noctalia_fedora() {
+  if rpm -q noctalia-shell >/dev/null 2>&1; then
+    return
+  fi
+
+  if dnf -q list --available noctalia-shell >/dev/null 2>&1; then
+    install_dnf noctalia-shell
+    return
+  fi
+
+  echo ">> Noctalia Shell is not available from the configured Fedora repositories."
+  if [[ "$ASSUME_YES" == "yes" ]]; then
+    echo ">> Skipping Terra repository setup in non-interactive mode."
+    return
+  fi
+  if [[ "$(prompt_yes_no "Install Terra repository and Noctalia Shell?")" != "yes" ]]; then
+    return
+  fi
+
+  echo "==> Installing Terra repository..."
+  sudo dnf install -y --nogpgcheck \
+    --repofrompath "terra,https://repos.fyralabs.com/terra\$releasever" \
+    terra-release
+  # shellcheck disable=SC2034
+  DNF_MAKECACHE_DONE="no"
+  install_dnf noctalia-shell
+}
+
+noctalia_apt_suite() {
+  local codename=""
+
+  if [[ -f /etc/os-release ]]; then
+    # shellcheck disable=SC1091
+    . /etc/os-release
+    codename="${VERSION_CODENAME:-${UBUNTU_CODENAME:-}}"
+  fi
+
+  case "$codename" in
+    trixie|sid|plucky|questing)
+      printf '%s\n' "$codename"
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+ensure_noctalia_ubuntu() {
+  local suite key_file
+
+  if dpkg-query -W -f='${Status}' noctalia-shell 2>/dev/null | grep -q "install ok installed"; then
+    return
+  fi
+
+  if apt-cache show noctalia-shell >/dev/null 2>&1; then
+    install_apt noctalia-shell
+    return
+  fi
+
+  if ! suite="$(noctalia_apt_suite)"; then
+    echo ">> Noctalia Shell APT packages are only configured for Debian trixie/sid and Ubuntu plucky/questing."
+    echo ">> Skipping Noctalia Shell package setup for this distro release."
+    return
+  fi
+
+  if [[ "$ASSUME_YES" == "yes" ]]; then
+    echo ">> Skipping Noctalia APT repository setup in non-interactive mode."
+    return
+  fi
+  if [[ "$(prompt_yes_no "Add Noctalia APT repository for $suite and install Noctalia Shell?")" != "yes" ]]; then
+    return
+  fi
+
+  echo "==> Adding Noctalia APT repository..."
+  sudo install -d -m 0755 /etc/apt/keyrings
+  key_file="$(mktemp)"
+  curl -fsSL https://pkg.noctalia.dev/gpg.key -o "$key_file"
+  sudo gpg --yes --dearmor -o /etc/apt/keyrings/noctalia.gpg "$key_file"
+  rm -f "$key_file"
+  echo "deb [signed-by=/etc/apt/keyrings/noctalia.gpg] https://pkg.noctalia.dev/apt $suite main" \
+    | sudo tee /etc/apt/sources.list.d/noctalia.list >/dev/null
+  install_apt noctalia-shell
 }
 
 extract_niri_local_config() {

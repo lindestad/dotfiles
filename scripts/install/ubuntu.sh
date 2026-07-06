@@ -46,9 +46,7 @@ APT_PKGS_COMMON=(
 
 NIRI_APT_PKGS=(
   niri
-  waybar
   fuzzel
-  swaylock
   swayidle
   wl-clipboard
   cliphist
@@ -57,6 +55,10 @@ NIRI_APT_PKGS=(
   bluez
   network-manager-gnome
   pavucontrol
+  power-profiles-daemon
+  upower
+  wlsunset
+  xdg-desktop-portal
 )
 
 APT_PKGS_OPTIONAL=(
@@ -190,8 +192,9 @@ ensure_ghostty_ubuntu() {
 echo "==> Installing apt packages..."
 install_apt "${APT_PKGS_COMMON[@]}" "${APT_PKGS_OPTIONAL[@]}"
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
-  echo "==> Installing Niri desktop packages..."
+  echo "==> Installing Niri + Noctalia desktop packages..."
   install_apt "${NIRI_APT_PKGS[@]}"
+  ensure_noctalia_ubuntu
 fi
 ensure_wezterm_ubuntu
 ensure_ghostty_ubuntu
