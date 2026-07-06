@@ -27,7 +27,7 @@ This repo manages:
 
 - shell, terminal, editor, file manager, prompt, and Git configuration
 - bundled fonts and platform-specific config linking
-- optional Kanata keyboard remapping
+- optional keyboard layout and Kanata laptop remapping
 - optional Niri + Noctalia desktop configuration on supported Linux installs
 - package installs for the tools used by the dotfiles
 
@@ -90,6 +90,15 @@ This dotfiles setup is designed to support:
 
 ---
 
+## Keyboard Layout
+
+The Niri config uses the custom XKB layout in `config/xkb/symbols/usno`. It keeps a US base layout and maps Norwegian characters on AltGr:
+
+- `RightAlt` + `;`/`'`/`[` -> `ø`/`æ`/`å`
+- `RightAlt` + `Shift` + `;`/`'`/`[` -> `Ø`/`Æ`/`Å`
+
+The Windows layout source and built installer are tracked under `keyboard_layouts/`.
+
 ## Kanata Key Remappings
 
 Kanata is an optional install. Use `--kanata`, or answer the installer prompt when running interactively.
@@ -99,7 +108,8 @@ Kanata is an optional install. Use `--kanata`, or answer the installer prompt wh
 - `Caps Lock` → `LeftCtrl`
 - `LeftCtrl` → `Escape`
 - `RightCtrl` → `Caps Lock`
-- `RightAlt` + `;`/`'`/`[` → `ø`/`æ`/`å`
+- `LeftAlt` ↔ `LeftSuper`
+- `RightAlt` passes through for XKB AltGr
 
 **Optional binds:**
 
