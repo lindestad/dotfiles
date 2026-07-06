@@ -1,0 +1,35 @@
+/* #ui */
+
+.R,
+.HM,
+.HM > .LH,
+.HM > .LH * {
+  font-family: "Inter", "JetBrains Mono", "Iosevka", sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.02em !important;
+}
+
+.HM > .LH,
+.D > .LH {
+  color: #e5e7eb !important;
+  background: rgba(24, 24, 27, 0.98) !important;
+  border: 1px solid rgba(63, 63, 70, 1) !important;
+  border-bottom-color: rgba(161, 161, 170, 0.5) !important;
+  border-radius: 7px !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 6px 18px rgba(0, 0, 0, 0.35) !important;
+  padding: 4px 6px !important;
+}
+
+.BH,
+.MC,
+.MH {
+  color: #60a5fa !important;
+}
+
+.One {
+  border-color: #60a5fa !important;
+}
