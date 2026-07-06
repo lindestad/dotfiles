@@ -95,14 +95,12 @@ NIRI_DNF_PKGS=(
   cliphist
   bluez
   bluez-tools
-  NetworkManager-applet
+  network-manager-applet
   pavucontrol
   niri
   fuzzel
   swayidle
   wl-clipboard
-  noctalia-shell
-  power-profiles-daemon
   upower
   wlsunset
   xfce-polkit
@@ -231,6 +229,7 @@ install_dnf "${DNF_PKGS[@]}" "${DNF_PKGS_OPTIONAL[@]}"
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
   echo "==> Installing Niri + Noctalia desktop packages..."
   install_dnf "${NIRI_DNF_PKGS[@]}"
+  ensure_power_profiles_fedora
   ensure_noctalia_fedora
 fi
 ensure_wezterm_fedora

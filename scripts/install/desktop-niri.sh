@@ -19,7 +19,7 @@ add_wayland_desktop_links() {
 }
 
 ensure_noctalia_fedora() {
-  if rpm -q noctalia-shell >/dev/null 2>&1; then
+  if rpm -q noctalia-shell >/dev/null 2>&1 || rpm -q noctalia-shell-legacy >/dev/null 2>&1; then
     return
   fi
 
@@ -44,6 +44,19 @@ ensure_noctalia_fedora() {
   # shellcheck disable=SC2034
   DNF_MAKECACHE_DONE="no"
   install_dnf noctalia-shell
+}
+
+ensure_power_profiles_fedora() {
+  if rpm -q power-profiles-daemon >/dev/null 2>&1; then
+    return
+  fi
+
+  if rpm -q tuned-ppd >/dev/null 2>&1; then
+    echo ">> Skipping power-profiles-daemon; tuned-ppd is installed and provides the power profile service."
+    return
+  fi
+
+  install_dnf power-profiles-daemon
 }
 
 noctalia_apt_suite() {
