@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Linux systemd startup setup for Kanata. Usually called by ./install.sh.
 set -euo pipefail
 
 # Resolve target user/home even if invoked via sudo
@@ -82,7 +83,7 @@ if [[ "$REPLY" =~ ^[Yy]$ ]]; then
 
   # Sanity checks
   if [[ -z "$KANATA_BIN" ]]; then
-    echo "!! 'kanata' not found in PATH. Install it (e.g. yay -S kanata or kanata-bin) and re-run."
+    echo "!! 'kanata' not found in PATH. Install it with your distro package manager or Cargo, then re-run."
     exit 1
   fi
   if [[ ! -f "$KANATA_CFG" ]]; then

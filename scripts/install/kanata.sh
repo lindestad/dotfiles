@@ -35,7 +35,7 @@ link_kanata_config() {
 }
 
 setup_kanata_startup() {
-  local helper="$DOTFILES_DIR/config/kanata/add_to_startup_arch.sh"
+  local helper="$DOTFILES_DIR/scripts/install/kanata-linux-startup.sh"
   local system_prompt user_prompt
 
   system_prompt="Enable Kanata system-wide (pre-login; copies config to /etc, rerun script after changes)?"

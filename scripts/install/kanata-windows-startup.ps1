@@ -6,6 +6,9 @@ function Write-Status {
     Write-Information -MessageData $Message -InformationAction Continue
 }
 
+$ScriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Definition }
+$Dotfiles = (Resolve-Path (Join-Path $ScriptDir "..\..")).Path
+
 $KanataExe = try { (Get-Command kanata_gui.exe -ErrorAction Stop).Source } catch { $null }
 
 # winget installs kanata with a versioned name (e.g. kanata_windows_gui_winIOv2_x64.exe);
@@ -25,8 +28,8 @@ if ($KanataExe -and (Test-Path $KanataExe)) {
         $ConfigPath = $UserCfg
     }
     else {
-        $RepoIso = "$HOME\dev\dotfiles\config\kanata\config_iso_to_ansi.kbd"
-        $RepoAnsi = "$HOME\dev\dotfiles\config\kanata\config.kbd"
+        $RepoIso = Join-Path $Dotfiles "config\kanata\config_iso_to_ansi.kbd"
+        $RepoAnsi = Join-Path $Dotfiles "config\kanata\config.kbd"
         if (Test-Path $RepoIso) { $ConfigPath = $RepoIso } else { $ConfigPath = $RepoAnsi }
     }
 

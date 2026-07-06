@@ -621,7 +621,7 @@ if ($installKanata) {
     }
 
     # Add kanata autostart
-    & (Join-Path $Dotfiles "config\kanata\add_to_startup_windows.ps1")
+    & (Join-Path $Dotfiles "scripts\install\kanata-windows-startup.ps1")
 }
 else {
     Write-Status "Skipping Kanata install."
