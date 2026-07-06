@@ -1,9 +1,6 @@
-// Copy this file to local.kdl for machine-specific niri settings.
-// local.kdl is intentionally ignored by git.
+// Copy to local.kdl for machine-specific settings. local.kdl is ignored.
+// Output names and modes come from `niri msg outputs`.
 
-// Output names and modes come from:
-//   niri msg outputs
-//
 // output "eDP-1" {
 //     mode "2560x1600@60.001"
 //     scale 1.5
@@ -12,7 +9,6 @@
 // }
 
 // Keep hardware-specific renderer/workaround settings local.
-//
 // debug {
 //     render-drm-device "/dev/dri/renderD129"
 //     wait-for-frame-completion-before-queueing
