@@ -54,7 +54,7 @@ The installer prompts for optional components when no flags are provided. Use fl
 
 Optional components:
 
-- `--niri` installs and links the Niri + Noctalia desktop stack: niri, noctalia-shell, fuzzel, swayidle, and related Wayland utilities.
+- `--niri` installs and links the Niri + Noctalia desktop stack: niri, noctalia-shell, NiriMod, fuzzel, swayidle, and related Wayland utilities.
 - `--kanata` installs or links Kanata keyboard remapping config where supported.
 
 ### Windows (PowerShell)

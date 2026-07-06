@@ -195,6 +195,7 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
   echo "==> Installing Niri + Noctalia desktop packages..."
   install_apt "${NIRI_APT_PKGS[@]}"
   ensure_noctalia_ubuntu
+  ensure_nirimod
 fi
 ensure_wezterm_ubuntu
 ensure_ghostty_ubuntu

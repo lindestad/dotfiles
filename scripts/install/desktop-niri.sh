@@ -60,6 +60,53 @@ ensure_power_profiles_fedora() {
   install_dnf power-profiles-daemon
 }
 
+ensure_nirimod() {
+  if have nirimod; then
+    echo "-> NiriMod already installed: $(command -v nirimod)"
+    return
+  fi
+
+  echo "==> Installing NiriMod..."
+
+  if have pacman; then
+    local helper=""
+    if helper="$(aur_helper 2>/dev/null)"; then
+      if "$helper" -S --needed --noconfirm nirimod-git && have nirimod; then
+        return
+      fi
+      echo ">> Could not install nirimod-git from AUR; falling back to the upstream installer."
+    else
+      echo ">> No AUR helper found; using the upstream NiriMod installer."
+    fi
+  fi
+
+  if ! have curl; then
+    echo "!! curl is required to install NiriMod from upstream."
+    return
+  fi
+
+  local installer
+  installer="$(mktemp)"
+  if ! curl -fsSL https://raw.githubusercontent.com/srinivasr/nirimod/main/install.sh -o "$installer"; then
+    echo "!! Could not download the NiriMod installer."
+    rm -f "$installer"
+    return
+  fi
+
+  if ! bash "$installer" --install; then
+    echo "!! NiriMod installer failed; continuing without NiriMod."
+    rm -f "$installer"
+    return
+  fi
+
+  rm -f "$installer"
+  if have nirimod; then
+    echo "-> Installed NiriMod: $(command -v nirimod)"
+  else
+    echo "!! NiriMod installer completed, but nirimod is not on PATH."
+  fi
+}
+
 noctalia_apt_suite() {
   local codename=""
 

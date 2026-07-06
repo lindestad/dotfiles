@@ -231,6 +231,7 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
   install_dnf "${NIRI_DNF_PKGS[@]}"
   ensure_power_profiles_fedora
   ensure_noctalia_fedora
+  ensure_nirimod
 fi
 ensure_wezterm_fedora
 ensure_ghostty_fedora

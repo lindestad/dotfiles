@@ -130,6 +130,9 @@ if [[ "$INSTALL_NIRI" == "yes" ]] && ((${#NIRI_AUR_PKGS[@]})); then
   echo "==> Installing Niri + Noctalia AUR packages (if helper found)..."
   install_aur "${NIRI_AUR_PKGS[@]}"
 fi
+if [[ "$INSTALL_NIRI" == "yes" ]]; then
+  ensure_nirimod
+fi
 
 KANATA_CONFIG_SRC=""
 if [[ "$INSTALL_KANATA" == "yes" ]]; then
