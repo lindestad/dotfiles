@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+direction="${1:-}"
+case "$direction" in
+  down|up) ;;
+  *)
+    echo "usage: niri-move-window-or-workspace down|up" >&2
+    exit 2
+    ;;
+esac
+
+workspaces="$(niri msg -j workspaces)"
+focused="$(jq -c '.[] | select(.is_focused == true)' <<<"$workspaces")"
+
+if [[ -z "$focused" ]]; then
+  exit 1
+fi
+
+current_idx="$(jq -r '.idx' <<<"$focused")"
+output="$(jq -r '.output' <<<"$focused")"
+max_idx="$(
+  jq -r --arg output "$output" \
+    '[.[] | select(.output == $output) | .idx] | max' \
+    <<<"$workspaces"
+)"
+
+if [[ "$direction" == "down" && "$current_idx" -lt "$max_idx" ]]; then
+  exec niri msg action move-window-down-or-to-workspace-down
+fi
+
+if [[ "$direction" == "up" && "$current_idx" -gt 1 ]]; then
+  exec niri msg action move-window-up-or-to-workspace-up
+fi
+
+if [[ "$direction" == "down" ]]; then
+  target_idx=$((current_idx + 1))
+else
+  target_idx="$current_idx"
+fi
+
+temp_workspace="_niri_insert_${direction}_$$"
+
+niri msg action set-workspace-name --workspace "$max_idx" "$temp_workspace" >/dev/null
+cleanup() {
+  niri msg action unset-workspace-name "$temp_workspace" >/dev/null 2>&1 || true
+}
+trap cleanup EXIT
+
+niri msg action move-workspace-to-index "$target_idx" --reference "$temp_workspace" >/dev/null
+niri msg action move-window-to-workspace "$temp_workspace" >/dev/null
+
+cleanup
+trap - EXIT

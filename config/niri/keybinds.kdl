@@ -70,8 +70,8 @@ binds {
     Mod+Ctrl+Up    { move-window-up; }
     Mod+Ctrl+Right { move-column-right; }
     Mod+Ctrl+H     { move-column-left-or-to-monitor-left; }
-    Mod+Ctrl+J     { spawn "/home/dl/.local/bin/niri-move-window-or-workspace" "down"; }
-    Mod+Ctrl+K     { spawn "/home/dl/.local/bin/niri-move-window-or-workspace" "up"; }
+    Mod+Ctrl+J     { spawn-sh "$HOME/.local/bin/niri-move-window-or-workspace down"; }
+    Mod+Ctrl+K     { spawn-sh "$HOME/.local/bin/niri-move-window-or-workspace up"; }
     Mod+Ctrl+L     { move-column-right-or-to-monitor-right; }
 
     // Alternative commands that move across workspaces when reaching

@@ -133,6 +133,9 @@ echo "==> Creating config symlinks..."
 link_pairs "${LINKS[@]}"
 ensure_broot_launcher
 ensure_local_bin
+if [[ "$INSTALL_NIRI" == "yes" ]]; then
+  install_niri_helpers
+fi
 copy_gitconfig
 ensure_codex_config
 ensure_zsh_default_shell
