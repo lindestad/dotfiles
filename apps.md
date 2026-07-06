@@ -160,6 +160,7 @@ These are not package installs, but the installers manage them alongside the too
 | Ghostty config + shaders | non-WSL Linux only | not linked |
 | Helix | symlinked | linked/copied |
 | Neovim | symlinked | linked/copied |
+| Noctalia color scheme | optional with `--niri` | not managed |
 | Kanata | optional | optional |
 | Starship | symlinked | linked/copied |
 | WezTerm | non-WSL Linux only | linked/copied to `.wezterm.lua` and `.config/wezterm/wezterm.lua` |
