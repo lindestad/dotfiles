@@ -32,12 +32,10 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Install actionlint
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | bash
-
       - name: Run actionlint
-        run: ./actionlint
+        uses: docker://rhysd/actionlint:latest
+        with:
+          args: -color
 
   lint-shell:
     name: ShellCheck (Bash)
