@@ -1,9 +1,7 @@
 ;; ISO-to-ANSI feel remap
-;; - Keep existing ANSI mapping (same as config.kbd) for base + Norwegian layers
-;; - Additionally:
-;;   Key left of Z (often labelled < > | on ISO) becomes lsft
-;;   Key between ' and Enter (ISO extra key) becomes Enter
-;;   When Right alt is held, both the ISO extra key and enter becomes backslash ( \ )
+;; - Key left of Z (often labelled < > | on ISO) becomes lsft.
+;; - Key between ' and Enter becomes Enter.
+;; - Enter becomes backslash, the ANSI key above Enter.
 
 (defcfg
   linux-dev /dev/input/by-path/platform-i8042-serio-0-event-kbd
@@ -19,58 +17,22 @@
   caps
   lctrl
   rctrl
+  lalt
+  lmet
   ralt
-  ;
-  '
-  [
-  lsft
-  rsft
   lsgt                               ;; ISO 102nd key (left of Z)
   \                                  ;; ISO Non-US Hash (between ' and Enter)
   ret                                ;; Enter
-)
-
-(defalias
-  no     (layer-while-held no)       ;; Hold RAlt -> Norwegian layer
-  nocaps (layer-while-held no-caps)  ;; On that layer, holding Shift -> uppercase layer
-  shnocaps (multi lsft @nocaps)      ;; for left shift
-  rshnocaps (multi rsft @nocaps)     ;; for right shift
 )
 
 (deflayer base
   lctrl
   esc
   caps
-  @no
-  ; ' [
-  lsft rsft
+  lmet
+  lalt
+  ralt
   lsft                               ;; lsgt -> left shift for ANSI feel
   ret                                ;; nuhs -> Enter
   ret                                ;; ret (Enter) -> backslash (ANSI key above Enter row)
-)
-
-;; Norwegian layer (RAlt held)
-(deflayer no
-  caps
-  lctrl
-  rctrl
-  ralt
-  (unicode ø) (unicode æ) (unicode å)
-  @shnocaps @shnocaps
-  lsft                               ;; lsgt -> lsft
-  \                                  ;; backslash -> backslash
-  \                                  ;; ret (Enter) -> backslash
-)
-
-;; Uppercase Norwegian layer (RAlt + Shift held)
-(deflayer no-caps
-  caps
-  lctrl
-  rctrl
-  ralt
-  (unicode Ø) (unicode Æ) (unicode Å)
-  lsft rsft
-  lsft                               ;; lsgt -> lsft
-  \                                  ;; backslash -> backslash
-  \                                  ;; ret (Enter) -> backslash
 )

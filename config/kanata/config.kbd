@@ -1,4 +1,4 @@
-;; ANSI/base keyboard remap
+;; Laptop keyboard remap
 
 (defcfg
   linux-dev /dev/input/by-path/platform-i8042-serio-0-event-kbd
@@ -9,46 +9,16 @@
   caps
   lctrl
   rctrl
+  lalt
+  lmet
   ralt
-  ;
-  '
-  [
-  lsft
-  rsft
-)
-
-(defalias
-  no     (layer-while-held no)       ;; Hold RAlt -> Norwegian layer
-  nocaps (layer-while-held no-caps)  ;; On that layer, holding Shift -> uppercase layer
-  shnocaps (multi lsft @nocaps)      ;; for left shift
-  rshnocaps (multi rsft @nocaps)     ;; for right shift
 )
 
 (deflayer base
   lctrl
   esc
   caps
-  @no
-  ; ' [
-  lsft rsft
-)
-
-;; Norwegian layer (RAlt held)
-(deflayer no
-  caps
-  lctrl
-  rctrl
+  lmet
+  lalt
   ralt
-  (unicode ø) (unicode æ) (unicode å)
-  @shnocaps @shnocaps
-)
-
-;; Uppercase Norwegian layer (RAlt + Shift held)
-(deflayer no-caps
-  caps
-  lctrl
-  rctrl
-  ralt
-  (unicode Ø) (unicode Æ) (unicode Å)
-  lsft rsft
 )
