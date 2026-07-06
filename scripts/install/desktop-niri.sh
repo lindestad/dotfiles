@@ -183,6 +183,7 @@ install_niri_helpers() {
 
   local helper
   local helpers=(
+    niri-focus-workspace-all
     niri-move-window-or-workspace
   )
 

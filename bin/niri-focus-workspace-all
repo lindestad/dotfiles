@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+direction="${1:-}"
+case "$direction" in
+  down|up) ;;
+  *)
+    echo "usage: niri-focus-workspace-all down|up" >&2
+    exit 2
+    ;;
+esac
+
+if ! command -v jq >/dev/null 2>&1; then
+  echo "niri-focus-workspace-all: jq is required" >&2
+  exit 1
+fi
+
+if command -v flock >/dev/null 2>&1; then
+  exec 9>"${XDG_RUNTIME_DIR:-/tmp}/niri-focus-workspace-all.lock"
+  flock -n 9 || exit 0
+fi
+
+workspaces="$(niri msg -j workspaces)"
+focused="$(jq -e -c '.[] | select(.is_focused == true)' <<<"$workspaces")"
+
+current_idx="$(jq -r '.idx' <<<"$focused")"
+focused_output="$(jq -r '.output' <<<"$focused")"
+
+case "$direction" in
+  down) target_idx=$((current_idx + 1)) ;;
+  up) target_idx=$((current_idx - 1)) ;;
+esac
+
+if (( target_idx < 1 )); then
+  exit 0
+fi
+
+restore_focus() {
+  niri msg action focus-monitor "$focused_output" >/dev/null 2>&1 || true
+}
+trap restore_focus EXIT
+
+while IFS=$'\t' read -r output active_idx; do
+  [[ -n "$output" ]] || continue
+  niri msg action focus-monitor "$output" >/dev/null || continue
+
+  if niri msg action focus-workspace "$target_idx" >/dev/null 2>&1; then
+    continue
+  fi
+
+  while (( active_idx < target_idx )); do
+    niri msg action focus-workspace-down >/dev/null
+    active_idx=$((active_idx + 1))
+  done
+
+  while (( active_idx > target_idx )); do
+    niri msg action focus-workspace-up >/dev/null
+    active_idx=$((active_idx - 1))
+  done
+done < <(
+  jq -r '.[] | select(.is_active == true) | [.output, .idx] | @tsv' \
+    <<<"$workspaces"
+)
+
+restore_focus
+trap - EXIT
