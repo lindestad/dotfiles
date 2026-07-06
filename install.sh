@@ -2,13 +2,13 @@
 set -euo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck source=install-common.sh
-source "$DOTFILES_DIR/install-common.sh"
+# shellcheck source=scripts/install/common.sh
+source "$DOTFILES_DIR/scripts/install/common.sh"
 
 parse_install_flags "$@"
 
 if is_wsl; then
-  exec "$DOTFILES_DIR/install-wsl.sh" "$@"
+  exec "$DOTFILES_DIR/scripts/install/wsl.sh" "$@"
 fi
 
 if [[ -f /etc/os-release ]]; then
@@ -22,26 +22,26 @@ fi
 installer=""
 case "${ID:-}" in
   arch|endeavouros|manjaro)
-    installer="$DOTFILES_DIR/install-arch.sh"
+    installer="$DOTFILES_DIR/scripts/install/arch.sh"
     ;;
   ubuntu|debian|pop|linuxmint)
-    installer="$DOTFILES_DIR/install-ubuntu.sh"
+    installer="$DOTFILES_DIR/scripts/install/ubuntu.sh"
     ;;
   fedora)
-    installer="$DOTFILES_DIR/install-fedora.sh"
+    installer="$DOTFILES_DIR/scripts/install/fedora.sh"
     ;;
 esac
 
 if [[ -z "$installer" ]]; then
   case " ${ID_LIKE:-} " in
     *" arch "*)
-      installer="$DOTFILES_DIR/install-arch.sh"
+      installer="$DOTFILES_DIR/scripts/install/arch.sh"
       ;;
     *" debian "*|*" ubuntu "*)
-      installer="$DOTFILES_DIR/install-ubuntu.sh"
+      installer="$DOTFILES_DIR/scripts/install/ubuntu.sh"
       ;;
     *" fedora "*)
-      installer="$DOTFILES_DIR/install-fedora.sh"
+      installer="$DOTFILES_DIR/scripts/install/fedora.sh"
       ;;
   esac
 fi
@@ -51,5 +51,5 @@ if [[ -n "$installer" ]]; then
 fi
 
 echo "!! Unsupported distro: ${PRETTY_NAME:-${ID:-unknown}}"
-echo "   Run one of: ./install-arch.sh, ./install-ubuntu.sh, ./install-fedora.sh, ./install-wsl.sh"
+echo "   Use ./install.sh on a supported Arch, Debian/Ubuntu, Fedora, or WSL install."
 exit 1

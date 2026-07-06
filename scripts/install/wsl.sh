@@ -3,9 +3,9 @@ set -euo pipefail
 
 # --- Config -------------------------------------------------------------------
 
-DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck source=install-common.sh
-source "$DOTFILES_DIR/install-common.sh"
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+# shellcheck source=scripts/install/common.sh
+source "$DOTFILES_DIR/scripts/install/common.sh"
 
 parse_install_flags "$@"
 ensure_not_root

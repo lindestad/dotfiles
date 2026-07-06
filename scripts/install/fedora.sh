@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck source=install-common.sh
-source "$DOTFILES_DIR/install-common.sh"
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+# shellcheck source=scripts/install/common.sh
+source "$DOTFILES_DIR/scripts/install/common.sh"
 
 parse_install_flags "$@"
 ensure_not_root
@@ -206,7 +206,7 @@ add_common_cli_links
 add_zsh_link
 
 if is_wsl; then
-  echo "!! WSL detected. Use ./install-wsl.sh for WSL installs."
+  echo "!! WSL detected. Use ./install.sh for WSL installs."
   exit 1
 fi
 

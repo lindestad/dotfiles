@@ -2,11 +2,11 @@
 # Shared helpers for Linux/WSL install scripts. Source this file; do not run it.
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
-  echo "!! install-common.sh is a helper; run a distro installer instead."
+  echo "!! scripts/install/common.sh is a helper; run ./install.sh instead."
   exit 1
 fi
 
-: "${DOTFILES_DIR:=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
+: "${DOTFILES_DIR:=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
