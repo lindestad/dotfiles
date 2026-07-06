@@ -249,6 +249,9 @@ ensure_node_lts
 install_fonts
 
 echo "==> Creating config symlinks..."
+if [[ "$INSTALL_NIRI" == "yes" ]]; then
+  prepare_niri_config_dir
+fi
 link_pairs "${LINKS[@]}"
 ensure_broot_launcher
 ensure_local_bin

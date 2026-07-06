@@ -164,7 +164,9 @@ add_ghostty_link() {
 
 add_wayland_desktop_links() {
   LINKS+=(
-    "$DOTFILES_DIR/config/niri|$HOME/.config/niri"
+    "$DOTFILES_DIR/config/niri/config.kdl|$HOME/.config/niri/config.kdl"
+    "$DOTFILES_DIR/config/niri/keybinds.kdl|$HOME/.config/niri/keybinds.kdl"
+    "$DOTFILES_DIR/config/niri/local.example.kdl|$HOME/.config/niri/local.example.kdl"
     "$DOTFILES_DIR/config/waybar|$HOME/.config/waybar"
     "$DOTFILES_DIR/config/fuzzel/fuzzel.ini|$HOME/.config/fuzzel/fuzzel.ini"
   )
@@ -747,6 +749,38 @@ link_pairs() {
     IFS='|' read -r src dst <<<"$pair"
     backup_then_link "$src" "$dst"
   done
+}
+
+prepare_niri_config_dir() {
+  local niri_dir="$HOME/.config/niri"
+  local ts local_tmp=""
+
+  mkdir -p "$HOME/.config"
+
+  if [[ -L "$niri_dir" ]]; then
+    if [[ -e "$niri_dir/local.kdl" ]]; then
+      local_tmp="$(mktemp)"
+      cp -pL "$niri_dir/local.kdl" "$local_tmp"
+    fi
+
+    ts="$(date +%Y%m%d-%H%M%S)"
+    mv -v "$niri_dir" "${niri_dir}.bak.${ts}"
+    mkdir -p "$niri_dir"
+
+    if [[ -n "$local_tmp" ]]; then
+      cp -p "$local_tmp" "$niri_dir/local.kdl"
+      rm -f "$local_tmp"
+      echo "-> Preserved existing Niri local config: $niri_dir/local.kdl"
+    fi
+    return
+  fi
+
+  if [[ -e "$niri_dir" && ! -d "$niri_dir" ]]; then
+    ts="$(date +%Y%m%d-%H%M%S)"
+    mv -v "$niri_dir" "${niri_dir}.bak.${ts}"
+  fi
+
+  mkdir -p "$niri_dir"
 }
 
 copy_gitconfig() {
