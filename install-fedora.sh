@@ -253,6 +253,9 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
   prepare_niri_config_dir
 fi
 link_pairs "${LINKS[@]}"
+if [[ "$INSTALL_NIRI" == "yes" ]]; then
+  validate_migrated_niri_local_config
+fi
 ensure_broot_launcher
 ensure_local_bin
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
