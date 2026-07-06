@@ -43,7 +43,7 @@ cd ~/dev/dotfiles
 ./install.sh
 ```
 
-`install.sh` detects Arch-based, Debian/Ubuntu-based, Fedora, and WSL installs, then dispatches to the matching platform installer.
+`install.sh` detects Arch-based, Debian/Ubuntu-based, Fedora, and WSL installs, then dispatches to the matching implementation under `scripts/install/`.
 
 The installer prompts for optional components when no flags are provided. Use flags for repeatable installs:
 
@@ -65,7 +65,7 @@ cd $HOME\dev\dotfiles
 .\install.ps1
 ```
 
-The platform-specific scripts are still available for direct use when needed: `install-arch.sh`, `install-ubuntu.sh`, `install-fedora.sh`, `install-wsl.sh`, and `install-windows.ps1`.
+`install.sh` and `install.ps1` are the supported entrypoints. Platform-specific installer code lives under `scripts/install/`.
 
 ## Zellij Sessions
 

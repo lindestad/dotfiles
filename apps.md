@@ -1,6 +1,6 @@
 # Apps and Tools
 
-This tracks the packages and post-install tools managed by the platform installers. Keep this file in sync when adding, removing, or renaming entries in `install-*.sh` or `install-windows.ps1`.
+This tracks the packages and post-install tools managed by the platform installers. Keep this file in sync when adding, removing, or renaming entries in `install.sh`, `install.ps1`, or `scripts/install/`.
 
 ## Cross-platform
 
@@ -132,7 +132,7 @@ Kanata is optional and controlled by `--kanata` on Linux installers or an intera
 
 ## Windows-only
 
-These winget packages are only in `install-windows.ps1`.
+These winget packages are only in `scripts/install/windows.ps1`.
 
 | Tool | Winget ID |
 | --- | --- |
