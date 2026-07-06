@@ -23,6 +23,9 @@ function Request-Administrator {
 
 Request-Administrator
 
+$ScriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Definition }
+$Dotfiles = (Resolve-Path (Join-Path $ScriptDir "..\..")).Path
+
 function Write-Status {
     param(
         [Parameter(Mandatory)] [AllowEmptyString()] [string]$Message
@@ -463,6 +466,134 @@ function Read-YesNo([string]$Question) {
     }
 }
 
+function Get-WindowsKeyboardLayoutEntry {
+    param(
+        [Parameter(Mandatory)] [string]$LayoutText,
+        [Parameter(Mandatory)] [string]$LayoutFile
+    )
+
+    $layoutRoot = "HKLM:\SYSTEM\CurrentControlSet\Control\Keyboard Layouts"
+    try {
+        foreach ($key in Get-ChildItem -Path $layoutRoot -ErrorAction Stop) {
+            try {
+                $props = Get-ItemProperty -Path $key.PSPath -ErrorAction Stop
+            }
+            catch {
+                continue
+            }
+
+            if ($props."Layout Text" -eq $LayoutText -or $props."Layout File" -ieq $LayoutFile) {
+                return [pscustomobject]@{
+                    Key = $key.PSChildName
+                    Text = $props."Layout Text"
+                    File = $props."Layout File"
+                }
+            }
+        }
+    }
+    catch {
+        Write-Warning "Could not inspect installed keyboard layouts. $($_.Exception.Message)"
+    }
+
+    return $null
+}
+
+function Enable-WindowsKeyboardLayoutForUser {
+    param(
+        [Parameter(Mandatory)] [string]$LayoutKey
+    )
+
+    $getLanguageList = Get-Command Get-WinUserLanguageList -ErrorAction SilentlyContinue
+    $setLanguageList = Get-Command Set-WinUserLanguageList -ErrorAction SilentlyContinue
+    if (-not $getLanguageList -or -not $setLanguageList) {
+        Write-Warning "Windows language-list cmdlets not found; install succeeded, but enable the US+NO keyboard layout manually."
+        return
+    }
+
+    $tip = "0409:$($LayoutKey.ToUpperInvariant())"
+    $languageList = Get-WinUserLanguageList
+    $enUs = $languageList | Where-Object { $_.LanguageTag -eq "en-US" } | Select-Object -First 1
+    if (-not $enUs) {
+        Write-Warning "No en-US language entry found; install succeeded, but enable the US+NO keyboard layout manually."
+        return
+    }
+
+    $existingTips = @($enUs.InputMethodTips)
+    if ($existingTips | Where-Object { $_ -ieq $tip }) {
+        Write-Status "US+NO keyboard layout is already enabled for en-US."
+        return
+    }
+
+    try {
+        $enUs.InputMethodTips.Add($tip)
+    }
+    catch {
+        $enUs.InputMethodTips = @($existingTips + $tip)
+    }
+
+    Set-WinUserLanguageList -LanguageList $languageList -Force
+    Write-Status "Enabled US+NO keyboard layout for en-US."
+}
+
+function Install-WindowsUsNoKeyboardLayout {
+    param(
+        [Parameter(Mandatory)] [string]$DotfilesDir
+    )
+
+    $layoutText = "US with Norwegian on alt gr layer"
+    $layoutFile = "US+NO.dll"
+    $entry = Get-WindowsKeyboardLayoutEntry -LayoutText $layoutText -LayoutFile $layoutFile
+    if ($entry) {
+        Write-Status "US+NO keyboard layout is already installed."
+        Enable-WindowsKeyboardLayoutForUser -LayoutKey $entry.Key
+        return
+    }
+
+    $layoutDir = Join-Path $DotfilesDir "keyboard_layouts/us+no"
+    if (-not (Test-Path $layoutDir)) {
+        Write-Warning "US+NO keyboard layout directory not found: $layoutDir"
+        return
+    }
+
+    if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") {
+        Write-Warning "US+NO layout artifacts do not include an ARM64 keyboard DLL; skipping layout install."
+        return
+    }
+
+    $msiName = if ([Environment]::Is64BitOperatingSystem) { "US+NO_amd64.msi" } else { "US+NO_i386.msi" }
+    $msi = Join-Path $layoutDir $msiName
+    if (-not (Test-Path $msi)) {
+        Write-Warning "US+NO keyboard layout installer not found: $msi"
+        return
+    }
+
+    Write-Status ""
+    Write-Status "==> Installing US+NO Windows keyboard layout"
+    $process = Start-Process -FilePath "msiexec.exe" -ArgumentList @("/i", "`"$msi`"", "/qn", "/norestart") -Wait -PassThru
+    if ($process.ExitCode -notin @(0, 3010)) {
+        Write-Warning "US+NO keyboard layout install failed with msiexec exit code $($process.ExitCode)."
+        return
+    }
+
+    $entry = Get-WindowsKeyboardLayoutEntry -LayoutText $layoutText -LayoutFile $layoutFile
+    if (-not $entry) {
+        Write-Warning "US+NO keyboard layout installer completed, but the layout was not found in the registry. You may need to restart Windows."
+        return
+    }
+
+    Enable-WindowsKeyboardLayoutForUser -LayoutKey $entry.Key
+    if ($process.ExitCode -eq 3010) {
+        Write-Status "US+NO keyboard layout install requested a restart."
+    }
+}
+
+if (Read-YesNo "Install US+NO Windows keyboard layout (AltGr Norwegian)?") {
+    Install-WindowsUsNoKeyboardLayout -DotfilesDir $Dotfiles
+}
+else {
+    Write-Status "Skipping US+NO keyboard layout install."
+}
+
 # Optional: Kanata
 $installKanata = Read-YesNo "Install Kanata (Keyboard remapping)?"
 $chosenKanataCfg = $null
@@ -470,12 +601,11 @@ if ($installKanata) {
     winget install --id "jtroo.kanata_gui" --accept-source-agreements --accept-package-agreements -e
 
     $isoToAnsi = Read-YesNo "Remap ISO to ANSI like? Warning, remaps Enter key."
-    $repo = Split-Path -Parent $MyInvocation.MyCommand.Definition
     if ($isoToAnsi) {
-        $chosenKanataCfg = Join-Path $repo "config/kanata/config_iso_to_ansi.kbd"
+        $chosenKanataCfg = Join-Path $Dotfiles "config/kanata/config_iso_to_ansi.kbd"
     }
     else {
-        $chosenKanataCfg = Join-Path $repo "config/kanata/config.kbd"
+        $chosenKanataCfg = Join-Path $Dotfiles "config/kanata/config.kbd"
     }
 
     $appDataKanata = Join-Path $env:APPDATA "kanata"
@@ -491,7 +621,7 @@ if ($installKanata) {
     }
 
     # Add kanata autostart
-    .\config\kanata\add_to_startup_windows.ps1
+    & (Join-Path $Dotfiles "config\kanata\add_to_startup_windows.ps1")
 }
 else {
     Write-Status "Skipping Kanata install."
@@ -603,7 +733,6 @@ fi
     }
 }
 
-$Dotfiles = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $UserHome = [Environment]::GetFolderPath('UserProfile')
 $Roaming = [Environment]::GetFolderPath('ApplicationData')
 

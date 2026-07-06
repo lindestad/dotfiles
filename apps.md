@@ -125,6 +125,7 @@ These are installed when the Linux installer runs with `--niri`.
 ## Optional Keyboard Remapping
 
 Kanata is optional and controlled by `--kanata` on Linux installers or an interactive prompt on Windows.
+The Windows installer can also install and enable the tracked US+NO keyboard layout from `keyboard_layouts/us+no`.
 
 | Platform | Install behavior |
 | --- | --- |

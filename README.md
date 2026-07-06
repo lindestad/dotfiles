@@ -67,6 +67,8 @@ cd $HOME\dev\dotfiles
 
 `install.sh` and `install.ps1` are the supported entrypoints. Platform-specific installer code lives under `scripts/install/`.
 
+On Windows, the installer can optionally install and enable the tracked US+NO keyboard layout for `RightAlt` Norwegian characters.
+
 ## Zellij Sessions
 
 The shell configs keep plain `zellij` unchanged and add a few shortcuts:
