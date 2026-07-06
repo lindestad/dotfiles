@@ -276,6 +276,77 @@ validate_migrated_niri_local_config() {
   niri validate -c "$niri_config" || true
 }
 
+activate_niri_usno_layout() {
+  local target_name="US with Norwegian on AltGr"
+  local layouts original_idx original_name target_idx current_idx after after_idx after_name
+  local restored restored_idx restored_name
+
+  if ! have niri; then
+    return
+  fi
+
+  if ! have jq; then
+    echo ">> Skipping Niri keyboard layout activation; jq is not installed."
+    return
+  fi
+
+  if ! layouts="$(niri msg -j keyboard-layouts 2>/dev/null)"; then
+    return
+  fi
+
+  original_idx="$(jq -r '.current_idx // empty' <<<"$layouts")"
+  original_name="$(jq -r --arg idx "$original_idx" '.names[$idx | tonumber] // "unknown"' <<<"$layouts" 2>/dev/null || true)"
+
+  niri msg action load-config-file >/dev/null 2>&1 || true
+  sleep 0.2
+
+  if ! layouts="$(niri msg -j keyboard-layouts 2>/dev/null)"; then
+    echo ">> Niri config reload was requested, but keyboard layout status could not be read afterward."
+    return
+  fi
+
+  target_idx="$(jq -r --arg target "$target_name" '.names | to_entries[] | select(.value == $target) | .key' <<<"$layouts" | head -n 1)"
+  current_idx="$(jq -r '.current_idx // empty' <<<"$layouts")"
+
+  if [[ -z "$target_idx" ]]; then
+    echo ">> Niri config reloaded, but the running session did not expose '$target_name'."
+    echo ">> Restart Niri to activate the new XKB layout. Current layout remains: ${original_name:-unknown}."
+    return
+  fi
+
+  if [[ "$current_idx" == "$target_idx" ]]; then
+    echo "-> Niri keyboard layout already active: $target_name"
+    return
+  fi
+
+  if ! niri msg action switch-layout "$target_idx" >/dev/null 2>&1; then
+    echo "!! Failed to switch Niri keyboard layout to '$target_name'."
+    return
+  fi
+
+  after="$(niri msg -j keyboard-layouts 2>/dev/null || true)"
+  after_idx="$(jq -r '.current_idx // empty' <<<"$after" 2>/dev/null || true)"
+  after_name="$(jq -r --arg idx "$after_idx" '.names[$idx | tonumber] // "unknown"' <<<"$after" 2>/dev/null || true)"
+
+  if [[ "$after_idx" == "$target_idx" ]]; then
+    echo "-> Niri keyboard layout set to: $target_name"
+    return
+  fi
+
+  echo "!! Niri keyboard layout switch landed on '${after_name:-unknown}' instead of '$target_name'."
+  if [[ "$original_idx" =~ ^[0-9]+$ ]] && niri msg action switch-layout "$original_idx" >/dev/null 2>&1; then
+    restored="$(niri msg -j keyboard-layouts 2>/dev/null || true)"
+    restored_idx="$(jq -r '.current_idx // empty' <<<"$restored" 2>/dev/null || true)"
+    restored_name="$(jq -r --arg idx "$restored_idx" '.names[$idx | tonumber] // "unknown"' <<<"$restored" 2>/dev/null || true)"
+    if [[ "$restored_idx" == "$original_idx" ]]; then
+      echo "-> Restored original Niri keyboard layout: ${restored_name:-$original_name}"
+      return
+    fi
+  fi
+
+  echo "!! Could not restore original Niri keyboard layout. Current layout may be: ${after_name:-unknown}."
+}
+
 install_niri_helpers() {
   ensure_local_bin
 

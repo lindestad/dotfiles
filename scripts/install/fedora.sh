@@ -258,6 +258,7 @@ fi
 link_pairs "${LINKS[@]}"
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
   validate_migrated_niri_local_config
+  activate_niri_usno_layout
 fi
 ensure_broot_launcher
 ensure_local_bin
