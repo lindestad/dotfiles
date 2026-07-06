@@ -2,7 +2,9 @@ input {
     focus-follows-mouse max-scroll-amount="33%"
 
     keyboard {
-        xkb
+        xkb {
+            layout "usno"
+        }
         numlock
     }
 
