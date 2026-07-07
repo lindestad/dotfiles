@@ -117,6 +117,7 @@ ensure_shfmt_release
 ensure_yq_mikefarah
 ensure_lazygit_release
 ensure_modern_cli_cargo_tools
+ensure_tealdeer
 ensure_resvg_cargo
 ensure_dust_cargo
 ensure_node_lts

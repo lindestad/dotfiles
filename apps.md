@@ -76,6 +76,7 @@ These are installed only by the Linux/WSL shell installers.
 | pkg-config | not installed | `pkg-config` | `pkgconf-pkg-config` | `pkg-config` |
 | resvg | cargo fallback | cargo fallback | cargo fallback | cargo fallback |
 | rustup/cargo | install script | install script | install script | install script |
+| tealdeer/tldr | cargo install | cargo install | cargo install | cargo install |
 | unzip | `unzip` | `unzip` | `unzip` | `unzip` |
 | user fonts | bundled fonts copied to `~/.local/share/fonts` | same | same | same |
 | vivid | `vivid` | `vivid` (optional) | cargo fallback | `vivid` (optional) |
@@ -164,6 +165,7 @@ These are not package installs, but the installers manage them alongside the too
 | Noctalia color scheme | optional with `--niri` | not managed |
 | Kanata | optional | optional |
 | Starship | symlinked | linked/copied |
+| Tealdeer | config symlinked with 30-day automatic cache updates | not managed |
 | WezTerm | non-WSL Linux only | linked/copied to `.wezterm.lua` and `.config/wezterm/wezterm.lua` |
 | Windows Terminal | not managed | Git Bash profile/default configured when settings exist |
 | Yazi | symlinked | linked/copied |

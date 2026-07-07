@@ -91,6 +91,29 @@ ensure_cargo_tool() {
   cargo install --locked "$crate_name"
 }
 
+have_cargo_tealdeer() {
+  [[ "$(command -v tldr 2>/dev/null || true)" == "$HOME/.cargo/bin/tldr" ]] \
+    && tldr --version 2>/dev/null | head -n1 | grep -qi '^tealdeer '
+}
+
+update_tealdeer_cache() {
+  echo "==> Updating tealdeer cache..."
+  if ! tldr --update; then
+    echo ">> Could not update tealdeer cache; run 'tldr --update' later."
+  fi
+}
+
+ensure_tealdeer() {
+  ensure_rust_toolchain
+  if have_cargo_tealdeer; then
+    return
+  fi
+
+  echo "==> Installing tealdeer with cargo..."
+  cargo install --locked tealdeer
+  update_tealdeer_cache
+}
+
 github_latest_asset_url() {
   local repo="$1" pattern="$2"
   curl -fsSL "https://api.github.com/repos/$repo/releases/latest" \
