@@ -208,14 +208,15 @@ UNIT
   fi
 
   sudo systemctl daemon-reload
-  sudo systemctl enable --now kanata.service
+  sudo systemctl enable kanata.service
+  sudo systemctl restart kanata.service
 
   # Avoid double-grabbing: stop/disable per-user unit if running
   SCMD_USER=(systemctl --user --machine="$TARGET_USER@.host")
   "${SCMD_USER[@]}" stop kanata.service >/dev/null 2>&1 || true
   "${SCMD_USER[@]}" disable kanata.service >/dev/null 2>&1 || true
 
-  echo "   System-wide service enabled. If you change your Kanata config, re-run this to sync /etc/kanata/config.kbd."
+  echo "   System-wide service enabled and restarted. If you change your Kanata config, re-run this to sync /etc/kanata/config.kbd."
 fi
 
 echo "==> Done."
