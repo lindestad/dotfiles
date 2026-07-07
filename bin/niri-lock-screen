@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if command -v flock >/dev/null 2>&1; then
+  exec 9>"${XDG_RUNTIME_DIR:-/tmp}/niri-lock-screen.lock"
+  flock -n 9 || exit 0
+fi
+
+if command -v hyprlock >/dev/null 2>&1; then
+  exec hyprlock --immediate-render --no-fade-in
+fi
+
+if command -v qs >/dev/null 2>&1; then
+  exec qs -c noctalia-shell ipc call lockScreen lock
+fi
+
+if command -v loginctl >/dev/null 2>&1; then
+  exec loginctl lock-session
+fi
+
+echo "niri-lock-screen: no supported lock command found" >&2
+exit 1

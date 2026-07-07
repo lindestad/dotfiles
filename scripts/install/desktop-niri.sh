@@ -13,6 +13,7 @@ add_wayland_desktop_links() {
     "$DOTFILES_DIR/config/niri/config.kdl|$HOME/.config/niri/config.kdl"
     "$DOTFILES_DIR/config/niri/keybinds.kdl|$HOME/.config/niri/keybinds.kdl"
     "$DOTFILES_DIR/config/niri/local.example.kdl|$HOME/.config/niri/local.example.kdl"
+    "$DOTFILES_DIR/config/hypr/hyprlock.conf|$HOME/.config/hypr/hyprlock.conf"
     "$DOTFILES_DIR/config/xkb/symbols/usno|$HOME/.config/xkb/symbols/usno"
     "$DOTFILES_DIR/config/fuzzel/fuzzel.ini|$HOME/.config/fuzzel/fuzzel.ini"
     "$DOTFILES_DIR/config/noctalia/monochrome-strong.json|$HOME/.config/noctalia/colorschemes/monochrome-strong/monochrome-strong.json"
@@ -400,6 +401,7 @@ install_niri_helpers() {
   local helper
   local helpers=(
     niri-focus-workspace-all
+    niri-lock-screen
     niri-move-window-or-workspace
   )
 
