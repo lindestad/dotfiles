@@ -57,6 +57,8 @@ Optional components:
 - `--niri` installs and links the Niri + Noctalia desktop stack: niri, noctalia-shell, NiriMod, fuzzel, swayidle, and related Wayland utilities.
 - `--kanata` installs or links Kanata keyboard remapping config where supported.
 
+The CachyOS/Limine Plymouth LUKS prompt theme is documented in [docs/plymouth-luks-theme.md](./docs/plymouth-luks-theme.md).
+
 ### Windows (PowerShell)
 
 ```powershell
