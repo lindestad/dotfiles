@@ -136,6 +136,72 @@ if command -v carapace >/dev/null 2>&1; then
   fi
 fi
 
+####--------------------------------------------------
+#### Zellij completions
+####--------------------------------------------------
+_zellij_session_names() {
+  local -a sessions
+  sessions=("${(@f)$(zellij list-sessions --short --no-formatting 2>/dev/null)}")
+  (( ${#sessions} )) && compadd "$@" -a sessions
+}
+
+_zellij_session_command() {
+  _arguments \
+    '(-h --help)'{-h,--help}'[Print help information]' \
+    '1:session:_zellij_session_names'
+}
+
+_zellij_attach() {
+  _arguments \
+    '(-c --create)'{-c,--create}'[Create session if it does not exist]' \
+    '(-b --create-background)'{-b,--create-background}'[Create detached session in the background if it does not exist]' \
+    '(-f --force-run-commands)'{-f,--force-run-commands}'[Run resurrected session commands immediately]' \
+    '(-r --remember)'{-r,--remember}'[Save session for automatic re-authentication]' \
+    '--forget[Delete saved session before connecting]' \
+    '--insecure[Skip TLS certificate validation]' \
+    '--index=[Attach by session index]:index:' \
+    '(-t --token)'{-t+,--token=}'[Authentication token for remote sessions]:token:' \
+    '--ca-cert=[Path to a custom CA certificate]:file:_files' \
+    '1:session:_zellij_session_names'
+}
+
+_zellij() {
+  local -a commands
+  commands=(
+    'attach:Attach to a session'
+    'a:Attach to a session'
+    'list-sessions:List sessions'
+    'ls:List sessions'
+    'watch:Watch a session'
+    'w:Watch a session'
+    'kill-session:Kill a session'
+    'k:Kill a session'
+    'delete-session:Delete a session'
+    'd:Delete a session'
+  )
+
+  case "$words[2]" in
+    attach|a)
+      words=("${(@)words[2,-1]}")
+      (( CURRENT-- ))
+      _zellij_attach
+      ;;
+    watch|w|kill-session|k|delete-session|d)
+      words=("${(@)words[2,-1]}")
+      (( CURRENT-- ))
+      _zellij_session_command
+      ;;
+    *)
+      if (( CURRENT == 2 )); then
+        _describe -t commands 'zellij command' commands
+      fi
+      ;;
+  esac
+}
+
+compdef _zellij zellij zj
+compdef _zellij_session_names zp
+
 # Optional theming
 # Use terminal file colors (if set LS_COLORS, e.g. via vivid)
 if command -v vivid >/dev/null 2>&1; then
@@ -206,6 +272,8 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 
 # Zellij session shortcuts
+alias zj='zellij'
+
 zp() {
   local session_name="${1:-${ZELLIJ_PERSISTENT_SESSION:-work}}"
   zellij attach --create "$session_name"
