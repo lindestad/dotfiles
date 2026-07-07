@@ -18,6 +18,7 @@ local function startup_explorer_opts()
     hidden = true,
     ignored = true,
     exclude = { ".git" },
+    jump = { close = true },
     layout = {
       fullscreen = true,
       hidden = { "preview" },
@@ -46,6 +47,7 @@ return {
             hidden = true,
             ignored = true,
             exclude = { ".git" },
+            jump = { close = true },
           },
         },
       },
