@@ -112,7 +112,7 @@ truncation_length = 4
 truncation_symbol = '…/'
 use_os_path_sep = false
 home_symbol = "~"
-format = '  [$path]($style) '
+format = ' [$path]($style) '
 
 [directory.substitutions]
 "Documents" = "󰈙"
@@ -153,8 +153,10 @@ disabled = false
 
 [os]
 disabled = false
+format = '[$symbol]($style) '
 
 [os.symbols]
+CachyOS = "󰣇"
 Ubuntu = ""
 Linux = ""
 Windows = ""
@@ -183,7 +185,7 @@ disabled = false
 
 [custom.giturl]
 description = "Display symbol for remote Git server"
-format = "at $output "
+format = "at $output  "
 command = """
 #!/usr/bin/env sh
 url="$(git ls-remote --get-url 2>/dev/null || printf '')"
@@ -191,7 +193,8 @@ case "$url" in
   *github*)    printf '' ;;
   *gitlab*)    printf '' ;;
   *bitbucket*) printf '' ;;
-  *git*)       printf '' ;;
+  *codeberg*)  printf '' ;;
+  *git*)       printf '' ;;
   *)           printf '' ;;
 esac
 """
