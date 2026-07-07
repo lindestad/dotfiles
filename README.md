@@ -7,8 +7,8 @@
   <a href="https://github.com/lindestad/dotfiles/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/github/license/lindestad/dotfiles?style=for-the-badge&labelColor=101418&color=b9c8da"></a>
   <a href="https://github.com/lindestad/dotfiles/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/lindestad/dotfiles?style=for-the-badge&labelColor=101418&color=ffd700"></a>
   <a href="https://github.com/lindestad/dotfiles/actions"><img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/lindestad/dotfiles/lint.yml?branch=main&style=for-the-badge&labelColor=101418"></a>
-  <a href="#compatibility"><img alt="Platform: Linux, Windows, WSL" src="https://img.shields.io/badge/platform-linux%20%7C%20windows%20%7C%20wsl-9ccbfb?style=for-the-badge&labelColor=101418"></a>
-  <a href="#installation"><img alt="Shells: zsh, bash, PowerShell" src="https://img.shields.io/badge/shells-zsh%20%7C%20bash%20%7C%20powershell-b9c8da?style=for-the-badge&labelColor=101418"></a>
+  <a href="#contents"><img alt="Compositor: Niri" src="https://img.shields.io/badge/compositor-niri-9ccbfb?style=for-the-badge&labelColor=101418"></a>
+  <a href="#installation"><img alt="Shells: zsh, bash" src="https://img.shields.io/badge/shells-zsh%20%7C%20bash-b9c8da?style=for-the-badge&labelColor=101418"></a>
 </div>
 
 ---
