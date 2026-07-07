@@ -240,9 +240,10 @@ alias sps='sudo pacman -S'
 
 # Safe ls → eza (fallback to ls if eza missing)
 if command -v eza >/dev/null 2>&1; then
-  alias ls='eza --group-directories-first --icons'
+  alias ls='eza --oneline --group-directories-first --long --git --no-user --no-time --no-permissions --icons --color=auto'
+  alias lsa='eza --all --oneline --group-directories-first --long --git --no-user --no-time --no-permissions --icons --color=auto' 
   alias ll='eza -l --group-directories-first --icons'
-  alias la='eza -la --group-directories-first --icons'
+  alias la='eza --all --oneline --group-directories-first --long --git --no-user --no-time --no-permissions --icons --color=auto'
   alias tree='eza --tree --level=5'
   alias lz='eza --grid --long --icons --group-directories-first --git-ignore'
   alias lza='eza -a --grid --long --icons --group-directories-first'
