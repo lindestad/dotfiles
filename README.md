@@ -1,17 +1,17 @@
 <h1 align="center">
-  <img align="left" width="140" height="140" src="https://www.svgrepo.com/show/361365/terminal-bash.svg">
+  <img align="left" width="140" height="140" src="./docs/assets/terminal-bash.svg">
   <a name="top">~/.dotfiles</a><br/><br/>
   <sup>Cross-platform, cross-shell configuration</sup><br/><sub><br/></sub>
 </h1>
 <div align="center">
   <a href="https://github.com/lindestad/dotfiles/blob/main/LICENSE">
-    <img alt="License: MIT" src="https://img.shields.io/github/license/lindestad/dotfiles?style=flat-square">
+    <img alt="License: MIT" src="https://img.shields.io/github/license/lindestad/dotfiles?style=for-the-badge&labelColor=101418&color=b9c8da">
   </a>
   <a href="https://github.com/lindestad/dotfiles/stargazers">
-    <img alt="Stars" src="https://img.shields.io/github/stars/lindestad/dotfiles?style=flat-square">
+    <img alt="Stars" src="https://img.shields.io/github/stars/lindestad/dotfiles?style=for-the-badge&labelColor=101418&color=ffd700">
   </a>
   <a href="https://github.com/lindestad/dotfiles/actions">
-    <img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/lindestad/dotfiles/lint.yml?branch=main&style=flat-square">
+    <img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/lindestad/dotfiles/lint.yml?branch=main&style=for-the-badge&labelColor=101418">
   </a>
 </div>
 
