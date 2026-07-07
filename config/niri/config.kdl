@@ -100,6 +100,11 @@ window-rule {
     }
 }
 
+window-rule {
+    match app-id="com.mitchellh.ghostty"
+    draw-border-with-background false
+}
+
 layer-rule {
     match namespace="^noctalia-wallpaper*"
     place-within-backdrop true
