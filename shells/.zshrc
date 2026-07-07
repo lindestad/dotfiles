@@ -382,6 +382,14 @@ gshd() {
 
   git -c diff.external=difft show --ext-diff --decorate --format=medium --stat --patch "$rev" -- "$@"
 }
+gsd() {
+  if [ "$#" -eq 0 ]; then
+    echo "usage: gsd <commit|range> [commit|range ...]" >&2
+    return 2
+  fi
+
+  git -c diff.external=difft show --ext-diff --decorate --format=medium --stat --patch "$@"
+}
 gld() {
   git -c diff.external=difft log --ext-diff -p "$@"
 }
