@@ -1,7 +1,7 @@
 ;; ISO-to-ANSI feel remap
 ;; - Key left of Z (often labelled < > | on ISO) becomes lsft.
 ;; - Key between ' and Enter becomes Enter.
-;; - Enter becomes backslash, the ANSI key above Enter.
+;; - RightAlt keeps XKB AltGr behavior and exposes backslash on both Enter keys.
 
 (defcfg
   linux-dev /dev/input/by-path/platform-i8042-serio-0-event-kbd
@@ -11,6 +11,11 @@
 ;; Ensure non-US key names resolve on Linux
 (deflocalkeys-linux
   lsgt 86   ;; KEY_102ND (left of Z)
+)
+
+(defalias
+  agr (multi ralt (layer-while-held altgr))
+  bsl (multi (release-key ralt) \)
 )
 
 (defsrc
@@ -31,8 +36,20 @@
   caps
   lmet
   lalt
-  ralt
+  @agr
   lsft                               ;; lsgt -> left shift for ANSI feel
   ret                                ;; nuhs -> Enter
-  \                                  ;; ret (Enter) -> backslash (ANSI key above Enter row)
+  ret                                ;; ret -> Enter
+)
+
+(deflayer altgr
+  _
+  _
+  _
+  _
+  _
+  _
+  _
+  @bsl                               ;; AltGr+nuhs -> backslash
+  @bsl                               ;; AltGr+ret -> backslash
 )
