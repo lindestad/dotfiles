@@ -257,6 +257,27 @@ gac() {
 alias gcm='git commit -m'
 alias gcam='git commit -am'
 alias gsh='git show HEAD'
+gdd() {
+  git -c diff.external=difft diff --ext-diff "$@"
+}
+gdds() {
+  git -c diff.external=difft diff --ext-diff --staged "$@"
+}
+gddh() {
+  git -c diff.external=difft diff --ext-diff HEAD "$@"
+}
+gshd() {
+  local rev="${1:-HEAD}"
+  if [ "$#" -gt 0 ]; then
+    shift
+  fi
+
+  git log -1 --decorate --stat "$rev" -- "$@" || return
+  git -c diff.external=difft show --ext-diff --format= "$rev" -- "$@"
+}
+gld() {
+  git -c diff.external=difft log --ext-diff -p "$@"
+}
 
 y() {
   local tmp newdir
