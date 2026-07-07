@@ -266,6 +266,7 @@ ensure_modern_cli_cargo_tools() {
   ensure_cargo_tool hyperfine hyperfine
   ensure_cargo_tool watchexec watchexec-cli
   ensure_cargo_tool atuin atuin
+  ensure_cargo_tool difft difftastic difftastic
   ensure_cargo_tool sd sd
   ensure_cargo_tool xh xh
   ensure_cargo_tool procs procs
