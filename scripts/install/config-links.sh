@@ -210,7 +210,7 @@ ensure_codex_config() {
   mkdir -p "$(dirname "$dst")"
   touch "$dst"
 
-  ensure_codex_root_config "$dst" "default_permissions" '":danger-full-access"'
+  ensure_codex_root_config "$dst" "sandbox_mode" '"danger-full-access"'
   ensure_codex_root_config "$dst" "approval_policy" '"never"'
   ensure_codex_tui_config "$dst" "vim_mode_default" "true"
 }

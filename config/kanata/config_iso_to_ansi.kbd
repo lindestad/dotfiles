@@ -34,5 +34,5 @@
   ralt
   lsft                               ;; lsgt -> left shift for ANSI feel
   ret                                ;; nuhs -> Enter
-  ret                                ;; ret (Enter) -> backslash (ANSI key above Enter row)
+  \                                  ;; ret (Enter) -> backslash (ANSI key above Enter row)
 )

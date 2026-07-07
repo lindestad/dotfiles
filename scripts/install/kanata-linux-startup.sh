@@ -9,6 +9,10 @@ KANATA_BIN="$(command -v kanata || true)"
 KANATA_CFG="${KANATA_CFG:-$TARGET_HOME/.config/kanata/config.kbd}"
 SYSTEM_KANATA_BIN=""
 
+if [[ -z "$KANATA_BIN" && -x "$TARGET_HOME/.cargo/bin/kanata" ]]; then
+  KANATA_BIN="$TARGET_HOME/.cargo/bin/kanata"
+fi
+
 echo "==> User: $TARGET_USER"
 echo "==> Home: $TARGET_HOME"
 
@@ -106,7 +110,7 @@ After=graphical-session.target
 Type=simple
 # Wait until /dev/uinput is present (some systems create it lazily)
 ExecStartPre=/usr/bin/sh -c 'for i in $(seq 1 25); do [ -e /dev/uinput ] && exit 0; sleep 0.2; done; echo "/dev/uinput missing" >&2; exit 1'
-ExecStart=/usr/bin/kanata -c %h/.config/kanata/config.kbd
+ExecStart=/usr/bin/kanata --no-wait -c %h/.config/kanata/config.kbd
 Restart=on-failure
 RestartSec=2
 
@@ -190,7 +194,7 @@ Before=display-manager.service
 [Service]
 Type=simple
 ExecStartPre=/usr/bin/sh -c 'for i in $(seq 1 25); do [ -e /dev/uinput ] && exit 0; sleep 0.2; done; echo "/dev/uinput missing" >&2; exit 1'
-ExecStart=/usr/bin/kanata -c /etc/kanata/config.kbd
+ExecStart=/usr/bin/kanata --no-wait -c /etc/kanata/config.kbd
 Restart=on-failure
 RestartSec=2
 

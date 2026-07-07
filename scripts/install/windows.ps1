@@ -826,7 +826,7 @@ function Set-CodexConfig {
 
     $content = Get-Content $Dst -Raw
     if ($null -eq $content) { $content = "" }
-    $content = Get-TomlRootValueContent -Content $content -Key "default_permissions" -Value '":danger-full-access"' -Path $Dst
+    $content = Get-TomlRootValueContent -Content $content -Key "sandbox_mode" -Value '"danger-full-access"' -Path $Dst
     $content = Get-TomlRootValueContent -Content $content -Key "approval_policy" -Value '"never"' -Path $Dst
     $content = Get-TomlTableValueContent -Content $content -Table "tui" -Key "vim_mode_default" -Value "true" -Path $Dst
 

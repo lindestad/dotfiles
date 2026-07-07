@@ -21,7 +21,7 @@ PACMAN_PKGS=(
   ripgrep
   fd
   ffmpeg
-  p7zip
+  7zip
   jq
   bat
   neovim
@@ -79,9 +79,7 @@ AUR_PKGS=(
   carapace-bin
 )
 
-NIRI_AUR_PKGS=(
-  noctalia-shell
-)
+NIRI_AUR_PKGS=()
 
 LINKS=()
 add_common_cli_links
@@ -110,6 +108,11 @@ install_pacman "${PACMAN_PKGS[@]}"
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
   echo "==> Installing Niri + Noctalia desktop packages..."
   install_pacman "${NIRI_PACMAN_PKGS[@]}"
+  if pacman -Si noctalia-shell >/dev/null 2>&1; then
+    install_pacman noctalia-shell
+  else
+    NIRI_AUR_PKGS+=(noctalia-shell)
+  fi
 fi
 ensure_rust_toolchain
 ensure_starship
@@ -127,6 +130,7 @@ if ((${#AUR_PKGS[@]})); then
   echo "==> Installing AUR packages (if helper found)..."
   install_aur "${AUR_PKGS[@]}"
 fi
+ensure_carapace_release
 if [[ "$INSTALL_NIRI" == "yes" ]] && ((${#NIRI_AUR_PKGS[@]})); then
   echo "==> Installing Niri + Noctalia AUR packages (if helper found)..."
   install_aur "${NIRI_AUR_PKGS[@]}"

@@ -8,13 +8,13 @@ These are the main package and tool installs managed by the platform installers.
 
 | Tool | Arch | Ubuntu | Fedora | WSL | Windows |
 | --- | --- | --- | --- | --- | --- |
-| 7zip/p7zip | `p7zip` | `p7zip-full` | `7zip` | `p7zip-full` | `7zip.7zip` |
+| 7zip/p7zip | `7zip` | `p7zip-full` | `7zip` | `p7zip-full` | `7zip.7zip` |
 | Alacritty | not installed | not installed | `alacritty` | not installed | not installed |
 | Atuin | `atuin` | `atuin` or cargo fallback | `atuin` | `atuin` or cargo fallback | `Atuinsh.Atuin` |
 | bat | `bat` | `bat` | `bat` | `bat` | `sharkdp.bat` |
 | bottom/btm | `bottom` | `btm` | cargo fallback | `btm` | `Clement.bottom` |
 | Broot | `broot` | `broot` or cargo fallback | cargo fallback | `broot` or cargo fallback | `Dystroy.broot` |
-| carapace | `carapace-bin` (AUR) | `carapace` or release fallback | release fallback | `carapace` or release fallback | `rsteube.Carapace` |
+| carapace | `carapace-bin` (AUR) or release fallback | `carapace` or release fallback | release fallback | `carapace` or release fallback | `rsteube.Carapace` |
 | direnv | `direnv` | `direnv` | `direnv` | `direnv` | `direnv.direnv` |
 | dust | `dust` with cargo fallback | `du-dust` with cargo fallback | `du-dust` with cargo fallback | `du-dust` with cargo fallback | `bootandy.dust` |
 | eza | `eza` | `eza` (optional) | `eza` | `eza` (optional) | `eza-community.eza` |
@@ -95,7 +95,7 @@ These are the main package naming differences to check when adding support for a
 | lm sensors | `lm_sensors` | `lm-sensors` | `lm_sensors` |
 | network applet | `network-manager-applet` | `network-manager-gnome` | `network-manager-applet` |
 | OpenSSL headers | not installed | `libssl-dev` | `openssl-devel` |
-| p7zip | `p7zip` | `p7zip-full` | `7zip` |
+| p7zip | `7zip` | `p7zip-full` | `7zip` |
 | pkg-config | not installed | `pkg-config` | `pkgconf-pkg-config` |
 | pipx | `python-pipx` | `pipx` | `pipx` |
 | Python | `python` | `python3`, `python3.12`, `python3.12-venv` | `python3.12` |
@@ -112,7 +112,7 @@ These are installed when the Linux installer runs with `--niri`.
 | fuzzel | `fuzzel` | `fuzzel` | `fuzzel` |
 | network applet | `network-manager-applet` | `network-manager-gnome` | `NetworkManager-applet` |
 | niri | `niri` | `niri` | `niri` |
-| Noctalia Shell | AUR: `noctalia-shell` | Noctalia APT repo: `noctalia-shell` where supported | `noctalia-shell` |
+| Noctalia Shell | `noctalia-shell` when provided by the distro, otherwise AUR | Noctalia APT repo: `noctalia-shell` where supported | `noctalia-shell` |
 | pavucontrol | `pavucontrol` | `pavucontrol` | `pavucontrol` |
 | polkit auth agent | not installed | not installed | `xfce-polkit` |
 | power profiles | `power-profiles-daemon` | `power-profiles-daemon` | `power-profiles-daemon` unless `tuned-ppd` is installed |
@@ -130,7 +130,7 @@ The Windows installer can also install and enable the tracked US+NO keyboard lay
 
 | Platform | Install behavior |
 | --- | --- |
-| Arch | Installs `kanata` from AUR when an AUR helper is available, then can configure system or user startup. |
+| Arch | Installs `kanata` from AUR when an AUR helper is available, falls back to Cargo, then can configure system or user startup. |
 | Ubuntu | Links the selected config, but package install and service setup are manual. |
 | Fedora | Installs `kanata` with Cargo when missing, links the selected config, and configures udev/systemd startup. |
 | WSL | Not supported. |
