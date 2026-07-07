@@ -242,6 +242,8 @@ alias sps='sudo pacman -S'
 if command -v eza >/dev/null 2>&1; then
   alias ls='eza --oneline --group-directories-first --long --git --no-user --no-time --no-permissions --icons --color=auto'
   alias lsa='eza --all --oneline --group-directories-first --long --git --no-user --no-time --no-permissions --icons --color=auto' 
+  alias lt='eza --tree --git-ignore --level=2 --oneline --group-directories-first --long --git --no-user --no-time --no-permissions --icons --color=auto'
+  alias lta='eza --tree --level=2 --all --oneline --group-directories-first --long --git --no-user --no-time --no-permissions --icons --color=auto'
   alias ll='eza -l --group-directories-first --icons'
   alias la='eza --all --oneline --group-directories-first --long --git --no-user --no-time --no-permissions --icons --color=auto'
   alias tree='eza --tree --level=5'
