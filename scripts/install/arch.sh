@@ -139,6 +139,10 @@ KANATA_CONFIG_SRC=""
 if [[ "$INSTALL_KANATA" == "yes" ]]; then
   echo "==> Installing Kanata from AUR (if helper found)..."
   install_aur kanata || true
+  if ! have kanata; then
+    echo "==> Kanata not found after AUR step; installing with cargo..."
+    ensure_kanata_cargo
+  fi
   choose_kanata_config
 fi
 
