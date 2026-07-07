@@ -14,7 +14,7 @@ These are the main package and tool installs managed by the platform installers.
 | bat | `bat` | `bat` | `bat` | `bat` | `sharkdp.bat` |
 | bottom/btm | `bottom` | `btm` | cargo fallback | `btm` | `Clement.bottom` |
 | Broot | `broot` | `broot` or cargo fallback | cargo fallback | `broot` or cargo fallback | `Dystroy.broot` |
-| carapace | `carapace-bin` (AUR) or release fallback | `carapace` or release fallback | release fallback | `carapace` or release fallback | `rsteube.Carapace` |
+| carapace | release fallback | `carapace` or release fallback | release fallback | `carapace` or release fallback | `rsteube.Carapace` |
 | direnv | `direnv` | `direnv` | `direnv` | `direnv` | `direnv.direnv` |
 | dust | `dust` with cargo fallback | `du-dust` with cargo fallback | `du-dust` with cargo fallback | `du-dust` with cargo fallback | `bootandy.dust` |
 | eza | `eza` | `eza` (optional) | `eza` | `eza` (optional) | `eza-community.eza` |
@@ -130,7 +130,7 @@ The Windows installer can also install and enable the tracked US+NO keyboard lay
 
 | Platform | Install behavior |
 | --- | --- |
-| Arch | Installs `kanata` from AUR when an AUR helper is available, falls back to Cargo, then can configure system or user startup. |
+| Arch | Installs `kanata` with Cargo when missing, falls back to AUR when an AUR helper is available, then can configure system or user startup. |
 | Ubuntu | Links the selected config, but package install and service setup are manual. |
 | Fedora | Installs `kanata` with Cargo when missing, links the selected config, and configures udev/systemd startup. |
 | WSL | Not supported. |

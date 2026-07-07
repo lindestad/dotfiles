@@ -1,3 +1,4 @@
 config/yazi/state
 config/niri/local.kdl
 .codex
+logs/

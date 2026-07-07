@@ -75,10 +75,6 @@ NIRI_PACMAN_PKGS=(
   wlsunset
 )
 
-AUR_PKGS=(
-  carapace-bin
-)
-
 NIRI_AUR_PKGS=()
 
 LINKS=()
@@ -126,10 +122,6 @@ ensure_dust_cargo
 ensure_node_lts
 install_fonts
 
-if ((${#AUR_PKGS[@]})); then
-  echo "==> Installing AUR packages (if helper found)..."
-  install_aur "${AUR_PKGS[@]}"
-fi
 ensure_carapace_release
 if [[ "$INSTALL_NIRI" == "yes" ]] && ((${#NIRI_AUR_PKGS[@]})); then
   echo "==> Installing Niri + Noctalia AUR packages (if helper found)..."
@@ -141,13 +133,23 @@ fi
 
 KANATA_CONFIG_SRC=""
 if [[ "$INSTALL_KANATA" == "yes" ]]; then
-  echo "==> Installing Kanata from AUR (if helper found)..."
-  install_aur kanata || true
-  if ! have kanata; then
-    echo "==> Kanata not found after AUR step; installing with cargo..."
-    ensure_kanata_cargo
+  if have kanata; then
+    echo "== Kanata already installed: $(command -v kanata)"
+  else
+    if ! ensure_kanata_cargo; then
+      echo ">> Could not install Kanata with cargo; falling back to AUR (if helper found)..."
+      install_aur kanata || true
+    fi
+    if ! have kanata; then
+      echo "!! Kanata is still not installed after Cargo/AUR attempts."
+      exit 1
+    fi
   fi
   choose_kanata_config
+  if [[ -n "$KANATA_CONFIG_SRC" ]]; then
+    link_kanata_config "$KANATA_CONFIG_SRC"
+  fi
+  setup_kanata_startup
 fi
 
 echo "==> Creating config symlinks..."
@@ -167,14 +169,6 @@ fi
 copy_gitconfig
 ensure_codex_config
 ensure_zsh_default_shell
-
-if [[ "$INSTALL_KANATA" == "yes" ]]; then
-  if [[ -n "$KANATA_CONFIG_SRC" ]]; then
-    link_kanata_config "$KANATA_CONFIG_SRC"
-  fi
-
-  setup_kanata_startup
-fi
 
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
   run_sensors_detect

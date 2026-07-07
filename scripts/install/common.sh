@@ -10,6 +10,24 @@ fi
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+
+start_install_log() {
+  if [[ "${DOTFILES_INSTALL_LOGGING:-}" == "active" ]]; then
+    return
+  fi
+
+  local log_dir ts
+  log_dir="${DOTFILES_INSTALL_LOG_DIR:-$DOTFILES_DIR/logs}"
+  mkdir -p "$log_dir"
+  ts="$(date +%Y%m%d-%H%M%S)"
+  export DOTFILES_INSTALL_LOG_FILE="${DOTFILES_INSTALL_LOG_FILE:-$log_dir/install-$ts.log}"
+  export DOTFILES_INSTALL_LOGGING="active"
+
+  exec > >(tee -a "$DOTFILES_INSTALL_LOG_FILE") 2>&1
+  echo "==> Logging install output to $DOTFILES_INSTALL_LOG_FILE"
+}
+
 # shellcheck source=scripts/install/desktop-niri.sh
 source "$DOTFILES_DIR/scripts/install/desktop-niri.sh"
 # shellcheck source=scripts/install/config-links.sh
@@ -139,15 +157,23 @@ install_pacman() {
 aur_helper() {
   if have yay; then echo yay; return 0; fi
   if have paru; then echo paru; return 0; fi
+  if have shelly; then echo shelly; return 0; fi
   return 1
 }
 
 install_aur() {
   local helper
   if helper="$(aur_helper)"; then
-    "$helper" -S --needed --noconfirm "$@"
+    case "$helper" in
+      yay|paru) "$helper" -S --needed --noconfirm "$@" ;;
+      shelly) shelly aur install --no-confirm "$@" ;;
+      *)
+        echo "!! Unsupported AUR helper: $helper"
+        return 1
+        ;;
+    esac
   else
-    echo ">> No AUR helper (yay/paru) found. Skipping AUR packages: $*"
+    echo ">> No AUR helper (yay/paru/shelly) found. Skipping AUR packages: $*"
     echo "   You can install one with: sudo pacman -S --needed base-devel git && (yay|paru)"
   fi
 }
