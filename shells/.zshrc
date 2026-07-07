@@ -380,8 +380,7 @@ gshd() {
     shift
   fi
 
-  git log -1 --decorate --stat "$rev" -- "$@" || return
-  git -c diff.external=difft show --ext-diff --format= "$rev" -- "$@"
+  git -c diff.external=difft show --ext-diff --decorate --format=medium --stat --patch "$rev" -- "$@"
 }
 gld() {
   git -c diff.external=difft log --ext-diff -p "$@"
