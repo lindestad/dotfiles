@@ -68,7 +68,7 @@ else
   backup_file "$pam_file"
   tmp="$(mktemp)"
   if ! awk '
-    !inserted && $0 ~ /^-auth[[:space:]]+optional[[:space:]]+pam_(gnome_keyring|kwallet5)\.so/ {
+    !inserted && $0 ~ /^-auth[[:space:]]+optional[[:space:]]+pam_(gnome_keyring|kwallet5|kwallet6)\.so/ {
       print "-auth       optional    pam_systemd_loadkey.so"
       inserted = 1
     }

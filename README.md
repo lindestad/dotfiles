@@ -54,6 +54,7 @@ Optional components:
 - `--kanata` installs or links Kanata keyboard remapping config where supported.
 
 The CachyOS/Limine Plymouth LUKS prompt theme is documented in [docs/plymouth-luks-theme.md](./docs/plymouth-luks-theme.md).
+SDDM autologin using the cached LUKS passphrase is documented in [docs/sddm-luks-autologin.md](./docs/sddm-luks-autologin.md).
 
 ### Windows (PowerShell)
 
