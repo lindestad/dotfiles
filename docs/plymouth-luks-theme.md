@@ -25,6 +25,8 @@ The helper:
 
 - fetches only `pack_2/hexagon_alt` from `adi1090x/plymouth-themes`;
 - installs it to `/usr/share/plymouth/themes/hexagon_alt`;
+- patches the theme script to center the animation and password prompt
+  consistently and to use password bullet dots instead of `*`;
 - writes `/etc/plymouth/plymouthd.conf` with `Theme=hexagon_alt` and
   `DeviceScale=2`;
 - rebuilds boot images with `limine-mkinitcpio` when available, otherwise
