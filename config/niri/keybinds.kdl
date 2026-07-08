@@ -146,6 +146,7 @@ binds {
     // Screenshots and session
     Print { screenshot; }
     Mod+Shift+S hotkey-overlay-title="Screenshot Region" { spawn-sh "$HOME/.local/bin/niri-screenshot-region"; }
+    Mod+Shift+Ctrl+S hotkey-overlay-title="Screenshot Window" { screenshot-window; }
     Ctrl+Print { screenshot-screen; }
     Alt+Print { screenshot-window; }
     Mod+Escape allow-inhibiting=false { toggle-keyboard-shortcuts-inhibit; }
