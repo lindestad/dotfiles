@@ -68,6 +68,8 @@ NIRI_PACMAN_PKGS=(
   pavucontrol
   niri
   fuzzel
+  grim
+  slurp
   swayidle
   wl-clipboard
   power-profiles-daemon

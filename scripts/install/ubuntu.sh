@@ -47,6 +47,8 @@ APT_PKGS_COMMON=(
 NIRI_APT_PKGS=(
   niri
   fuzzel
+  grim
+  slurp
   swayidle
   wl-clipboard
   cliphist

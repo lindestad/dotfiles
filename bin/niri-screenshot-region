@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+die() {
+  echo "niri-screenshot-region: $*" >&2
+  exit 1
+}
+
+have() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+have grim || die "grim is required"
+have slurp || die "slurp is required"
+have wl-copy || die "wl-copy is required"
+
+geometry="$(
+  slurp \
+    -d \
+    -b "00000066" \
+    -c "edededff" \
+    -s "229be055" \
+    -w 2
+)" || exit 0
+
+[[ -n "$geometry" ]] || exit 0
+
+screenshot_dir="${XDG_SCREENSHOTS_DIR:-$HOME/Pictures/Screenshots}"
+mkdir -p "$screenshot_dir"
+
+timestamp="$(date '+%Y-%m-%d %H-%M-%S')"
+path="$screenshot_dir/Screenshot from $timestamp.png"
+if [[ -e "$path" ]]; then
+  path="$screenshot_dir/Screenshot from $timestamp.$$.png"
+fi
+
+tmp="$(mktemp --suffix=.png)"
+trap 'rm -f "$tmp"' EXIT
+
+grim -g "$geometry" "$tmp"
+wl-copy --type image/png <"$tmp"
+cp "$tmp" "$path"
+
+if have notify-send; then
+  notify-send "Screenshot copied" "$(basename "$path")" >/dev/null 2>&1 || true
+fi
+
+printf '%s\n' "$path"
