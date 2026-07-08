@@ -204,6 +204,7 @@ ensure_ghostty_ubuntu
 ensure_shell_shims
 ensure_neovim_release || install_apt neovim
 ensure_rust_toolchain
+ensure_zsh_patina
 ensure_starship
 ensure_zellij_cargo
 ensure_typst_cli

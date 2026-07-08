@@ -91,6 +91,20 @@ ensure_cargo_tool() {
   cargo install --locked "$crate_name"
 }
 
+ensure_zsh_patina() {
+  if have zsh-patina; then
+    return
+  fi
+
+  ensure_rust_toolchain
+  echo "==> Installing zsh-patina with cargo (target-cpu=native)..."
+  if [[ "${RUSTFLAGS:-}" == *"target-cpu="* ]]; then
+    cargo install --locked zsh-patina
+  else
+    RUSTFLAGS="${RUSTFLAGS:+$RUSTFLAGS }-C target-cpu=native" cargo install --locked zsh-patina
+  fi
+}
+
 have_cargo_tealdeer() {
   [[ "$(command -v tldr 2>/dev/null || true)" == "$HOME/.cargo/bin/tldr" ]] \
     && tldr --version 2>/dev/null | head -n1 | grep -qi '^tealdeer '

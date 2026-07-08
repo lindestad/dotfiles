@@ -113,6 +113,7 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
   fi
 fi
 ensure_rust_toolchain
+ensure_zsh_patina
 ensure_starship
 ensure_shfmt_release
 ensure_yq_mikefarah

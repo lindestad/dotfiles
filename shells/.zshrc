@@ -436,3 +436,9 @@ fi
 if [ -f "$HOME/.zshrc.local" ]; then
   source "$HOME/.zshrc.local"
 fi
+
+####--------------------------------------------------
+#### Syntax highlighting
+####--------------------------------------------------
+# zsh-patina needs to activate last so it sees the final ZLE setup.
+command -v zsh-patina >/dev/null 2>&1 && eval "$(zsh-patina activate)"

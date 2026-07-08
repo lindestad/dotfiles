@@ -236,6 +236,7 @@ fi
 ensure_wezterm_fedora
 ensure_ghostty_fedora
 ensure_rust_toolchain
+ensure_zsh_patina
 ensure_starship
 ensure_bottom
 ensure_typst_cli
