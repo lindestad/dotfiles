@@ -17,6 +17,25 @@ generated. Signing those files changes their bytes, so the hashes embedded in
 The failure mode is documented in
 [limine-secureboot-hash-issue.md](./limine-secureboot-hash-issue.md).
 
+## Theme Assets
+
+Limine also loads theme assets such as the wallpaper. With Secure Boot and
+verification enabled, those assets should have hashes in `limine.conf` too.
+If the wallpaper is not hashed, Limine can boot normally but skip the wallpaper,
+leaving the fallback terminal colors visible. With the CachyOS theme this can
+look like a white or otherwise broken background.
+
+For the default CachyOS Limine splash:
+
+```sh
+hash="$(sudo b2sum /boot/limine-splash.png | awk '{ print $1 }')"
+sudo sed -i "s|^wallpaper: boot():/limine-splash.png.*|wallpaper: boot():/limine-splash.png#${hash}|" /boot/limine.conf
+sudo limine-enroll-config
+```
+
+If the config is regenerated afterward, confirm the `wallpaper:` line still has
+the `#<hash>` suffix. If not, add it again and re-enroll the config.
+
 ## Repair Or Refresh
 
 Run from the repo root:
