@@ -213,4 +213,7 @@ ensure_codex_config() {
   ensure_codex_root_config "$dst" "sandbox_mode" '"danger-full-access"'
   ensure_codex_root_config "$dst" "approval_policy" '"never"'
   ensure_codex_tui_config "$dst" "vim_mode_default" "true"
+  ensure_codex_tui_config "$dst" "status_line" '["model-with-reasoning", "current-dir", "context-used", "five-hour-limit", "weekly-limit"]'
+  ensure_codex_tui_config "$dst" "status_line_use_colors" "true"
+  ensure_codex_tui_config "$dst" "theme" '"monokai-extended"'
 }

@@ -829,6 +829,9 @@ function Set-CodexConfig {
     $content = Get-TomlRootValueContent -Content $content -Key "sandbox_mode" -Value '"danger-full-access"' -Path $Dst
     $content = Get-TomlRootValueContent -Content $content -Key "approval_policy" -Value '"never"' -Path $Dst
     $content = Get-TomlTableValueContent -Content $content -Table "tui" -Key "vim_mode_default" -Value "true" -Path $Dst
+    $content = Get-TomlTableValueContent -Content $content -Table "tui" -Key "status_line" -Value '["model-with-reasoning", "current-dir", "context-used", "five-hour-limit", "weekly-limit"]' -Path $Dst
+    $content = Get-TomlTableValueContent -Content $content -Table "tui" -Key "status_line_use_colors" -Value "true" -Path $Dst
+    $content = Get-TomlTableValueContent -Content $content -Table "tui" -Key "theme" -Value '"monokai-extended"' -Path $Dst
 
     [System.IO.File]::WriteAllText($Dst, $content, $utf8NoBom)
 }
