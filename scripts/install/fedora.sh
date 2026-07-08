@@ -10,7 +10,6 @@ ensure_not_root
 
 DNF_PKGS=(
   zsh
-  zsh-syntax-highlighting
   curl
   wget
   unzip

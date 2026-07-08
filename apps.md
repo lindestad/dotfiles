@@ -83,7 +83,6 @@ These are installed only by the Linux/WSL shell installers.
 | vivid | `vivid` | `vivid` (optional) | cargo fallback | `vivid` (optional) |
 | Fedora workflow extras | not installed | not installed | `entr`, `git-lfs`, `tokei`, `tree` | not installed |
 | zsh | `zsh` | `zsh` | `zsh` | `zsh` |
-| zsh syntax highlighting | `zsh-syntax-highlighting` | `zsh-syntax-highlighting` | `zsh-syntax-highlighting` | `zsh-syntax-highlighting` |
 
 ## Distro-specific
 

@@ -436,19 +436,3 @@ fi
 if [ -f "$HOME/.zshrc.local" ]; then
   source "$HOME/.zshrc.local"
 fi
-
-####--------------------------------------------------
-#### Syntax highlighting
-####--------------------------------------------------
-# Source last so it can hook the final set of ZLE widgets.
-_zsh_syntax_highlighting_paths=(
-  /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-  /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-)
-for _zsh_syntax_highlighting in "${_zsh_syntax_highlighting_paths[@]}"; do
-  if [ -f "$_zsh_syntax_highlighting" ]; then
-    source "$_zsh_syntax_highlighting"
-    break
-  fi
-done
-unset _zsh_syntax_highlighting _zsh_syntax_highlighting_paths
