@@ -47,6 +47,9 @@ sudo ./scripts/install/secureboot-limine-signing.sh
 The helper:
 
 - disables the old unsafe signing hook if it exists;
+- installs `/usr/local/bin/refresh-limine-secureboot-assets`;
+- installs a late pacman hook that runs that refresher after kernel, Limine, or
+  wallpaper package updates;
 - removes Limine-managed `vmlinuz` files from `sbctl`'s saved-file database;
 - sets `ENABLE_ENROLL_LIMINE_CONFIG=yes`;
 - sets `ENABLE_VERIFICATION=yes`;
@@ -54,7 +57,16 @@ The helper:
 - runs `limine-snapper-sync` when available;
 - adds or refreshes hashes for `wallpaper: boot():/...` entries;
 - re-enrolls the Limine config checksum;
+- refreshes the fallback EFI copy only if it already appears to be Limine;
 - verifies every `boot():/...#hash` entry in `limine.conf`.
+
+The pacman hook intentionally does not sign kernels or run `limine-update`.
+It only repairs asset hashes after the normal CachyOS/Limine hooks have
+regenerated `limine.conf`.
+
+If a configured wallpaper is missing, the refresher exits with an error instead
+of silently re-enrolling a degraded theme config. That error is printed in
+pacman/Shelly output and logged with the `limine-secureboot-assets` tag.
 
 ## Expected Verification Output
 

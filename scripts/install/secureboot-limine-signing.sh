@@ -3,12 +3,15 @@ set -euo pipefail
 
 unsafe_signer_path="/usr/local/bin/sign-secureboot-bootfiles"
 unsafe_hook_path="/etc/pacman.d/hooks/zzzz-sign-secureboot-bootfiles.hook"
+asset_refresher_path="/usr/local/bin/refresh-limine-secureboot-assets"
+asset_hook_path="/etc/pacman.d/hooks/zzzz-refresh-limine-secureboot-assets.hook"
 limine_default="/etc/default/limine"
 ts="$(date +%Y%m%d-%H%M%S)"
 rescue_dir="/root/limine-secureboot-rescue-${ts}"
 
 die() {
   echo "!! $*" >&2
+  command -v logger >/dev/null 2>&1 && logger -t limine-secureboot-assets -- "$*"
   exit 1
 }
 
@@ -25,6 +28,17 @@ backup_move() {
   mv "$path" "$rescue_dir/$(basename "$path").disabled"
   echo "-> Disabled $label: $path"
   echo "   Backup: $rescue_dir/$(basename "$path").disabled"
+}
+
+write_root_file() {
+  local path="$1"
+  local mode="$2"
+  local tmp
+
+  tmp="$(mktemp)"
+  cat >"$tmp"
+  install -D -m "$mode" "$tmp" "$path"
+  rm -f "$tmp"
 }
 
 ensure_limine_option() {
@@ -71,6 +85,43 @@ remove_saved_kernel_signatures() {
   for file in "${saved_files[@]}"; do
     sbctl remove-file "$file"
   done
+}
+
+install_asset_refresher() {
+  local source_path
+
+  source_path="$(readlink -f "${BASH_SOURCE[0]}")"
+  install -D -m 0755 "$source_path" "$asset_refresher_path"
+  echo "-> Installed $asset_refresher_path"
+}
+
+install_asset_hook() {
+  write_root_file "$asset_hook_path" 0644 <<'EOF'
+[Trigger]
+Type = Path
+Operation = Install
+Operation = Upgrade
+Target = usr/lib/modules/*/vmlinuz
+Target = usr/lib/modules/*/pkgbase
+
+[Trigger]
+Type = Package
+Operation = Install
+Operation = Upgrade
+Target = linux-cachyos
+Target = linux-cachyos-lts
+Target = limine
+Target = limine-mkinitcpio-hook
+Target = limine-snapper-sync
+Target = mkinitcpio
+Target = cachyos-wallpapers
+
+[Action]
+Description = Refreshing Limine Secure Boot asset hashes...
+When = PostTransaction
+Exec = /usr/local/bin/refresh-limine-secureboot-assets --refresh-assets-only
+EOF
+  echo "-> Installed $asset_hook_path"
 }
 
 verify_limine_hashes() {
@@ -124,6 +175,7 @@ hash_limine_wallpapers() {
   local conf="${esp}/limine.conf"
   local tmp
   local changed=0
+  local missing=0
   local line prefix rel suffix rest file hash
 
   have b2sum || die "b2sum is required"
@@ -131,7 +183,7 @@ hash_limine_wallpapers() {
 
   tmp="$(mktemp)"
   while IFS= read -r line || [[ -n "$line" ]]; do
-    if [[ "$line" =~ ^([[:space:]]*wallpaper:[[:space:]]*)boot\(\):([^[:space:]#]+)(#[[:xdigit:]]+)?(.*)$ ]]; then
+    if [[ "$line" =~ ^([[:space:]]*wallpaper:[[:space:]]*)boot\(\):([^[:space:]#]+)(#[^[:space:]]+)?(.*)$ ]]; then
       prefix="${BASH_REMATCH[1]}"
       rel="${BASH_REMATCH[2]}"
       suffix="${BASH_REMATCH[3]}"
@@ -145,12 +197,20 @@ hash_limine_wallpapers() {
           changed=1
         fi
       else
-        echo ">> Wallpaper file not found, leaving unchanged: boot():${rel}" >&2
+        echo "!! Limine wallpaper file not found: boot():${rel}" >&2
+        command -v logger >/dev/null 2>&1 &&
+          logger -t limine-secureboot-assets -- "Limine wallpaper file not found: boot():${rel}"
+        missing=1
       fi
     fi
 
     printf '%s\n' "$line" >>"$tmp"
   done <"$conf"
+
+  if ((missing != 0)); then
+    rm -f "$tmp"
+    die "one or more Limine wallpaper files were missing; asset hash refresh aborted"
+  fi
 
   if ((changed != 0)); then
     install -m 0644 "$tmp" "$conf"
@@ -161,8 +221,78 @@ hash_limine_wallpapers() {
   rm -f "$tmp"
 }
 
+refresh_limine_fallback() {
+  local esp="$1"
+  local primary="${esp}/EFI/limine/limine_x64.efi"
+  local fallback="${esp}/EFI/BOOT/BOOTX64.EFI"
+
+  [[ -f "$primary" ]] || die "$primary does not exist"
+  grep -a -qi 'limine' "$primary" || die "$primary does not look like a Limine EFI binary"
+
+  if [[ ! -f "$fallback" ]]; then
+    echo "-> No Limine fallback EFI found; skipping"
+    return 0
+  fi
+
+  if ! grep -a -qi 'limine' "$fallback"; then
+    echo "-> Existing fallback EFI is not Limine; leaving unchanged"
+    return 0
+  fi
+
+  if cmp -s "$primary" "$fallback"; then
+    echo "-> Limine fallback EFI is current"
+    return 0
+  fi
+
+  cp -f "$primary" "$fallback"
+  sync -f "$fallback" 2>/dev/null || sync
+  echo "-> Refreshed Limine fallback EFI"
+}
+
+refresh_assets() {
+  local esp
+
+  have limine-enroll-config || die "limine-enroll-config is required"
+
+  esp="$(esp_path)"
+
+  echo "==> Hashing Limine theme assets"
+  hash_limine_wallpapers "$esp"
+
+  echo "==> Enrolling Limine config checksum"
+  limine-enroll-config
+
+  refresh_limine_fallback "$esp"
+  verify_limine_hashes "$esp"
+}
+
+refresh_assets_only=0
+case "${1:-}" in
+--refresh-assets-only)
+  refresh_assets_only=1
+  shift
+  ;;
+--help | -h)
+  cat <<EOF
+Usage:
+  sudo $0
+  sudo $0 --refresh-assets-only
+EOF
+  exit 0
+  ;;
+esac
+
+if (($# != 0)); then
+  die "unknown arguments: $*"
+fi
+
 if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
   die "run with sudo: sudo $0"
+fi
+
+if ((refresh_assets_only != 0)); then
+  refresh_assets
+  exit 0
 fi
 
 have sbctl || die "sbctl is required"
@@ -177,6 +307,10 @@ echo "==> Enabling Limine config enrollment and file verification"
 ensure_limine_option "ENABLE_ENROLL_LIMINE_CONFIG" "yes"
 ensure_limine_option "ENABLE_VERIFICATION" "yes"
 
+echo "==> Installing safe Limine Secure Boot asset refresh hook"
+install_asset_refresher
+install_asset_hook
+
 remove_saved_kernel_signatures
 
 echo "==> Regenerating Limine entries"
@@ -187,15 +321,7 @@ if have limine-snapper-sync; then
   limine-snapper-sync
 fi
 
-esp="$(esp_path)"
-
-echo "==> Hashing Limine theme assets"
-hash_limine_wallpapers "$esp"
-
-echo "==> Enrolling Limine config checksum"
-limine-enroll-config
-
-verify_limine_hashes "$esp"
+refresh_assets
 
 if have limine-snapper-info; then
   echo "==> Snapshot file check"
