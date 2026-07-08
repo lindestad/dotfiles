@@ -158,6 +158,7 @@ These are not package installs, but the installers manage them alongside the too
 | Bash profile | Ubuntu only | `.bashrc` linked/copied; `.bash_profile` created if no login profile exists |
 | Broot config + skins | symlinked; launchers generated when `broot` is installed | linked/copied to the Broot AppData config directory; Git Bash launcher generated when `broot` is installed |
 | Codex instructions | symlinked | linked/copied |
+| Dotfiles doctor | installed to `~/.local/bin/dotfiles-doctor` | not managed |
 | Git config | copied if missing; missing keys merged | copied if missing; missing keys merged |
 | Git global ignore | symlinked | linked/copied |
 | Ghostty config + shaders | non-WSL Linux only | not linked |

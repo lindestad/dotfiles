@@ -264,6 +264,7 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
 fi
 ensure_broot_launcher
 ensure_local_bin
+install_dotfiles_helpers
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
   install_niri_helpers
 fi

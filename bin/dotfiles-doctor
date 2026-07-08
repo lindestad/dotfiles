@@ -1,0 +1,375 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+failures=0
+warnings=0
+
+ok() {
+  printf 'ok   %s\n' "$*"
+}
+
+info() {
+  printf 'info %s\n' "$*"
+}
+
+warn() {
+  warnings=$((warnings + 1))
+  printf 'warn %s\n' "$*"
+}
+
+fail() {
+  failures=$((failures + 1))
+  printf 'fail %s\n' "$*"
+}
+
+section() {
+  printf '\n==> %s\n' "$*"
+}
+
+have() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+is_wsl() {
+  [[ -n "${WSL_DISTRO_NAME:-}" ]] || grep -qiE "(microsoft|wsl)" /proc/version 2>/dev/null
+}
+
+is_debian_like() {
+  local id="" id_like=""
+
+  if [[ -f /etc/os-release ]]; then
+    id="$(awk -F= '$1 == "ID" { gsub(/"/, "", $2); print $2 }' /etc/os-release)"
+    id_like="$(awk -F= '$1 == "ID_LIKE" { gsub(/"/, "", $2); print $2 }' /etc/os-release)"
+  fi
+
+  case " $id $id_like " in
+    *" ubuntu "*|*" debian "*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+same_path() {
+  [[ "$(readlink -f "$1" 2>/dev/null || true)" == "$(readlink -f "$2" 2>/dev/null || true)" ]]
+}
+
+resolve_dotfiles_dir() {
+  local script_dir candidate
+  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+  for candidate in \
+    "${DOTFILES_DIR:-}" \
+    "$script_dir/.." \
+    "$PWD" \
+    "$HOME/dev/dotfiles" \
+    "$HOME/.dotfiles"; do
+    [[ -n "$candidate" ]] || continue
+    if [[ -f "$candidate/install.sh" && -d "$candidate/config" ]]; then
+      readlink -f "$candidate"
+      return 0
+    fi
+  done
+
+  if have git; then
+    candidate="$(git -C "$PWD" rev-parse --show-toplevel 2>/dev/null || true)"
+    if [[ -n "$candidate" && -f "$candidate/install.sh" && -d "$candidate/config" ]]; then
+      readlink -f "$candidate"
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
+check_managed_link() {
+  local src="$1" dst="$2" label="${3:-$2}"
+
+  if [[ ! -e "$src" ]]; then
+    fail "$label source is missing: $src"
+    return
+  fi
+
+  if [[ -L "$dst" && ! -e "$dst" ]]; then
+    fail "$label is a broken symlink: $dst"
+    return
+  fi
+
+  if [[ ! -e "$dst" ]]; then
+    warn "$label is not installed: $dst"
+    return
+  fi
+
+  if same_path "$src" "$dst"; then
+    ok "$label"
+    return
+  fi
+
+  warn "$label differs from repo source: $dst"
+}
+
+check_helper() {
+  local helper="$1"
+  local src="$DOTFILES_DIR/bin/$helper"
+  local dst="$HOME/.local/bin/$helper"
+
+  if [[ ! -f "$src" ]]; then
+    fail "$helper source is missing: $src"
+    return
+  fi
+
+  if [[ ! -e "$dst" ]]; then
+    warn "$helper is not installed in ~/.local/bin"
+    return
+  fi
+
+  if [[ ! -x "$dst" ]]; then
+    warn "$helper is installed but not executable"
+    return
+  fi
+
+  if cmp -s "$src" "$dst"; then
+    ok "$helper installed"
+  else
+    warn "$helper in ~/.local/bin differs from repo"
+  fi
+}
+
+check_git_config() {
+  local src="$DOTFILES_DIR/config/git/gitconfig"
+  local entry key desired current had_issue="no"
+
+  if ! have git; then
+    warn "git is not installed; cannot inspect ~/.gitconfig"
+    return
+  fi
+  if [[ ! -f "$src" ]]; then
+    fail "repo gitconfig is missing: $src"
+    return
+  fi
+
+  while IFS= read -r entry; do
+    [[ "$entry" == *=* ]] || continue
+    key="${entry%%=*}"
+    desired="${entry#*=}"
+    current="$(git config --global --get "$key" 2>/dev/null || true)"
+    if [[ -z "$current" ]]; then
+      warn "$HOME/.gitconfig is missing $key=$desired"
+      had_issue="yes"
+    elif [[ "$current" != "$desired" ]]; then
+      if [[ "$key" == "user.signingkey" ]]; then
+        info "$HOME/.gitconfig has custom $key=$current"
+        continue
+      fi
+      warn "$HOME/.gitconfig has $key=$current; repo wants $desired"
+      had_issue="yes"
+    fi
+  done < <(git config --file "$src" --list)
+
+  [[ "$had_issue" == "yes" ]] || ok "git global config"
+}
+
+codex_root_value() {
+  local file="$1" key="$2"
+  awk -v key="$key" '
+    /^[[:space:]]*\[/ { exit }
+    $0 ~ "^[[:space:]]*" key "[[:space:]]*=" {
+      sub("^[[:space:]]*" key "[[:space:]]*=[[:space:]]*", "")
+      print
+      exit
+    }
+  ' "$file"
+}
+
+codex_tui_value() {
+  local file="$1" key="$2"
+  awk -v key="$key" '
+    /^\[tui\][[:space:]]*$/ { in_tui = 1; next }
+    /^\[/ { in_tui = 0 }
+    in_tui && $0 ~ "^[[:space:]]*" key "[[:space:]]*=" {
+      sub("^[[:space:]]*" key "[[:space:]]*=[[:space:]]*", "")
+      print
+      exit
+    }
+  ' "$file"
+}
+
+check_codex_config() {
+  local file="$HOME/.codex/config.toml"
+  local had_issue="no"
+  local key expected actual
+
+  if [[ ! -f "$file" ]]; then
+    warn "Codex config is missing: $file"
+    return
+  fi
+
+  while IFS='|' read -r key expected; do
+    actual="$(codex_root_value "$file" "$key")"
+    if [[ "$actual" != "$expected" ]]; then
+      warn "Codex config wants $key = $expected, found ${actual:-missing}"
+      had_issue="yes"
+    fi
+  done <<'EOF'
+sandbox_mode|"danger-full-access"
+approval_policy|"never"
+EOF
+
+  while IFS='|' read -r key expected; do
+    actual="$(codex_tui_value "$file" "$key")"
+    if [[ "$actual" != "$expected" ]]; then
+      warn "Codex [tui] wants $key = $expected, found ${actual:-missing}"
+      had_issue="yes"
+    fi
+  done <<'EOF'
+vim_mode_default|true
+status_line|["model-with-reasoning", "current-dir", "context-used", "five-hour-limit", "weekly-limit"]
+status_line_use_colors|true
+theme|"monokai-extended"
+EOF
+
+  [[ "$had_issue" == "yes" ]] || ok "Codex config"
+}
+
+check_fonts() {
+  local font dst had_issue="no"
+  shopt -s nullglob
+  for font in "$DOTFILES_DIR"/fonts/*.ttf "$DOTFILES_DIR"/fonts/*.otf; do
+    dst="$HOME/.local/share/fonts/$(basename "$font")"
+    if [[ ! -f "$dst" ]]; then
+      warn "font is not installed: $(basename "$font")"
+      had_issue="yes"
+    elif ! cmp -s "$font" "$dst"; then
+      warn "font differs from repo copy: $(basename "$font")"
+      had_issue="yes"
+    fi
+  done
+  shopt -u nullglob
+
+  [[ "$had_issue" == "yes" ]] || ok "bundled fonts"
+}
+
+check_niri() {
+  local config="$HOME/.config/niri/config.kdl"
+
+  check_managed_link "$DOTFILES_DIR/config/niri/config.kdl" "$config" "niri config"
+  check_managed_link "$DOTFILES_DIR/config/niri/keybinds.kdl" "$HOME/.config/niri/keybinds.kdl" "niri keybinds"
+  check_managed_link "$DOTFILES_DIR/config/niri/local.example.kdl" "$HOME/.config/niri/local.example.kdl" "niri local example"
+  check_managed_link "$DOTFILES_DIR/config/hypr/hyprlock.conf" "$HOME/.config/hypr/hyprlock.conf" "hyprlock config"
+  check_managed_link "$DOTFILES_DIR/config/xkb/symbols/usno" "$HOME/.config/xkb/symbols/usno" "xkb usno layout"
+  check_managed_link "$DOTFILES_DIR/config/fuzzel/fuzzel.ini" "$HOME/.config/fuzzel/fuzzel.ini" "fuzzel config"
+  check_managed_link "$DOTFILES_DIR/config/noctalia/monochrome-strong.json" "$HOME/.config/noctalia/colorschemes/monochrome-strong/monochrome-strong.json" "Noctalia color scheme"
+
+  check_helper niri-focus-workspace-all
+  check_helper niri-lock-screen
+  check_helper niri-move-window-or-workspace
+  check_helper niri-screenshot-region
+  check_helper noctalia-activate-notification
+
+  if [[ -f "$HOME/.config/niri/local.kdl" ]]; then
+    info "niri local config present: ~/.config/niri/local.kdl"
+  else
+    info "niri local config not present; repo defaults are in use"
+  fi
+
+  if have niri && [[ -f "$config" ]]; then
+    if niri validate -c "$config" >/dev/null 2>&1; then
+      ok "niri config validates"
+    else
+      fail "niri config does not validate; run: niri validate -c $config"
+    fi
+  elif have niri; then
+    warn "niri is installed, but ~/.config/niri/config.kdl is missing"
+  else
+    info "niri is not installed; skipping niri validation"
+  fi
+}
+
+DOTFILES_DIR="$(resolve_dotfiles_dir || true)"
+if [[ -z "$DOTFILES_DIR" ]]; then
+  fail "could not locate dotfiles repo; set DOTFILES_DIR=/path/to/dotfiles"
+  printf '\n==> summary\n'
+  printf 'doctor found %d failure(s), %d warning(s)\n' "$failures" "$warnings"
+  exit 1
+fi
+
+section "repo"
+ok "repo: $DOTFILES_DIR"
+if have git && git -C "$DOTFILES_DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  if [[ -n "$(git -C "$DOTFILES_DIR" status --short)" ]]; then
+    warn "repo has uncommitted changes"
+  else
+    ok "repo working tree clean"
+  fi
+else
+  warn "repo is not a git working tree"
+fi
+
+section "shell environment"
+case ":$PATH:" in
+  *":$HOME/.local/bin:"*) ok "$HOME/.local/bin is on PATH" ;;
+  *) warn "$HOME/.local/bin is not on PATH" ;;
+esac
+
+for cmd in git zsh starship nvim hx yazi zellij atuin direnv just jq rg; do
+  if have "$cmd"; then
+    ok "$cmd: $(command -v "$cmd")"
+  else
+    warn "$cmd is not installed or not on PATH"
+  fi
+done
+
+section "managed config"
+check_managed_link "$DOTFILES_DIR/config/atuin/config.toml" "$HOME/.config/atuin/config.toml" "atuin config"
+check_managed_link "$DOTFILES_DIR/config/atuin/themes" "$HOME/.config/atuin/themes" "atuin themes"
+check_managed_link "$DOTFILES_DIR/config/broot/conf.toml" "$HOME/.config/broot/conf.toml" "broot config"
+check_managed_link "$DOTFILES_DIR/config/broot/skins" "$HOME/.config/broot/skins" "broot skins"
+check_managed_link "$DOTFILES_DIR/config/codex/AGENTS.md" "$HOME/.codex/AGENTS.md" "Codex instructions"
+check_managed_link "$DOTFILES_DIR/config/copilot/copilot-instructions.md" "$HOME/.copilot/copilot-instructions.md" "Copilot instructions"
+check_managed_link "$DOTFILES_DIR/config/git/ignore" "$HOME/.config/git/ignore" "git ignore"
+check_managed_link "$DOTFILES_DIR/config/helix/config.toml" "$HOME/.config/helix/config.toml" "helix config"
+check_managed_link "$DOTFILES_DIR/config/helix/languages.toml" "$HOME/.config/helix/languages.toml" "helix languages"
+check_managed_link "$DOTFILES_DIR/config/nvim" "$HOME/.config/nvim" "neovim config"
+check_managed_link "$DOTFILES_DIR/config/starship/zsh/starship.toml" "$HOME/.config/starship.toml" "starship config"
+check_managed_link "$DOTFILES_DIR/config/tealdeer/config.toml" "$HOME/.config/tealdeer/config.toml" "tealdeer config"
+check_managed_link "$DOTFILES_DIR/config/yazi" "$HOME/.config/yazi" "yazi config"
+check_managed_link "$DOTFILES_DIR/config/zellij" "$HOME/.config/zellij" "zellij config"
+check_managed_link "$DOTFILES_DIR/shells/.zshrc" "$HOME/.zshrc" "zsh config"
+if same_path "$DOTFILES_DIR/shells/.bashrc" "$HOME/.bashrc"; then
+  check_managed_link "$DOTFILES_DIR/shells/.bashrc" "$HOME/.bashrc" "bash config"
+elif ! is_wsl && is_debian_like; then
+  check_managed_link "$DOTFILES_DIR/shells/.bashrc" "$HOME/.bashrc" "bash config"
+else
+  info "bash config is not managed on this platform"
+fi
+if ! is_wsl; then
+  check_managed_link "$DOTFILES_DIR/config/alacritty/alacritty.toml" "$HOME/.config/alacritty/alacritty.toml" "alacritty config"
+  check_managed_link "$DOTFILES_DIR/config/wezterm/wezterm.lua" "$HOME/.config/wezterm/wezterm.lua" "wezterm config"
+  check_managed_link "$DOTFILES_DIR/config/ghostty/config.ghostty" "$HOME/.config/ghostty/config.ghostty" "ghostty config"
+  check_managed_link "$DOTFILES_DIR/config/ghostty/shaders" "$HOME/.config/ghostty/shaders" "ghostty shaders"
+fi
+
+section "managed helpers"
+check_helper dotfiles-doctor
+
+section "merged config"
+check_git_config
+check_codex_config
+
+section "fonts"
+check_fonts
+
+if [[ -e "$HOME/.config/niri/config.kdl" ]] || have niri; then
+  section "niri desktop"
+  check_niri
+fi
+
+section "summary"
+if ((failures > 0)); then
+  printf 'doctor found %d failure(s), %d warning(s)\n' "$failures" "$warnings"
+  exit 1
+fi
+
+if ((warnings > 0)); then
+  printf 'doctor found %d warning(s)\n' "$warnings"
+else
+  printf 'doctor found no issues\n'
+fi

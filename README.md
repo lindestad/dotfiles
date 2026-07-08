@@ -67,6 +67,22 @@ cd $HOME\dev\dotfiles
 
 On Windows, the installer can optionally install and enable the tracked US+NO keyboard layout for `RightAlt` Norwegian characters.
 
+## Maintenance
+
+Run the local validation suite before committing installer or config changes:
+
+```bash
+just check
+```
+
+Run a read-only health check against the current machine:
+
+```bash
+just doctor
+# or, after install:
+dotfiles-doctor
+```
+
 ## Zellij Sessions
 
 The shell configs keep plain `zellij` unchanged and add a few shortcuts:

@@ -154,6 +154,7 @@ install_fonts
 echo "==> Creating WSL config symlinks..."
 link_pairs "${LINKS[@]}"
 ensure_broot_launcher
+install_dotfiles_helpers
 
 copy_gitconfig
 ensure_codex_config

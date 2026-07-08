@@ -78,6 +78,25 @@ ensure_local_bin() {
   mkdir -p "$HOME/.local/bin"
 }
 
+install_dotfiles_helpers() {
+  ensure_local_bin
+
+  local helper
+  local helpers=(
+    dotfiles-doctor
+  )
+
+  for helper in "${helpers[@]}"; do
+    if [[ ! -f "$DOTFILES_DIR/bin/$helper" ]]; then
+      echo "!! Missing dotfiles helper: $DOTFILES_DIR/bin/$helper"
+      continue
+    fi
+
+    install -m 0755 "$DOTFILES_DIR/bin/$helper" "$HOME/.local/bin/$helper"
+    echo "-> Installed dotfiles helper: ~/.local/bin/$helper"
+  done
+}
+
 ensure_shell_shims() {
   ensure_local_bin
 
