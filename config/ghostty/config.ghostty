@@ -5,7 +5,7 @@ window-padding-y = 0
 window-padding-balance = true
 window-padding-color = extend
 
-background-opacity = 0.90
+background-opacity = 0.88
 background-opacity-cells = true
 background-blur = true
 confirm-close-surface = false
