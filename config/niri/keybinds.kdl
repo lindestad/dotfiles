@@ -9,6 +9,8 @@ binds {
 
     // Noctalia
     Mod+Space hotkey-overlay-title="Noctalia Launcher" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "toggle"; }
+    Mod+N hotkey-overlay-title="Activate Latest Notification" { spawn-sh "$HOME/.local/bin/noctalia-activate-notification"; }
+    Mod+Shift+N hotkey-overlay-title="Noctalia Notification History" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "notifications" "toggleHistory"; }
     Mod+S hotkey-overlay-title="Noctalia Control Center" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "controlCenter" "toggle"; }
     Mod+Shift+Comma hotkey-overlay-title="Noctalia Settings" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "settings" "toggle"; }
     Mod+Alt+X hotkey-overlay-title="Noctalia Session Menu" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "sessionMenu" "toggle"; }

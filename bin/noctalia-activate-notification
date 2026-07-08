@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+die() {
+  echo "noctalia-activate-notification: $*" >&2
+  exit 1
+}
+
+have() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+ipc() {
+  qs -c noctalia-shell ipc call notifications "$@"
+}
+
+trim_bool() {
+  tr -d '\r\n[:space:]'
+}
+
+have qs || die "qs is required"
+have jq || die "jq is required"
+have niri || die "niri is required"
+
+lock="${XDG_RUNTIME_DIR:-/tmp}/noctalia-activate-notification.lock"
+exec 9>"$lock"
+flock -n 9 || exit 0
+
+cache_file="${NOCTALIA_NOTIF_HISTORY_FILE:-${XDG_CACHE_HOME:-$HOME/.cache}/noctalia/notifications.json}"
+
+history_json="$(ipc getHistory 2>/dev/null || printf '[]')"
+latest_id="$(jq -r '.[0].id // empty' <<<"$history_json")"
+
+visible_popup="no"
+if niri msg -j layers 2>/dev/null \
+  | jq -e 'any(.[]; (.namespace // "") | test("^noctalia-notifications-"))' >/dev/null; then
+  visible_popup="yes"
+fi
+
+if [[ "$visible_popup" == "yes" && -n "$latest_id" ]]; then
+  actions_json="$(ipc getActions 0 2>/dev/null || printf '[]')"
+  action_count="$(jq -r 'try length catch 0' <<<"$actions_json")"
+  result="$(ipc invokeDefaultAndDismiss 0 2>/dev/null | trim_bool || true)"
+
+  if [[ "$action_count" == "0" || "$result" == "true" ]]; then
+    ipc removeFromHistory "$latest_id" >/dev/null 2>&1 || true
+    exit 0
+  fi
+
+  exit 1
+fi
+
+[[ -n "$latest_id" ]] || exit 0
+
+actions_json="[]"
+if [[ -r "$cache_file" ]]; then
+  actions_json="$(
+    jq -r --arg id "$latest_id" \
+      '.notifications[]? | select(.id == $id) | .actionsJson // "[]"' \
+      "$cache_file" 2>/dev/null \
+      | head -n 1
+  )"
+fi
+[[ -n "$actions_json" ]] || actions_json="[]"
+
+action_id="$(
+  jq -r '
+    try (
+      (map(select(.identifier == "default"))[0].identifier)
+      // .[0].identifier
+      // empty
+    ) catch empty
+  ' <<<"$actions_json"
+)"
+
+if [[ -z "$action_id" ]]; then
+  ipc removeFromHistory "$latest_id" >/dev/null 2>&1 || true
+  exit 0
+fi
+
+result="$(ipc invokeAction "$latest_id" "$action_id" 2>/dev/null | trim_bool || true)"
+if [[ "$result" == "true" ]]; then
+  ipc removeFromHistory "$latest_id" >/dev/null 2>&1 || true
+  exit 0
+fi
+
+die "failed to invoke action '$action_id' for notification $latest_id"

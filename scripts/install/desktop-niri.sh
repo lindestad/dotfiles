@@ -403,6 +403,7 @@ install_niri_helpers() {
     niri-focus-workspace-all
     niri-lock-screen
     niri-move-window-or-workspace
+    noctalia-activate-notification
   )
 
   for helper in "${helpers[@]}"; do
