@@ -10,6 +10,7 @@ ensure_not_root
 
 PACMAN_PKGS=(
   zsh
+  zsh-syntax-highlighting
   curl
   unzip
   fontconfig

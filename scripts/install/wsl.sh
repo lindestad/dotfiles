@@ -12,6 +12,7 @@ ensure_not_root
 
 APT_PKGS=(
   zsh
+  zsh-syntax-highlighting
   curl
   unzip
   ca-certificates
