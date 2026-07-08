@@ -1,16 +1,23 @@
-# Secure Boot Limine Signing
+# Secure Boot With Limine
 
-CachyOS signs the top-level kernels through the normal `sbctl` hook, but
-`limine-update` also creates Limine-managed kernel copies below `/boot`. Those
-copies can be regenerated after the normal `zz-sbctl.hook` has already run.
-Secure Boot should not be enabled while `sbctl verify` reports unsigned Limine
-boot targets.
+Limine v12 can protect boot files with hashes in `limine.conf`. On CachyOS,
+the safe setup is:
 
-This helper installs a late pacman hook that signs every EFI binary and
-`vmlinuz-*` file below `/boot` after kernel, mkinitcpio, or Limine package
-updates.
+- enable Limine config enrollment;
+- enable Limine file verification;
+- let Limine generate hashes for its kernel and initramfs copies;
+- sign the Limine EFI binary, not the Limine-managed kernel copies.
 
-## Install
+Do not run a blanket `sbctl sign` over `/boot`. In particular, do not sign
+files below `/boot/<machine-id>/.../vmlinuz-*` or
+`/boot/<machine-id>/limine_history/vmlinuz-*` after `limine.conf` has been
+generated. Signing those files changes their bytes, so the hashes embedded in
+`limine.conf` no longer match and Limine refuses to boot the entries.
+
+The failure mode is documented in
+[limine-secureboot-hash-issue.md](./limine-secureboot-hash-issue.md).
+
+## Repair Or Refresh
 
 Run from the repo root:
 
@@ -18,43 +25,58 @@ Run from the repo root:
 sudo ./scripts/install/secureboot-limine-signing.sh
 ```
 
-The installer writes:
+The helper:
 
-- `/usr/local/bin/sign-secureboot-bootfiles`
-- `/etc/pacman.d/hooks/zzzz-sign-secureboot-bootfiles.hook`
+- disables the old unsafe signing hook if it exists;
+- removes Limine-managed `vmlinuz` files from `sbctl`'s saved-file database;
+- sets `ENABLE_ENROLL_LIMINE_CONFIG=yes`;
+- sets `ENABLE_VERIFICATION=yes`;
+- runs `limine-update`;
+- runs `limine-snapper-sync` when available;
+- verifies every `boot():/...#hash` entry in `limine.conf`.
 
-It also signs the current `/boot` files once.
+## Expected Verification Output
 
-## Verify
+`sbctl verify` may still report Limine-managed kernel copies as unsigned:
 
-After installing, check:
-
-```sh
-sudo sbctl verify
+```text
+/boot/<machine-id>/linux-cachyos/vmlinuz-linux-cachyos is not signed
 ```
 
-All listed EFI and kernel images should be signed before Secure Boot is enabled
-in firmware.
+That is expected for this setup. Limine validates those files using the hashes
+in `limine.conf`.
 
-## Manual Limine Updates
+The important checks are:
 
-Pacman hooks only run during pacman transactions. If `limine-update` is run
-manually, sign again afterwards:
+```sh
+sudo limine-snapper-info
+```
+
+which should report:
+
+```text
+Corrupted files   : 0
+```
+
+and the helper's own hash check:
+
+```text
+Verified <n> Limine file hashes
+```
+
+## Manual Update Order
+
+After changing Limine config or kernel/initramfs inputs:
 
 ```sh
 sudo limine-update
-sudo /usr/local/bin/sign-secureboot-bootfiles
-sudo sbctl verify
+sudo limine-snapper-sync
+sudo limine-snapper-info
 ```
 
-## Notes
-
-For ASUS and Gigabyte boards, enroll keys with Microsoft support but without
-firmware builtin keys:
+If Secure Boot keys need to be enrolled, include Microsoft keys so Windows
+continues to boot:
 
 ```sh
 sudo sbctl enroll-keys --microsoft
 ```
-
-Avoid `--firmware-builtin` on those boards because it can recreate duplicate
-firmware key entries.
