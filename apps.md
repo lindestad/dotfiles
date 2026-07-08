@@ -173,3 +173,4 @@ These are not package installs, but the installers manage them alongside the too
 | Windows Terminal | not managed | Git Bash profile/default configured when settings exist |
 | Yazi | symlinked | linked/copied |
 | Zsh | symlinked | not linked |
+| zsh-patina | config symlinked | not managed |

@@ -22,6 +22,7 @@ add_common_cli_links() {
     "$DOTFILES_DIR/config/tealdeer/config.toml|$HOME/.config/tealdeer/config.toml"
     "$DOTFILES_DIR/config/yazi|$HOME/.config/yazi"
     "$DOTFILES_DIR/config/zellij|$HOME/.config/zellij"
+    "$DOTFILES_DIR/config/zsh-patina/config.toml|$HOME/.config/zsh-patina/config.toml"
   )
 }
 
