@@ -35,32 +35,50 @@ if (( target_idx < 1 )); then
   exit 0
 fi
 
+mapfile -t active_outputs < <(
+  jq -r '.[] | select(.is_active == true) | .output' <<<"$workspaces"
+)
+
+for output in "${active_outputs[@]}"; do
+  if ! jq -e --arg output "$output" --argjson target_idx "$target_idx" \
+    '.[] | select(.output == $output and .idx == $target_idx)' \
+    <<<"$workspaces" >/dev/null; then
+    exit 0
+  fi
+done
+
+active_idx_for() {
+  niri msg -j workspaces \
+    | jq -r --arg output "$1" '.[] | select(.output == $output and .is_active == true) | .idx'
+}
+
 restore_focus() {
   niri msg action focus-monitor "$focused_output" >/dev/null 2>&1 || true
 }
 trap restore_focus EXIT
 
-while IFS=$'\t' read -r output active_idx; do
+for output in "${active_outputs[@]}"; do
   [[ -n "$output" ]] || continue
   niri msg action focus-monitor "$output" >/dev/null || continue
 
-  if niri msg action focus-workspace "$target_idx" >/dev/null 2>&1; then
-    continue
-  fi
+  for _ in {1..20}; do
+    active_idx="$(active_idx_for "$output")"
+    [[ -n "$active_idx" ]] || break
 
-  while (( active_idx < target_idx )); do
-    niri msg action focus-workspace-down >/dev/null
-    active_idx=$((active_idx + 1))
-  done
+    if (( active_idx == target_idx )); then
+      break
+    elif (( active_idx < target_idx )); then
+      niri msg action focus-workspace-down >/dev/null
+    else
+      niri msg action focus-workspace-up >/dev/null
+    fi
 
-  while (( active_idx > target_idx )); do
-    niri msg action focus-workspace-up >/dev/null
-    active_idx=$((active_idx - 1))
+    next_idx="$(active_idx_for "$output")"
+    if [[ -z "$next_idx" || "$next_idx" == "$active_idx" ]]; then
+      break
+    fi
   done
-done < <(
-  jq -r '.[] | select(.is_active == true) | [.output, .idx] | @tsv' \
-    <<<"$workspaces"
-)
+done
 
 restore_focus
 trap - EXIT
