@@ -52,6 +52,8 @@ The helper:
 - sets `ENABLE_VERIFICATION=yes`;
 - runs `limine-update`;
 - runs `limine-snapper-sync` when available;
+- adds or refreshes hashes for `wallpaper: boot():/...` entries;
+- re-enrolls the Limine config checksum;
 - verifies every `boot():/...#hash` entry in `limine.conf`.
 
 ## Expected Verification Output

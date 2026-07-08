@@ -119,12 +119,55 @@ verify_limine_hashes() {
   echo "-> Verified $count Limine file hashes"
 }
 
+hash_limine_wallpapers() {
+  local esp="$1"
+  local conf="${esp}/limine.conf"
+  local tmp
+  local changed=0
+  local line prefix rel suffix rest file hash
+
+  have b2sum || die "b2sum is required"
+  [[ -f "$conf" ]] || die "$conf does not exist"
+
+  tmp="$(mktemp)"
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    if [[ "$line" =~ ^([[:space:]]*wallpaper:[[:space:]]*)boot\(\):([^[:space:]#]+)(#[[:xdigit:]]+)?(.*)$ ]]; then
+      prefix="${BASH_REMATCH[1]}"
+      rel="${BASH_REMATCH[2]}"
+      suffix="${BASH_REMATCH[3]}"
+      rest="${BASH_REMATCH[4]}"
+      file="${esp}${rel}"
+
+      if [[ -f "$file" ]]; then
+        hash="$(b2sum "$file" | awk '{ print $1 }')"
+        if [[ "$suffix" != "#${hash}" ]]; then
+          line="${prefix}boot():${rel}#${hash}${rest}"
+          changed=1
+        fi
+      else
+        echo ">> Wallpaper file not found, leaving unchanged: boot():${rel}" >&2
+      fi
+    fi
+
+    printf '%s\n' "$line" >>"$tmp"
+  done <"$conf"
+
+  if ((changed != 0)); then
+    install -m 0644 "$tmp" "$conf"
+    echo "-> Added or refreshed Limine wallpaper hashes"
+  else
+    echo "-> Limine wallpaper hashes are current"
+  fi
+  rm -f "$tmp"
+}
+
 if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
   die "run with sudo: sudo $0"
 fi
 
 have sbctl || die "sbctl is required"
 have limine-update || die "limine-update is required"
+have limine-enroll-config || die "limine-enroll-config is required"
 
 echo "==> Disabling unsafe legacy signing hook, if present"
 backup_move "$unsafe_hook_path" "legacy pacman hook"
@@ -144,7 +187,15 @@ if have limine-snapper-sync; then
   limine-snapper-sync
 fi
 
-verify_limine_hashes "$(esp_path)"
+esp="$(esp_path)"
+
+echo "==> Hashing Limine theme assets"
+hash_limine_wallpapers "$esp"
+
+echo "==> Enrolling Limine config checksum"
+limine-enroll-config
+
+verify_limine_hashes "$esp"
 
 if have limine-snapper-info; then
   echo "==> Snapshot file check"
