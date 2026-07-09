@@ -11,5 +11,6 @@
 // Keep hardware-specific renderer/workaround settings local.
 // debug {
 //     render-drm-device "/dev/dri/renderD129"
+//     // Diagnostic/performance workaround only; can add pointer latency.
 //     wait-for-frame-completion-before-queueing
 // }

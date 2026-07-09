@@ -14,7 +14,10 @@ input {
         natural-scroll
     }
 
-    mouse
+    mouse {
+        accel-profile "flat"
+        accel-speed -0.5
+    }
     trackpoint
 }
 
