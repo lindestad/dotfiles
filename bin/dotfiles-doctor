@@ -134,6 +134,43 @@ check_helper() {
   fi
 }
 
+git_config_path_key() {
+  case "$1" in
+    core.excludesfile|commit.template|gpg.ssh.allowedsignersfile|include.path|includeif.*.path) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+normalize_git_config_path() {
+  local path="$1"
+
+  case "$path" in
+    \~) path="$HOME" ;;
+    \~/*) path="$HOME/${path:2}" ;;
+  esac
+
+  if [[ "$path" == /* ]] && readlink -m "$path" >/dev/null 2>&1; then
+    readlink -m "$path"
+  else
+    printf '%s\n' "$path"
+  fi
+}
+
+git_config_values_match() {
+  local key="$1" desired="$2" current="$3"
+
+  if [[ "$current" == "$desired" ]]; then
+    return 0
+  fi
+
+  if git_config_path_key "$key"; then
+    [[ "$(normalize_git_config_path "$current")" == "$(normalize_git_config_path "$desired")" ]]
+    return
+  fi
+
+  return 1
+}
+
 check_git_config() {
   local src="$DOTFILES_DIR/config/git/gitconfig"
   local entry key desired current had_issue="no"
@@ -155,7 +192,7 @@ check_git_config() {
     if [[ -z "$current" ]]; then
       warn "$HOME/.gitconfig is missing $key=$desired"
       had_issue="yes"
-    elif [[ "$current" != "$desired" ]]; then
+    elif ! git_config_values_match "$key" "$desired" "$current"; then
       if [[ "$key" == "user.signingkey" ]]; then
         info "$HOME/.gitconfig has custom $key=$current"
         continue
