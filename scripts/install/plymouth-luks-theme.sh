@@ -159,7 +159,7 @@ print_install_plan() {
   echo "-> Pinned commit: $repo_ref"
   echo "-> Target theme: $theme_dst"
   echo "-> Plymouth theme: $theme_name"
-  echo "-> Animation: hexagon frames converted to two-step throbber frames"
+  echo "-> Animation: hexagon frames drawn by a script LUKS prompt"
   if [[ -n "$scale" ]]; then
     echo "-> Plymouth DeviceScale: $scale"
   else
@@ -241,68 +241,15 @@ write_theme_metadata() {
   cat >"$metadata_path" <<EOF
 [Plymouth Theme]
 Name=$theme_name
-Description=hexagon_alt animation with Plymouth two-step LUKS prompt
+Description=hexagon_alt animation with a script LUKS prompt
 Comment=hexagon_alt assets from adi1090x/plymouth-themes, installed from $repo_url at $repo_ref
-ModuleName=two-step
+ModuleName=script
 
-[two-step]
+[script]
 Font=Noto Sans 14
-TitleFont=Noto Sans Light 30
 MonospaceFont=Noto Sans Mono 18
 ImageDir=$theme_dst
-DialogHorizontalAlignment=.5
-DialogVerticalAlignment=.68
-TitleHorizontalAlignment=.5
-TitleVerticalAlignment=.382
-HorizontalAlignment=.5
-VerticalAlignment=.42
-WatermarkHorizontalAlignment=.5
-WatermarkVerticalAlignment=.96
-Transition=none
-TransitionDuration=0.0
-BackgroundStartColor=0x000000
-BackgroundEndColor=0x000000
-MessageBelowAnimation=true
-
-[boot-up]
-UseAnimation=true
-UseEndAnimation=false
-
-[shutdown]
-UseAnimation=true
-UseEndAnimation=false
-
-[reboot]
-UseAnimation=true
-UseEndAnimation=false
-
-[updates]
-SuppressMessages=true
-ProgressBarShowPercentComplete=true
-UseProgressBar=true
-Title=Installing Updates...
-SubTitle=Do not turn off your computer
-
-[system-upgrade]
-SuppressMessages=true
-ProgressBarShowPercentComplete=true
-UseProgressBar=true
-Title=Upgrading System...
-SubTitle=Do not turn off your computer
-
-[firmware-upgrade]
-SuppressMessages=true
-ProgressBarShowPercentComplete=true
-UseProgressBar=true
-Title=Upgrading Firmware...
-SubTitle=Do not turn off your computer
-
-[system-reset]
-SuppressMessages=true
-ProgressBarShowPercentComplete=true
-UseProgressBar=true
-Title=Resetting System...
-SubTitle=Do not turn off your computer
+ScriptFile=$theme_dst/$theme_name.script
 EOF
 }
 
@@ -310,34 +257,224 @@ copy_prompt_assets() {
   local src_dir="/usr/share/plymouth/themes/spinner"
   local asset
 
-  for asset in entry.png bullet.png lock.png capslock.png keyboard.png keymap-render.png; do
-    [[ -f "$src_dir/$asset" ]] || die "required two-step prompt asset not found: $src_dir/$asset"
+  for asset in bullet.png capslock.png; do
+    [[ -f "$src_dir/$asset" ]] || die "required prompt asset not found: $src_dir/$asset"
     install -m 0644 "$src_dir/$asset" "$theme_dst/$asset"
   done
 }
 
-prepare_two_step_animation() {
+write_theme_script() {
+  local script_path="$theme_dst/$theme_name.script"
+
+  cat >"$script_path" <<'EOF'
+Window.SetBackgroundTopColor(0, 0, 0);
+Window.SetBackgroundBottomColor(0, 0, 0);
+
+screen.index = 0;
+screen.logo.y.factor = 0.42;
+screen.prompt.gap = 44;
+screen.bullet.gap = 18;
+
+frame.count = 119;
+for (i = 0; i < frame.count; i++)
+  hex.image[i] = Image("progress-" + i + ".png");
+
+hex.sprite = Sprite();
+hex.sprite.SetZ(10);
+
+bullet.image = Image("bullet.png");
+caps.image = Image("capslock.png");
+caps.sprite = Sprite(caps.image);
+caps.sprite.SetZ(23);
+caps.sprite.SetOpacity(0);
+
+prompt = null;
+question = null;
+answer = null;
+bullets = null;
+message = null;
+progress = 0;
+prompt.active = 0;
+question.active = 0;
+
+fun UpdateScreen()
+{
+    screen.x = Window.GetX(screen.index);
+    screen.y = Window.GetY(screen.index);
+    screen.w = Window.GetWidth(screen.index);
+    screen.h = Window.GetHeight(screen.index);
+    screen.center.x = screen.x + screen.w / 2;
+    screen.logo.center.y = screen.y + screen.h * screen.logo.y.factor;
+}
+
+fun PositionHex()
+{
+    hex.current = hex.image[Math.Int(progress / 2) % frame.count];
+    hex.sprite.SetImage(hex.current);
+    hex.sprite.SetX(screen.center.x - hex.current.GetWidth() / 2);
+    hex.sprite.SetY(screen.logo.center.y - hex.current.GetHeight() / 2);
+    hex.bottom = screen.logo.center.y + hex.current.GetHeight() / 2;
+}
+
+fun PromptY()
+{
+    return hex.bottom + screen.prompt.gap;
+}
+
+fun ClearPrompt()
+{
+    prompt = null;
+    bullets = null;
+    prompt.active = 0;
+    caps.sprite.SetOpacity(0);
+}
+
+fun ClearQuestion()
+{
+    question = null;
+    answer = null;
+    question.active = 0;
+}
+
+fun ClearMessage()
+{
+    message = null;
+}
+
+fun DrawCapsLock(base_y)
+{
+    if (Plymouth.GetCapslockState()) {
+        caps.sprite.SetX(screen.center.x - caps.image.GetWidth() / 2);
+        caps.sprite.SetY(base_y + bullet.image.GetHeight() + 12);
+        caps.sprite.SetOpacity(1);
+    } else {
+        caps.sprite.SetOpacity(0);
+    }
+}
+
+fun PositionBullets(count, base_y)
+{
+    total.width = count * bullet.image.GetWidth();
+    start.x = screen.center.x - total.width / 2;
+
+    for (i = 0; bullets[i]; i++) {
+        bullets[i].sprite.SetX(start.x + i * bullet.image.GetWidth());
+        bullets[i].sprite.SetY(base_y);
+    }
+}
+
+fun DrawBullets(count, base_y)
+{
+    bullets = null;
+    prompt.bullet.count = count;
+
+    for (i = 0; i < count; i++) {
+        bullets[i].sprite = Sprite(bullet.image);
+        bullets[i].sprite.SetZ(22);
+    }
+
+    PositionBullets(count, base_y);
+}
+
+fun DisplayPasswordCallback(text, count)
+{
+    ClearQuestion();
+    ClearPrompt();
+
+    if (!text || text == "")
+        text = "Enter Password";
+
+    prompt.image = Image.Text(text, 1, 1, 1, 1, "Noto Sans 14", "center");
+    prompt.sprite = Sprite(prompt.image);
+    prompt.sprite.SetZ(21);
+    prompt.sprite.SetX(screen.center.x - prompt.image.GetWidth() / 2);
+    prompt.sprite.SetY(PromptY());
+    prompt.active = 1;
+
+    bullet.y = prompt.sprite.GetY() + prompt.image.GetHeight() + screen.bullet.gap;
+    DrawBullets(count, bullet.y);
+    DrawCapsLock(bullet.y);
+}
+Plymouth.SetDisplayPasswordFunction(DisplayPasswordCallback);
+
+fun DisplayQuestionCallback(text, entry)
+{
+    ClearPrompt();
+    ClearQuestion();
+
+    if (!entry || entry == "")
+        entry = "<answer>";
+
+    question.image = Image.Text(text, 1, 1, 1, 1, "Noto Sans 14", "center");
+    question.sprite = Sprite(question.image);
+    question.sprite.SetZ(21);
+    question.sprite.SetX(screen.center.x - question.image.GetWidth() / 2);
+    question.sprite.SetY(PromptY());
+
+    answer.image = Image.Text(entry, 1, 1, 1, 1, "Noto Sans 14", "center");
+    answer.sprite = Sprite(answer.image);
+    answer.sprite.SetZ(22);
+    answer.sprite.SetX(screen.center.x - answer.image.GetWidth() / 2);
+    answer.sprite.SetY(question.sprite.GetY() + question.image.GetHeight() + screen.bullet.gap);
+    question.active = 1;
+}
+Plymouth.SetDisplayQuestionFunction(DisplayQuestionCallback);
+
+fun DisplayNormalCallback()
+{
+    ClearPrompt();
+    ClearQuestion();
+}
+Plymouth.SetDisplayNormalFunction(DisplayNormalCallback);
+
+fun DisplayMessageCallback(text)
+{
+    message.image = Image.Text(text, 1, 1, 1, 1, "Noto Sans 12", "center");
+    message.sprite = Sprite(message.image);
+    message.sprite.SetZ(30);
+    message.sprite.SetX(screen.center.x - message.image.GetWidth() / 2);
+    message.sprite.SetY(screen.y + message.image.GetHeight());
+}
+Plymouth.SetDisplayMessageFunction(DisplayMessageCallback);
+
+fun HideMessageCallback(text)
+{
+    ClearMessage();
+}
+Plymouth.SetHideMessageFunction(HideMessageCallback);
+
+fun RefreshCallback()
+{
+    UpdateScreen();
+    PositionHex();
+    progress++;
+
+    if (prompt.active) {
+        prompt.sprite.SetX(screen.center.x - prompt.image.GetWidth() / 2);
+        prompt.sprite.SetY(PromptY());
+        bullet.y = prompt.sprite.GetY() + prompt.image.GetHeight() + screen.bullet.gap;
+        PositionBullets(prompt.bullet.count, bullet.y);
+        DrawCapsLock(bullet.y);
+    }
+}
+Plymouth.SetRefreshRate(30);
+Plymouth.SetRefreshFunction(RefreshCallback);
+
+UpdateScreen();
+PositionHex();
+EOF
+}
+
+validate_theme_assets() {
   local frames=()
-  local frame
-  local index=1
-  local target
 
   mapfile -t frames < <(
     find "$theme_src" -maxdepth 1 -type f -name 'progress-*.png' -printf '%f\n' |
       sort -V
   )
   ((${#frames[@]} > 0)) || die "theme animation frames not found: $theme_src/progress-*.png"
-
-  find "$theme_dst" -maxdepth 1 -type f -name 'progress-*.png' -delete
-  find "$theme_dst" -maxdepth 1 -type f -name 'throbber-*.png' -delete
-
-  for frame in "${frames[@]}"; do
-    target="$(printf 'throbber-%04d.png' "$index")"
-    install -m 0644 "$theme_src/$frame" "$theme_dst/$target"
-    index=$((index + 1))
-  done
-
-  echo "-> Prepared $((index - 1)) hexagon throbber frames"
+  ((${#frames[@]} == 119)) || die "expected 119 hexagon frames, found ${#frames[@]}"
+  echo "-> Prepared ${#frames[@]} hexagon script frames"
 }
 
 usage() {
@@ -345,7 +482,7 @@ usage() {
 Usage: $(basename "$0") [scale]
        $(basename "$0") [--yes] [scale]
 
-Installs a two-step Plymouth theme using the hexagon_alt animation, optionally
+Installs a script Plymouth theme using the hexagon_alt animation, optionally
 sets Plymouth DeviceScale, and rebuilds the Limine or mkinitcpio boot image.
 
 Arguments:
@@ -382,7 +519,7 @@ fi
 
 [[ -z "$scale" || "$scale" =~ ^[1-9][0-9]*$ ]] || die "scale must be a positive integer"
 have git || die "git is required"
-[[ -e /usr/lib/plymouth/two-step.so ]] || die "Plymouth two-step plugin is not installed"
+[[ -e /usr/lib/plymouth/script.so ]] || die "Plymouth script plugin is not installed"
 
 detect_boot_environment
 print_install_plan
@@ -408,7 +545,8 @@ fi
 install -d -m 0755 "$theme_dst"
 cp -a "$theme_src/." "$theme_dst/"
 copy_prompt_assets
-prepare_two_step_animation
+validate_theme_assets
+write_theme_script
 write_theme_metadata
 
 echo "==> Setting Plymouth theme: $theme_name"

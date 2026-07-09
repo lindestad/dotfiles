@@ -4,9 +4,9 @@ This setup uses the `hexagon_alt` animation assets from a pinned fork of
 `adi1090x/plymouth-themes` for the graphical LUKS unlock prompt on CachyOS.
 
 The installed theme is generated locally as `hexagon_alt_twostep`. It uses
-Plymouth's stock `two-step` plugin for the LUKS prompt, so prompt centering,
-multi-display layout, keyboard layout, and Caps Lock handling come from
-Plymouth's maintained implementation instead of a custom script callback.
+Plymouth's script plugin so the hexagon animation stays visible while the LUKS
+password prompt is shown. The script uses the primary Plymouth display for all
+layout math and draws a small custom prompt below the animation.
 
 ## Install
 
@@ -39,14 +39,12 @@ The helper:
   `5d8817458d764bff4ff9daae94cf1bbaabf16ede`;
 - installs the generated theme to
   `/usr/share/plymouth/themes/hexagon_alt_twostep`;
-- writes two-step theme metadata around the hexagon animation assets;
-- converts the upstream `progress-*.png` hexagon frames to `throbber-*.png`
-  frames and removes the copied `progress-*.png` files from the generated
-  two-step theme, so Plymouth shows the hexagon as the continuous waiting
-  animation instead of a static progress overlay;
+- writes script theme metadata around the hexagon animation assets;
+- keeps the upstream `progress-*.png` hexagon frames and validates that the
+  pinned source still has the expected 119 animation frames;
 - copies Plymouth's stock prompt assets from the installed `spinner` theme:
-  `entry.png`, `bullet.png`, `lock.png`, `capslock.png`, `keyboard.png`, and
-  `keymap-render.png`;
+  `bullet.png` for typed password dots and `capslock.png` for the Caps Lock
+  warning;
 - declares `Noto Sans` / `Noto Sans Mono` in the generated metadata so the
   mkinitcpio Plymouth hook packs those fonts into the initramfs;
 - writes `/etc/plymouth/plymouthd.conf` with `Theme=hexagon_alt_twostep` and
@@ -73,9 +71,9 @@ The mkinitcpio config must include the `plymouth` hook before `sd-encrypt`.
 The kernel command line must include `splash`.
 
 Plymouth needs a font in the initramfs for prompt labels and console text. This
-theme uses `Noto Sans` and `Noto Sans Mono`, which have reliable coverage for
-the stock prompt text and bullet dot. On CachyOS/Arch, keep `noto-fonts`
-installed:
+theme uses `Noto Sans` and `Noto Sans Mono` for text. Password dots are drawn
+from Plymouth's stock `bullet.png`, so they do not depend on a special glyph in
+the prompt font. On CachyOS/Arch, keep `noto-fonts` installed:
 
 ```sh
 pacman -Q noto-fonts
@@ -95,118 +93,51 @@ Plymouth metadata at install time.
 
 The stock CachyOS LUKS prompt is a `two-step` Plymouth theme. Its C plugin
 creates a separate view per pixel display and computes prompt placement from
-that display's own width and height.
+that display's own width and height. That is why the default LUKS prompt centers
+correctly.
 
 The upstream `hexagon_alt` theme is a script theme with one global sprite
-coordinate space. That is the source of the display-centering problems this
-setup avoids by generating a `two-step` theme instead.
+coordinate space. Its original script mixed `Window.GetWidth(0)` /
+`Window.GetHeight(0)` with unindexed `Window.GetX()` / `Window.GetY()`, which
+can center the prompt against the wrong display bounds on multi-display boots.
 
-Plymouth's `two-step` plugin treats `throbber-*.png` as the continuous waiting
-animation and `progress-*.png` as an optional progress-driven overlay. The
-installer therefore maps the hexagon frames to `throbber-*.png` and removes the
-`progress-*.png` copies from the generated theme.
+The generated script uses `Window.GetX(0)`, `Window.GetY(0)`,
+`Window.GetWidth(0)`, and `Window.GetHeight(0)` consistently. The hexagon is
+centered on display 0 at 42% of the display height, and the prompt is drawn
+below it.
 
-The prompt dialog is placed below the hexagon with `DialogVerticalAlignment=.68`
-while the hexagon itself is kept above center with `VerticalAlignment=.42`.
+Plymouth's stock `two-step` plugin cannot keep the animation visible during
+password entry. Its password callback stops the animation, and its password draw
+path only draws the prompt widgets. This is why the installer uses the script
+plugin instead of trying to combine `two-step` with the hexagon animation.
 
 ## Caps Lock
 
 The stock `two-step` prompt shows Caps Lock by using Plymouth's internal
-`ply-capslock-icon` helper, which polls renderer caps-lock state and draws
-`capslock.png` near the prompt. Because this setup now uses `two-step`, the
-Caps Lock warning comes from Plymouth itself.
+`ply-capslock-icon` helper. Script themes cannot reuse that helper directly,
+but Plymouth exposes `Plymouth.GetCapslockState()` to scripts. The generated
+theme polls that state during refresh and shows the stock `capslock.png` below
+the password dots when Caps Lock is active.
 
 ## Manual Equivalent
 
+The installer is the canonical manual recipe. In outline, it fetches the pinned
+`pack_2/hexagon_alt` source, copies it to
+`/usr/share/plymouth/themes/hexagon_alt_twostep`, adds `bullet.png` and
+`capslock.png` from Plymouth's spinner theme, writes a generated
+`hexagon_alt_twostep.script`, writes metadata with `ModuleName=script`, sets
+`Theme=hexagon_alt_twostep`, and rebuilds the boot images.
+
+Use the helper instead of hand-copying files so the Secure Boot/Limine detection
+and refresh path stays consistent:
+
 ```sh
-tmp="$(mktemp -d)"
-git clone --filter=blob:none --sparse --no-checkout \
-  https://github.com/lindestad/plymouth-themes.git "$tmp/plymouth-themes"
-git -C "$tmp/plymouth-themes" sparse-checkout set pack_2/hexagon_alt
-git -C "$tmp/plymouth-themes" fetch --depth 1 origin \
-  5d8817458d764bff4ff9daae94cf1bbaabf16ede
-git -C "$tmp/plymouth-themes" checkout --detach \
-  5d8817458d764bff4ff9daae94cf1bbaabf16ede
-
-sudo rm -rf /usr/share/plymouth/themes/hexagon_alt_twostep
-sudo install -d -m 0755 /usr/share/plymouth/themes/hexagon_alt_twostep
-sudo cp -r "$tmp/plymouth-themes/pack_2/hexagon_alt/." \
-  /usr/share/plymouth/themes/hexagon_alt_twostep/
-sudo cp /usr/share/plymouth/themes/spinner/{entry,bullet,lock,capslock,keyboard,keymap-render}.png \
-  /usr/share/plymouth/themes/hexagon_alt_twostep/
-sudo find /usr/share/plymouth/themes/hexagon_alt_twostep \
-  -maxdepth 1 -type f -name 'progress-*.png' -delete
-i=1
-find "$tmp/plymouth-themes/pack_2/hexagon_alt" \
-  -maxdepth 1 -type f -name 'progress-*.png' -printf '%f\n' |
-  sort -V |
-  while IFS= read -r frame; do
-    sudo install -m 0644 \
-      "$tmp/plymouth-themes/pack_2/hexagon_alt/$frame" \
-      "/usr/share/plymouth/themes/hexagon_alt_twostep/throbber-$(printf '%04d' "$i").png"
-    i=$((i + 1))
-  done
-
-sudo tee /usr/share/plymouth/themes/hexagon_alt_twostep/hexagon_alt_twostep.plymouth >/dev/null <<'EOF'
-[Plymouth Theme]
-Name=hexagon_alt_twostep
-Description=hexagon_alt animation with Plymouth two-step LUKS prompt
-Comment=hexagon_alt assets from adi1090x/plymouth-themes
-ModuleName=two-step
-
-[two-step]
-Font=Noto Sans 14
-TitleFont=Noto Sans Light 30
-MonospaceFont=Noto Sans Mono 18
-ImageDir=/usr/share/plymouth/themes/hexagon_alt_twostep
-DialogHorizontalAlignment=.5
-DialogVerticalAlignment=.68
-TitleHorizontalAlignment=.5
-TitleVerticalAlignment=.382
-HorizontalAlignment=.5
-VerticalAlignment=.42
-WatermarkHorizontalAlignment=.5
-WatermarkVerticalAlignment=.96
-Transition=none
-TransitionDuration=0.0
-BackgroundStartColor=0x000000
-BackgroundEndColor=0x000000
-MessageBelowAnimation=true
-
-[boot-up]
-UseAnimation=true
-UseEndAnimation=false
-
-[shutdown]
-UseAnimation=true
-UseEndAnimation=false
-
-[reboot]
-UseAnimation=true
-UseEndAnimation=false
-EOF
-
-sudo cp -a /etc/plymouth/plymouthd.conf \
-  "/etc/plymouth/plymouthd.conf.bak.$(date +%Y%m%d-%H%M%S)"
-sudo tee /etc/plymouth/plymouthd.conf >/dev/null <<'EOF'
-[Daemon]
-Theme=hexagon_alt_twostep
-EOF
-
-sudo limine-mkinitcpio
-command -v limine-snapper-sync >/dev/null && sudo limine-snapper-sync
-
-# If Secure Boot, Limine verification, or Limine config enrollment is active:
-command -v refresh-limine-secureboot-assets >/dev/null && \
-  sudo refresh-limine-secureboot-assets --refresh-assets-only
-
-command -v limine-snapper-info >/dev/null && sudo limine-snapper-info
+sudo ./scripts/install/plymouth-luks-theme.sh
 ```
 
-If Limine is not installed, use `sudo mkinitcpio -P` instead of
-the Limine commands. If the Secure Boot refresh helper is missing on a machine
-with Secure Boot or Limine verification enabled, refresh Limine hashes and
-config enrollment manually before rebooting.
+If Limine is not installed, the helper falls back to `mkinitcpio -P`. If Secure
+Boot, Limine verification, or Limine config enrollment appears to be enabled, it
+prints the needed refresh plan before asking for confirmation.
 
 ## Recovery
 
