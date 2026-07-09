@@ -263,6 +263,8 @@ check_niri() {
   check_helper niri-move-window-or-workspace
   check_helper niri-screenshot-region
   check_helper noctalia-activate-notification
+  check_helper zen-url-handler
+  check_zen_url_handler
 
   if [[ -f "$HOME/.config/niri/local.kdl" ]]; then
     info "niri local config present: ~/.config/niri/local.kdl"
@@ -280,6 +282,38 @@ check_niri() {
     warn "niri is installed, but ~/.config/niri/config.kdl is missing"
   else
     info "niri is not installed; skipping niri validation"
+  fi
+}
+
+check_zen_url_handler() {
+  local desktop_file="$HOME/.local/share/applications/zen-url-handler.desktop"
+  local expected_http="zen-url-handler.desktop"
+  local current_http=""
+  local current_https=""
+
+  if [[ ! -f "$desktop_file" ]]; then
+    warn "Zen URL desktop handler is not installed: $desktop_file"
+    return
+  fi
+
+  if have desktop-file-validate; then
+    if desktop-file-validate "$desktop_file" >/dev/null 2>&1; then
+      ok "Zen URL desktop handler validates"
+    else
+      warn "Zen URL desktop handler does not validate"
+    fi
+  fi
+
+  if have xdg-mime; then
+    current_http="$(xdg-mime query default x-scheme-handler/http 2>/dev/null || true)"
+    current_https="$(xdg-mime query default x-scheme-handler/https 2>/dev/null || true)"
+    if [[ "$current_http" == "$expected_http" && "$current_https" == "$expected_http" ]]; then
+      ok "Zen URL handler is default for http/https"
+    else
+      warn "http/https defaults are $current_http/$current_https; expected $expected_http"
+    fi
+  else
+    warn "xdg-mime is not installed; cannot inspect browser defaults"
   fi
 }
 

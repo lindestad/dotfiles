@@ -84,6 +84,7 @@ install_dotfiles_helpers() {
   local helper
   local helpers=(
     dotfiles-doctor
+    zen-url-handler
   )
 
   for helper in "${helpers[@]}"; do
@@ -95,6 +96,77 @@ install_dotfiles_helpers() {
     install -m 0755 "$DOTFILES_DIR/bin/$helper" "$HOME/.local/bin/$helper"
     echo "-> Installed dotfiles helper: ~/.local/bin/$helper"
   done
+}
+
+zen_browser_available() {
+  if have flatpak && flatpak info app.zen_browser.zen >/dev/null 2>&1; then
+    return 0
+  fi
+  have zen-browser || have zen
+}
+
+install_zen_browser_url_handler() {
+  ensure_local_bin
+
+  local helper_src="$DOTFILES_DIR/bin/zen-url-handler"
+  local helper_dst="$HOME/.local/bin/zen-url-handler"
+  local applications_dir="$HOME/.local/share/applications"
+  local desktop_file="$applications_dir/zen-url-handler.desktop"
+
+  if [[ ! -f "$helper_src" ]]; then
+    echo "!! Missing Zen URL helper: $helper_src"
+    return
+  fi
+
+  install -m 0755 "$helper_src" "$helper_dst"
+  mkdir -p "$applications_dir"
+  cat >"$desktop_file" <<EOF
+[Desktop Entry]
+Name=Zen Browser URL Handler
+Comment=Open links in Zen Browser
+Exec=$helper_dst %u
+Icon=app.zen_browser.zen
+Type=Application
+MimeType=text/html;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;
+StartupNotify=true
+NoDisplay=true
+Terminal=false
+Categories=Network;WebBrowser;
+EOF
+  echo "-> Installed Zen URL desktop handler: ~/.local/share/applications/zen-url-handler.desktop"
+
+  if have desktop-file-validate; then
+    desktop-file-validate "$desktop_file" || return
+  fi
+
+  if have update-desktop-database; then
+    update-desktop-database "$applications_dir" || true
+  fi
+
+  if ! zen_browser_available; then
+    echo ">> Zen Browser not detected; leaving browser defaults unchanged."
+    return
+  fi
+
+  if ! have xdg-mime; then
+    echo ">> xdg-mime not found; cannot set Zen URL defaults."
+    return
+  fi
+
+  xdg-mime default zen-url-handler.desktop x-scheme-handler/http
+  xdg-mime default zen-url-handler.desktop x-scheme-handler/https
+  xdg-mime default zen-url-handler.desktop text/html
+  xdg-mime default zen-url-handler.desktop application/xhtml+xml
+
+  if have xdg-settings; then
+    xdg-settings set default-web-browser zen-url-handler.desktop || true
+  fi
+
+  if have update-desktop-database; then
+    update-desktop-database "$applications_dir" || true
+  fi
+
+  echo "-> Set Zen URL handler as default browser for links."
 }
 
 ensure_shell_shims() {

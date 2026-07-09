@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+desktop_id="${ZEN_DESKTOP_ID:-app.zen_browser.zen}"
+
+if command -v gtk-launch >/dev/null 2>&1; then
+  if gtk-launch "$desktop_id" "$@"; then
+    exit 0
+  fi
+fi
+
+if command -v flatpak >/dev/null 2>&1 && flatpak info app.zen_browser.zen >/dev/null 2>&1; then
+  exec flatpak run app.zen_browser.zen "$@"
+fi
+
+for browser in zen-browser zen; do
+  if command -v "$browser" >/dev/null 2>&1; then
+    exec "$browser" "$@"
+  fi
+done
+
+echo "zen-url-handler: Zen Browser is not installed or not available on PATH" >&2
+exit 127
