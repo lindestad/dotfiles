@@ -1,11 +1,12 @@
 # Plymouth LUKS Theme
 
-This setup uses the `hexagon_alt` Plymouth theme from
+This setup uses the `hexagon_alt` animation assets from a pinned fork of
 `adi1090x/plymouth-themes` for the graphical LUKS unlock prompt on CachyOS.
 
-The theme is intentionally simple at unlock time: it shows the hexagon
-animation in the center and Plymouth's script password callback near the
-bottom. It does not add an OS logo or extra branding.
+The installed theme is generated locally as `hexagon_alt_twostep`. It uses
+Plymouth's stock `two-step` plugin for the LUKS prompt, so prompt centering,
+multi-display layout, keyboard layout, and Caps Lock handling come from
+Plymouth's maintained implementation instead of a custom script callback.
 
 ## Install
 
@@ -15,7 +16,8 @@ Run from the repo root:
 sudo ./scripts/install/plymouth-luks-theme.sh
 ```
 
-The optional first argument sets Plymouth's integer `DeviceScale`:
+The optional first argument sets Plymouth's integer `DeviceScale`. By default,
+the helper leaves `DeviceScale` unset and lets Plymouth choose automatically:
 
 ```sh
 sudo ./scripts/install/plymouth-luks-theme.sh 2
@@ -23,12 +25,20 @@ sudo ./scripts/install/plymouth-luks-theme.sh 2
 
 The helper:
 
-- fetches only `pack_2/hexagon_alt` from `adi1090x/plymouth-themes`;
-- installs it to `/usr/share/plymouth/themes/hexagon_alt`;
-- patches the theme script to center the animation and password prompt
-  consistently and to use password bullet dots instead of `*`;
-- writes `/etc/plymouth/plymouthd.conf` with `Theme=hexagon_alt` and
-  `DeviceScale=2`;
+- fetches only `pack_2/hexagon_alt` from
+  `https://github.com/lindestad/plymouth-themes.git`;
+- pins the source checkout to commit
+  `5d8817458d764bff4ff9daae94cf1bbaabf16ede`;
+- installs the generated theme to
+  `/usr/share/plymouth/themes/hexagon_alt_twostep`;
+- writes two-step theme metadata around the hexagon animation assets;
+- copies Plymouth's stock prompt assets from the installed `spinner` theme:
+  `entry.png`, `bullet.png`, `lock.png`, `capslock.png`, `keyboard.png`, and
+  `keymap-render.png`;
+- declares `Noto Sans` / `Noto Sans Mono` in the generated metadata so the
+  mkinitcpio Plymouth hook packs those fonts into the initramfs;
+- writes `/etc/plymouth/plymouthd.conf` with `Theme=hexagon_alt_twostep` and
+  only writes `DeviceScale=` when a scale argument is provided;
 - rebuilds boot images with `limine-mkinitcpio` when available, otherwise
   falls back to `mkinitcpio -P`.
 
@@ -37,35 +47,102 @@ The helper:
 The mkinitcpio config must include the `plymouth` hook before `sd-encrypt`.
 The kernel command line must include `splash`.
 
-Plymouth script themes need a font in the initramfs for the password prompt.
-On CachyOS/Arch, keep at least one of these installed:
+Plymouth needs a font in the initramfs for prompt labels and console text. This
+theme uses `Noto Sans` and `Noto Sans Mono`, which have reliable coverage for
+the stock prompt text and bullet dot. On CachyOS/Arch, keep `noto-fonts`
+installed:
 
 ```sh
-pacman -Q cantarell-fonts ttf-dejavu
+pacman -Q noto-fonts
 ```
 
 Fonts are not copied manually into `/boot`. The mkinitcpio Plymouth hook
 resolves fonts with `fc-match` and packs them into the generated initramfs.
 
+## Source and License
+
+The upstream theme assets are GPLv3 and remain in their upstream fork instead
+of being vendored into this MIT-licensed dotfiles repository. The installer
+uses a pinned commit from the fork for reproducibility and generates local
+Plymouth metadata at install time.
+
+## Layout Notes
+
+The stock CachyOS LUKS prompt is a `two-step` Plymouth theme. Its C plugin
+creates a separate view per pixel display and computes prompt placement from
+that display's own width and height.
+
+The upstream `hexagon_alt` theme is a script theme with one global sprite
+coordinate space. That is the source of the display-centering problems this
+setup avoids by generating a `two-step` theme instead.
+
+## Caps Lock
+
+The stock `two-step` prompt shows Caps Lock by using Plymouth's internal
+`ply-capslock-icon` helper, which polls renderer caps-lock state and draws
+`capslock.png` near the prompt. Because this setup now uses `two-step`, the
+Caps Lock warning comes from Plymouth itself.
+
 ## Manual Equivalent
 
 ```sh
 tmp="$(mktemp -d)"
-git clone --depth 1 --filter=blob:none --sparse \
-  https://github.com/adi1090x/plymouth-themes.git "$tmp/plymouth-themes"
+git clone --filter=blob:none --sparse --no-checkout \
+  https://github.com/lindestad/plymouth-themes.git "$tmp/plymouth-themes"
 git -C "$tmp/plymouth-themes" sparse-checkout set pack_2/hexagon_alt
+git -C "$tmp/plymouth-themes" fetch --depth 1 origin \
+  5d8817458d764bff4ff9daae94cf1bbaabf16ede
+git -C "$tmp/plymouth-themes" checkout --detach \
+  5d8817458d764bff4ff9daae94cf1bbaabf16ede
 
-sudo rm -rf /usr/share/plymouth/themes/hexagon_alt
-sudo install -d -m 0755 /usr/share/plymouth/themes/hexagon_alt
+sudo rm -rf /usr/share/plymouth/themes/hexagon_alt_twostep
+sudo install -d -m 0755 /usr/share/plymouth/themes/hexagon_alt_twostep
 sudo cp -r "$tmp/plymouth-themes/pack_2/hexagon_alt/." \
-  /usr/share/plymouth/themes/hexagon_alt/
+  /usr/share/plymouth/themes/hexagon_alt_twostep/
+sudo cp /usr/share/plymouth/themes/spinner/{entry,bullet,lock,capslock,keyboard,keymap-render}.png \
+  /usr/share/plymouth/themes/hexagon_alt_twostep/
+
+sudo tee /usr/share/plymouth/themes/hexagon_alt_twostep/hexagon_alt_twostep.plymouth >/dev/null <<'EOF'
+[Plymouth Theme]
+Name=hexagon_alt_twostep
+Description=hexagon_alt animation with Plymouth two-step LUKS prompt
+Comment=hexagon_alt assets from adi1090x/plymouth-themes
+ModuleName=two-step
+
+[two-step]
+Font=Noto Sans 14
+TitleFont=Noto Sans Light 30
+MonospaceFont=Noto Sans Mono 18
+ImageDir=/usr/share/plymouth/themes/hexagon_alt_twostep
+DialogHorizontalAlignment=.5
+DialogVerticalAlignment=.382
+TitleHorizontalAlignment=.5
+TitleVerticalAlignment=.382
+HorizontalAlignment=.5
+VerticalAlignment=.5
+WatermarkHorizontalAlignment=.5
+WatermarkVerticalAlignment=.96
+Transition=none
+TransitionDuration=0.0
+BackgroundStartColor=0x000000
+BackgroundEndColor=0x000000
+MessageBelowAnimation=true
+
+[boot-up]
+UseEndAnimation=false
+
+[shutdown]
+UseEndAnimation=false
+
+[reboot]
+UseEndAnimation=false
+EOF
 
 sudo cp -a /etc/plymouth/plymouthd.conf \
   "/etc/plymouth/plymouthd.conf.bak.$(date +%Y%m%d-%H%M%S)"
 sudo tee /etc/plymouth/plymouthd.conf >/dev/null <<'EOF'
 [Daemon]
-Theme=hexagon_alt
-DeviceScale=2
+Theme=hexagon_alt_twostep
 EOF
 
 sudo limine-mkinitcpio

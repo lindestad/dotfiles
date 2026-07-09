@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo_url="https://github.com/adi1090x/plymouth-themes.git"
+repo_url="https://github.com/lindestad/plymouth-themes.git"
+repo_ref="5d8817458d764bff4ff9daae94cf1bbaabf16ede"
 repo_theme_path="pack_2/hexagon_alt"
-theme_name="hexagon_alt"
+theme_name="hexagon_alt_twostep"
 theme_dst="/usr/share/plymouth/themes/$theme_name"
-scale="2"
+scale=""
 ts="$(date +%Y%m%d-%H%M%S)"
 tmp_dir=""
 
@@ -25,135 +26,93 @@ cleanup() {
   [[ -z "$tmp_dir" ]] || rm -rf "$tmp_dir"
 }
 
-patch_theme_script() {
-  local script_path="$theme_dst/$theme_name.script"
+write_theme_metadata() {
+  local metadata_path="$theme_dst/$theme_name.plymouth"
 
-  cat >"$script_path" <<'EOF'
-## Author : Aditya Shakya (adi1090x)
-## Mail : adi1090x@gmail.com
-## Github : @adi1090x
-## Reddit : @adi1090x
-## Local changes: center layout consistently and use password bullets.
+  cat >"$metadata_path" <<EOF
+[Plymouth Theme]
+Name=$theme_name
+Description=hexagon_alt animation with Plymouth two-step LUKS prompt
+Comment=hexagon_alt assets from adi1090x/plymouth-themes, installed from $repo_url at $repo_ref
+ModuleName=two-step
 
-// Screen size
-screen.x = Window.GetX();
-screen.y = Window.GetY();
-screen.w = Window.GetWidth();
-screen.h = Window.GetHeight();
-screen.center.x = screen.x + screen.w / 2;
-screen.center.y = screen.y + screen.h / 2;
+[two-step]
+Font=Noto Sans 14
+TitleFont=Noto Sans Light 30
+MonospaceFont=Noto Sans Mono 18
+ImageDir=$theme_dst
+DialogHorizontalAlignment=.5
+DialogVerticalAlignment=.382
+TitleHorizontalAlignment=.5
+TitleVerticalAlignment=.382
+HorizontalAlignment=.5
+VerticalAlignment=.5
+WatermarkHorizontalAlignment=.5
+WatermarkVerticalAlignment=.96
+Transition=none
+TransitionDuration=0.0
+BackgroundStartColor=0x000000
+BackgroundEndColor=0x000000
+MessageBelowAnimation=true
 
-// Question prompt
-question = null;
-answer = null;
+[boot-up]
+UseEndAnimation=false
 
-// Message
-message = null;
+[shutdown]
+UseEndAnimation=false
 
-// Password prompt
-bullets = null;
-prompt = null;
-bullet.image = Image.Text("•", 1, 1, 1);
+[reboot]
+UseEndAnimation=false
 
-// Flow
-state.status = "play";
-state.time = 0.0;
+[updates]
+SuppressMessages=true
+ProgressBarShowPercentComplete=true
+UseProgressBar=true
+Title=Installing Updates...
+SubTitle=Do not turn off your computer
 
-//--------------------------------- Refresh (Logo animation) --------------------------
+[system-upgrade]
+SuppressMessages=true
+ProgressBarShowPercentComplete=true
+UseProgressBar=true
+Title=Upgrading System...
+SubTitle=Do not turn off your computer
 
-# cycle through all images
-for (i = 0; i < 119; i++)
-  flyingman_image[i] = Image("progress-" + i + ".png");
-flyingman_sprite = Sprite();
+[firmware-upgrade]
+SuppressMessages=true
+ProgressBarShowPercentComplete=true
+UseProgressBar=true
+Title=Upgrading Firmware...
+SubTitle=Do not turn off your computer
 
-# set image position
-flyingman_sprite.SetX(screen.center.x - flyingman_image[0].GetWidth() / 2);
-flyingman_sprite.SetY(screen.center.y - flyingman_image[0].GetHeight() / 2);
-
-progress = 0;
-
-fun refresh_callback ()
-  {
-    frame = flyingman_image[Math.Int(progress / 2) % 119];
-    flyingman_sprite.SetImage(frame);
-    flyingman_sprite.SetX(screen.center.x - frame.GetWidth() / 2);
-    flyingman_sprite.SetY(screen.center.y - frame.GetHeight() / 2);
-    progress++;
-  }
-
-Plymouth.SetRefreshFunction (refresh_callback);
-
-//------------------------------------- Question prompt -------------------------------
-fun DisplayQuestionCallback(prompt, entry) {
-    question = null;
-    answer = null;
-
-    if (entry == "")
-        entry = "<answer>";
-
-    question.image = Image.Text(prompt, 1, 1, 1);
-    question.sprite = Sprite(question.image);
-    question.sprite.SetX(screen.center.x - question.image.GetWidth() / 2);
-    question.sprite.SetY(screen.center.y + 210);
-
-    answer.image = Image.Text(entry, 1, 1, 1);
-    answer.sprite = Sprite(answer.image);
-    answer.sprite.SetX(screen.center.x - answer.image.GetWidth() / 2);
-    answer.sprite.SetY(screen.center.y + 250);
-}
-Plymouth.SetDisplayQuestionFunction(DisplayQuestionCallback);
-
-//------------------------------------- Password prompt -------------------------------
-fun DisplayPasswordCallback(nil, bulletCount) {
-    state.status = "pause";
-    totalWidth = bulletCount * bullet.image.GetWidth();
-    startPos = screen.center.x - totalWidth / 2;
-
-    prompt.image = Image.Text("Enter Password", 1, 1, 1);
-    prompt.sprite = Sprite(prompt.image);
-    prompt.sprite.SetX(screen.center.x - prompt.image.GetWidth() / 2);
-    prompt.sprite.SetY(screen.center.y + 210);
-
-    // Clear all bullets (user might hit backspace)
-    bullets = null;
-    for (i = 0; i < bulletCount; i++) {
-        bullets[i].sprite = Sprite(bullet.image);
-        bullets[i].sprite.SetX(startPos + i * bullet.image.GetWidth());
-        bullets[i].sprite.SetY(screen.center.y + 250);
-    }
-}
-Plymouth.SetDisplayPasswordFunction(DisplayPasswordCallback);
-
-//--------------------------- Normal display (unset all text) ----------------------
-fun DisplayNormalCallback() {
-    state.status = "play";
-    bullets = null;
-    prompt = null;
-    message = null;
-    question = null;
-    answer = null;
-}
-Plymouth.SetDisplayNormalFunction(DisplayNormalCallback);
-
-//----------------------------------------- Message --------------------------------
-fun MessageCallback(text) {
-    message.image = Image.Text(text, 1, 1, 1);
-    message.sprite = Sprite(message.image);
-    message.sprite.SetPosition(screen.center.x - message.image.GetWidth() / 2, screen.y + message.image.GetHeight());
-}
-Plymouth.SetMessageFunction(MessageCallback);
+[system-reset]
+SuppressMessages=true
+ProgressBarShowPercentComplete=true
+UseProgressBar=true
+Title=Resetting System...
+SubTitle=Do not turn off your computer
 EOF
+}
+
+copy_prompt_assets() {
+  local src_dir="/usr/share/plymouth/themes/spinner"
+  local asset
+
+  for asset in entry.png bullet.png lock.png capslock.png keyboard.png keymap-render.png; do
+    [[ -f "$src_dir/$asset" ]] || die "required two-step prompt asset not found: $src_dir/$asset"
+    install -m 0644 "$src_dir/$asset" "$theme_dst/$asset"
+  done
 }
 
 usage() {
   cat <<EOF
 Usage: $(basename "$0") [scale]
 
-Installs the adi1090x hexagon_alt Plymouth theme, sets Plymouth DeviceScale,
-and rebuilds the Limine or mkinitcpio boot image.
+Installs a two-step Plymouth theme using the hexagon_alt animation, optionally
+sets Plymouth DeviceScale, and rebuilds the Limine or mkinitcpio boot image.
 
 Arguments:
-  scale   Positive integer Plymouth DeviceScale value. Default: 2
+  scale   Optional positive integer Plymouth DeviceScale value. Default: auto
 EOF
 }
 
@@ -173,9 +132,9 @@ if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
   die "run with sudo: sudo $0 [scale]"
 fi
 
-[[ "$scale" =~ ^[1-9][0-9]*$ ]] || die "scale must be a positive integer"
+[[ -z "$scale" || "$scale" =~ ^[1-9][0-9]*$ ]] || die "scale must be a positive integer"
 command -v git >/dev/null 2>&1 || die "git is required"
-[[ -e /usr/lib/plymouth/script.so ]] || die "Plymouth script plugin is not installed"
+[[ -e /usr/lib/plymouth/two-step.so ]] || die "Plymouth two-step plugin is not installed"
 
 if ! command -v limine-mkinitcpio >/dev/null 2>&1; then
   command -v mkinitcpio >/dev/null 2>&1 || die "mkinitcpio is required"
@@ -183,13 +142,15 @@ fi
 
 trap cleanup EXIT
 
-echo "==> Fetching Plymouth theme: $theme_name"
+echo "==> Fetching Plymouth theme assets: $repo_theme_path"
 tmp_dir="$(mktemp -d)"
-git clone --depth 1 --filter=blob:none --sparse "$repo_url" "$tmp_dir/plymouth-themes"
+git clone --filter=blob:none --sparse --no-checkout "$repo_url" "$tmp_dir/plymouth-themes"
 git -C "$tmp_dir/plymouth-themes" sparse-checkout set "$repo_theme_path"
+git -C "$tmp_dir/plymouth-themes" fetch --depth 1 origin "$repo_ref"
+git -C "$tmp_dir/plymouth-themes" checkout --detach "$repo_ref"
 theme_src="$tmp_dir/plymouth-themes/$repo_theme_path"
-[[ -f "$theme_src/$theme_name.plymouth" ]] || die "theme metadata not found: $theme_src/$theme_name.plymouth"
-[[ -f "$theme_src/$theme_name.script" ]] || die "theme script not found: $theme_src/$theme_name.script"
+[[ -f "$theme_src/hexagon_alt.plymouth" ]] || die "theme metadata not found: $theme_src/hexagon_alt.plymouth"
+[[ -f "$theme_src/progress-0.png" ]] || die "theme animation frames not found: $theme_src/progress-0.png"
 
 echo "==> Installing Plymouth theme: $theme_name"
 if [[ -e "$theme_dst" ]]; then
@@ -198,16 +159,24 @@ if [[ -e "$theme_dst" ]]; then
 fi
 install -d -m 0755 "$theme_dst"
 cp -a "$theme_src/." "$theme_dst/"
-patch_theme_script
+copy_prompt_assets
+write_theme_metadata
 
-echo "==> Setting Plymouth scale: $scale"
+echo "==> Setting Plymouth theme: $theme_name"
 backup_file /etc/plymouth/plymouthd.conf
 install -d -m 0755 /etc/plymouth
-cat >/etc/plymouth/plymouthd.conf <<EOF
+if [[ -n "$scale" ]]; then
+  cat >/etc/plymouth/plymouthd.conf <<EOF
 [Daemon]
 Theme=$theme_name
 DeviceScale=$scale
 EOF
+else
+  cat >/etc/plymouth/plymouthd.conf <<EOF
+[Daemon]
+Theme=$theme_name
+EOF
+fi
 
 if command -v limine-mkinitcpio >/dev/null 2>&1; then
   echo "==> Rebuilding Limine initramfs entries"
