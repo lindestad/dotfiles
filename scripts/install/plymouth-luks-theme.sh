@@ -159,6 +159,7 @@ print_install_plan() {
   echo "-> Pinned commit: $repo_ref"
   echo "-> Target theme: $theme_dst"
   echo "-> Plymouth theme: $theme_name"
+  echo "-> Animation: hexagon frames converted to two-step throbber frames"
   if [[ -n "$scale" ]]; then
     echo "-> Plymouth DeviceScale: $scale"
   else
@@ -250,11 +251,11 @@ TitleFont=Noto Sans Light 30
 MonospaceFont=Noto Sans Mono 18
 ImageDir=$theme_dst
 DialogHorizontalAlignment=.5
-DialogVerticalAlignment=.382
+DialogVerticalAlignment=.68
 TitleHorizontalAlignment=.5
 TitleVerticalAlignment=.382
 HorizontalAlignment=.5
-VerticalAlignment=.5
+VerticalAlignment=.42
 WatermarkHorizontalAlignment=.5
 WatermarkVerticalAlignment=.96
 Transition=none
@@ -264,12 +265,15 @@ BackgroundEndColor=0x000000
 MessageBelowAnimation=true
 
 [boot-up]
+UseAnimation=true
 UseEndAnimation=false
 
 [shutdown]
+UseAnimation=true
 UseEndAnimation=false
 
 [reboot]
+UseAnimation=true
 UseEndAnimation=false
 
 [updates]
@@ -310,6 +314,30 @@ copy_prompt_assets() {
     [[ -f "$src_dir/$asset" ]] || die "required two-step prompt asset not found: $src_dir/$asset"
     install -m 0644 "$src_dir/$asset" "$theme_dst/$asset"
   done
+}
+
+prepare_two_step_animation() {
+  local frames=()
+  local frame
+  local index=1
+  local target
+
+  mapfile -t frames < <(
+    find "$theme_src" -maxdepth 1 -type f -name 'progress-*.png' -printf '%f\n' |
+      sort -V
+  )
+  ((${#frames[@]} > 0)) || die "theme animation frames not found: $theme_src/progress-*.png"
+
+  find "$theme_dst" -maxdepth 1 -type f -name 'progress-*.png' -delete
+  find "$theme_dst" -maxdepth 1 -type f -name 'throbber-*.png' -delete
+
+  for frame in "${frames[@]}"; do
+    target="$(printf 'throbber-%04d.png' "$index")"
+    install -m 0644 "$theme_src/$frame" "$theme_dst/$target"
+    index=$((index + 1))
+  done
+
+  echo "-> Prepared $((index - 1)) hexagon throbber frames"
 }
 
 usage() {
@@ -380,6 +408,7 @@ fi
 install -d -m 0755 "$theme_dst"
 cp -a "$theme_src/." "$theme_dst/"
 copy_prompt_assets
+prepare_two_step_animation
 write_theme_metadata
 
 echo "==> Setting Plymouth theme: $theme_name"

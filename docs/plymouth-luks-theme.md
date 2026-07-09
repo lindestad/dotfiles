@@ -40,6 +40,10 @@ The helper:
 - installs the generated theme to
   `/usr/share/plymouth/themes/hexagon_alt_twostep`;
 - writes two-step theme metadata around the hexagon animation assets;
+- converts the upstream `progress-*.png` hexagon frames to `throbber-*.png`
+  frames and removes the copied `progress-*.png` files from the generated
+  two-step theme, so Plymouth shows the hexagon as the continuous waiting
+  animation instead of a static progress overlay;
 - copies Plymouth's stock prompt assets from the installed `spinner` theme:
   `entry.png`, `bullet.png`, `lock.png`, `capslock.png`, `keyboard.png`, and
   `keymap-render.png`;
@@ -97,6 +101,14 @@ The upstream `hexagon_alt` theme is a script theme with one global sprite
 coordinate space. That is the source of the display-centering problems this
 setup avoids by generating a `two-step` theme instead.
 
+Plymouth's `two-step` plugin treats `throbber-*.png` as the continuous waiting
+animation and `progress-*.png` as an optional progress-driven overlay. The
+installer therefore maps the hexagon frames to `throbber-*.png` and removes the
+`progress-*.png` copies from the generated theme.
+
+The prompt dialog is placed below the hexagon with `DialogVerticalAlignment=.68`
+while the hexagon itself is kept above center with `VerticalAlignment=.42`.
+
 ## Caps Lock
 
 The stock `two-step` prompt shows Caps Lock by using Plymouth's internal
@@ -122,6 +134,18 @@ sudo cp -r "$tmp/plymouth-themes/pack_2/hexagon_alt/." \
   /usr/share/plymouth/themes/hexagon_alt_twostep/
 sudo cp /usr/share/plymouth/themes/spinner/{entry,bullet,lock,capslock,keyboard,keymap-render}.png \
   /usr/share/plymouth/themes/hexagon_alt_twostep/
+sudo find /usr/share/plymouth/themes/hexagon_alt_twostep \
+  -maxdepth 1 -type f -name 'progress-*.png' -delete
+i=1
+find "$tmp/plymouth-themes/pack_2/hexagon_alt" \
+  -maxdepth 1 -type f -name 'progress-*.png' -printf '%f\n' |
+  sort -V |
+  while IFS= read -r frame; do
+    sudo install -m 0644 \
+      "$tmp/plymouth-themes/pack_2/hexagon_alt/$frame" \
+      "/usr/share/plymouth/themes/hexagon_alt_twostep/throbber-$(printf '%04d' "$i").png"
+    i=$((i + 1))
+  done
 
 sudo tee /usr/share/plymouth/themes/hexagon_alt_twostep/hexagon_alt_twostep.plymouth >/dev/null <<'EOF'
 [Plymouth Theme]
@@ -136,11 +160,11 @@ TitleFont=Noto Sans Light 30
 MonospaceFont=Noto Sans Mono 18
 ImageDir=/usr/share/plymouth/themes/hexagon_alt_twostep
 DialogHorizontalAlignment=.5
-DialogVerticalAlignment=.382
+DialogVerticalAlignment=.68
 TitleHorizontalAlignment=.5
 TitleVerticalAlignment=.382
 HorizontalAlignment=.5
-VerticalAlignment=.5
+VerticalAlignment=.42
 WatermarkHorizontalAlignment=.5
 WatermarkVerticalAlignment=.96
 Transition=none
@@ -150,12 +174,15 @@ BackgroundEndColor=0x000000
 MessageBelowAnimation=true
 
 [boot-up]
+UseAnimation=true
 UseEndAnimation=false
 
 [shutdown]
+UseAnimation=true
 UseEndAnimation=false
 
 [reboot]
+UseAnimation=true
 UseEndAnimation=false
 EOF
 
