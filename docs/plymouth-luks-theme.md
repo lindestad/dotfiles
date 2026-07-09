@@ -16,6 +16,14 @@ Run from the repo root:
 sudo ./scripts/install/plymouth-luks-theme.sh
 ```
 
+The helper prints the detected boot path and Secure Boot/Limine refresh plan,
+then asks for confirmation before it installs files or rebuilds boot images.
+For non-interactive use:
+
+```sh
+sudo ./scripts/install/plymouth-luks-theme.sh --yes
+```
+
 The optional first argument sets Plymouth's integer `DeviceScale`. By default,
 the helper leaves `DeviceScale` unset and lets Plymouth choose automatically:
 
@@ -40,7 +48,20 @@ The helper:
 - writes `/etc/plymouth/plymouthd.conf` with `Theme=hexagon_alt_twostep` and
   only writes `DeviceScale=` when a scale argument is provided;
 - rebuilds boot images with `limine-mkinitcpio` when available, otherwise
-  falls back to `mkinitcpio -P`.
+  falls back to `mkinitcpio -P`;
+- on Limine systems, runs `limine-snapper-sync` and `limine-snapper-info` when
+  available;
+- when Secure Boot, Limine verification, or Limine config enrollment appears to
+  be active and the Secure Boot refresh helper is installed, runs
+  `refresh-limine-secureboot-assets --refresh-assets-only` after rebuilding.
+  That refreshes Limine file hashes, enrolls the Limine config checksum,
+  refreshes the Limine fallback EFI when applicable, signs the Limine EFI
+  through `limine-enroll-config`/`sbctl` when configured, and verifies hashes.
+
+If Limine verification or Secure Boot appears to be enabled but the refresh
+helper is not installed, the script warns before proceeding. The managed setup
+for that helper is documented in
+[secureboot-limine-signing.md](./secureboot-limine-signing.md).
 
 ## Requirements
 
@@ -146,10 +167,19 @@ Theme=hexagon_alt_twostep
 EOF
 
 sudo limine-mkinitcpio
+command -v limine-snapper-sync >/dev/null && sudo limine-snapper-sync
+
+# If Secure Boot, Limine verification, or Limine config enrollment is active:
+command -v refresh-limine-secureboot-assets >/dev/null && \
+  sudo refresh-limine-secureboot-assets --refresh-assets-only
+
+command -v limine-snapper-info >/dev/null && sudo limine-snapper-info
 ```
 
 If Limine is not installed, use `sudo mkinitcpio -P` instead of
-`sudo limine-mkinitcpio`.
+the Limine commands. If the Secure Boot refresh helper is missing on a machine
+with Secure Boot or Limine verification enabled, refresh Limine hashes and
+config enrollment manually before rebooting.
 
 ## Recovery
 
@@ -160,6 +190,8 @@ blindly and press Enter. To restore the CachyOS Plymouth theme:
 sudo plymouth-set-default-theme cachyos
 sudo sed -i '/^DeviceScale=/d' /etc/plymouth/plymouthd.conf
 sudo limine-mkinitcpio
+command -v refresh-limine-secureboot-assets >/dev/null && \
+  sudo refresh-limine-secureboot-assets --refresh-assets-only
 ```
 
 If the machine is not using Limine, rebuild with `sudo mkinitcpio -P`.

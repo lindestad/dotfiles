@@ -7,6 +7,12 @@ repo_theme_path="pack_2/hexagon_alt"
 theme_name="hexagon_alt_twostep"
 theme_dst="/usr/share/plymouth/themes/$theme_name"
 scale=""
+assume_yes=0
+boot_backend=""
+secure_boot_state="not detected"
+limine_verification="unknown"
+limine_config_enrollment="unknown"
+plymouth_hook_state="unknown"
 ts="$(date +%Y%m%d-%H%M%S)"
 tmp_dir=""
 
@@ -24,6 +30,208 @@ backup_file() {
 
 cleanup() {
   [[ -z "$tmp_dir" ]] || rm -rf "$tmp_dir"
+}
+
+have() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+config_value_from_file() {
+  local file="$1"
+  local key="$2"
+
+  awk -v key="$key" '
+    $0 ~ "^[[:space:]]*" key "[[:space:]]*=" {
+      sub(/^[^=]*=[[:space:]]*/, "")
+      sub(/[[:space:]]*#.*/, "")
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "")
+      gsub(/^"|"$/, "")
+      value = $0
+    }
+    END {
+      if (value != "") print value
+    }
+  ' "$file"
+}
+
+limine_config_value() {
+  local key="$1"
+  local file value next
+
+  for file in /etc/limine-entry-tool.conf /etc/default/limine; do
+    [[ -f "$file" ]] || continue
+    next="$(config_value_from_file "$file" "$key" || true)"
+    [[ -n "$next" ]] && value="$next"
+  done
+
+  printf '%s\n' "${value:-}"
+}
+
+limine_default_value() {
+  local key="$1"
+
+  [[ -f /etc/default/limine ]] || return 0
+  config_value_from_file /etc/default/limine "$key"
+}
+
+value_is_enabled() {
+  case "${1,,}" in
+    1|yes|true|on)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+secure_boot_summary() {
+  local sb_var="/sys/firmware/efi/efivars/SecureBoot-8be4df61-93ca-11d2-aa0d-00e098032b8c"
+  local sb_byte
+
+  if [[ ! -r "$sb_var" ]]; then
+    printf 'not detected\n'
+    return 0
+  fi
+
+  sb_byte="$(od -An -t u1 -j4 -N1 "$sb_var" 2>/dev/null | tr -d ' ')"
+  if [[ "$sb_byte" == "1" ]]; then
+    printf 'enabled\n'
+  else
+    printf 'disabled\n'
+  fi
+}
+
+mkinitcpio_has_plymouth_hook() {
+  local files=()
+
+  [[ -f /etc/mkinitcpio.conf ]] && files+=(/etc/mkinitcpio.conf)
+
+  shopt -s nullglob
+  files+=(/etc/mkinitcpio.conf.d/*.conf)
+  shopt -u nullglob
+
+  ((${#files[@]} > 0)) || return 1
+
+  awk '
+    /^[[:space:]]*HOOKS[[:space:]]*=/ {
+      line = $0
+      sub(/[[:space:]]*#.*/, "", line)
+      if (line ~ /(^|[^[:alnum:]_-])plymouth([^[:alnum:]_-]|$)/) found = 1
+    }
+    END { exit found ? 0 : 1 }
+  ' "${files[@]}" 2>/dev/null
+}
+
+detect_boot_environment() {
+  if have limine-mkinitcpio; then
+    boot_backend="limine"
+  elif have mkinitcpio; then
+    boot_backend="mkinitcpio"
+  else
+    die "limine-mkinitcpio or mkinitcpio is required"
+  fi
+
+  secure_boot_state="$(secure_boot_summary)"
+  limine_verification="$(limine_config_value ENABLE_VERIFICATION)"
+  limine_config_enrollment="$(limine_default_value ENABLE_ENROLL_LIMINE_CONFIG)"
+
+  if mkinitcpio_has_plymouth_hook; then
+    plymouth_hook_state="present"
+  else
+    plymouth_hook_state="not found"
+  fi
+}
+
+limine_secure_refresh_risk() {
+  [[ "$boot_backend" == "limine" ]] || return 1
+
+  [[ "$secure_boot_state" == "enabled" ]] && return 0
+  value_is_enabled "$limine_verification" && return 0
+  value_is_enabled "$limine_config_enrollment" && return 0
+
+  return 1
+}
+
+print_install_plan() {
+  echo "==> Planned Plymouth theme install"
+  echo "-> Source assets: $repo_url"
+  echo "-> Pinned commit: $repo_ref"
+  echo "-> Target theme: $theme_dst"
+  echo "-> Plymouth theme: $theme_name"
+  if [[ -n "$scale" ]]; then
+    echo "-> Plymouth DeviceScale: $scale"
+  else
+    echo "-> Plymouth DeviceScale: auto"
+  fi
+  echo "-> mkinitcpio Plymouth hook: $plymouth_hook_state"
+  echo "-> Secure Boot: $secure_boot_state"
+
+  if [[ "$boot_backend" == "limine" ]]; then
+    echo "-> Limine verification: ${limine_verification:-not set}"
+    echo "-> Limine config enrollment: ${limine_config_enrollment:-not set}"
+    echo "-> Boot image rebuild: limine-mkinitcpio"
+    if have limine-snapper-sync; then
+      echo "-> Snapshot entries: limine-snapper-sync"
+    fi
+    if limine_secure_refresh_risk; then
+      if have refresh-limine-secureboot-assets; then
+        echo "-> Limine Secure Boot refresh: refresh-limine-secureboot-assets --refresh-assets-only"
+        echo "   This refreshes Limine file hashes, enrolls the Limine config checksum,"
+        echo "   refreshes the Limine fallback EFI when applicable, signs the Limine EFI"
+        echo "   through limine-enroll-config/sbctl when configured, and verifies hashes."
+      else
+        echo "!! Limine Secure Boot refresh helper was not found."
+        echo "   This machine appears to use Secure Boot and/or Limine verification."
+        echo "   Rebuilding initramfs can require refreshed Limine hashes and config"
+        echo "   enrollment. Install scripts/install/secureboot-limine-signing.sh first"
+        echo "   for the managed safe path, or refresh hashes/enrollment manually."
+      fi
+    else
+      echo "-> Limine Secure Boot refresh: skipped; Secure Boot/Limine verification not detected"
+    fi
+    if have limine-snapper-info; then
+      echo "-> Snapshot verification: limine-snapper-info"
+    fi
+  else
+    echo "-> Boot image rebuild: mkinitcpio -P"
+    if [[ "$secure_boot_state" == "enabled" ]]; then
+      echo "!! Secure Boot is enabled, but Limine was not detected."
+      echo "   This installer cannot know how this machine signs or verifies boot"
+      echo "   images. Proceed only if this machine's boot chain handles regenerated"
+      echo "   initramfs files outside this script."
+    fi
+  fi
+
+  if [[ "$plymouth_hook_state" != "present" ]]; then
+    echo "!! The mkinitcpio HOOKS line does not appear to include plymouth."
+    echo "   The theme can be installed, but the graphical LUKS prompt may not show"
+    echo "   until the plymouth hook is added before sd-encrypt."
+  fi
+}
+
+confirm_install() {
+  local answer
+
+  if ((assume_yes != 0)); then
+    return 0
+  fi
+
+  if [[ ! -t 0 ]]; then
+    die "confirmation requires a TTY; rerun with --yes to proceed non-interactively"
+  fi
+
+  echo
+  read -r -p "Proceed with installing the theme and rebuilding boot images? [Y/n] " answer
+  case "$answer" in
+    ""|[Yy]|[Yy][Ee][Ss])
+      return 0
+      ;;
+    *)
+      echo "Aborted."
+      exit 0
+      ;;
+  esac
 }
 
 write_theme_metadata() {
@@ -107,38 +315,50 @@ copy_prompt_assets() {
 usage() {
   cat <<EOF
 Usage: $(basename "$0") [scale]
+       $(basename "$0") [--yes] [scale]
 
 Installs a two-step Plymouth theme using the hexagon_alt animation, optionally
 sets Plymouth DeviceScale, and rebuilds the Limine or mkinitcpio boot image.
 
 Arguments:
   scale   Optional positive integer Plymouth DeviceScale value. Default: auto
+
+Options:
+  -y, --yes   Do not prompt before installing and rebuilding boot images
 EOF
 }
 
-case "${1:-}" in
-  -h|--help)
-    usage
-    exit 0
-    ;;
-  "")
-    ;;
-  *)
-    scale="$1"
-    ;;
-esac
+while (($# > 0)); do
+  case "$1" in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    -y|--yes)
+      assume_yes=1
+      ;;
+    -*)
+      die "unknown option: $1"
+      ;;
+    *)
+      [[ -z "$scale" ]] || die "scale was provided more than once"
+      scale="$1"
+      ;;
+  esac
+  shift
+done
 
 if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
-  die "run with sudo: sudo $0 [scale]"
+  die "run with sudo: sudo $0 [--yes] [scale]"
 fi
 
 [[ -z "$scale" || "$scale" =~ ^[1-9][0-9]*$ ]] || die "scale must be a positive integer"
-command -v git >/dev/null 2>&1 || die "git is required"
+have git || die "git is required"
 [[ -e /usr/lib/plymouth/two-step.so ]] || die "Plymouth two-step plugin is not installed"
 
-if ! command -v limine-mkinitcpio >/dev/null 2>&1; then
-  command -v mkinitcpio >/dev/null 2>&1 || die "mkinitcpio is required"
-fi
+detect_boot_environment
+print_install_plan
+confirm_install
 
 trap cleanup EXIT
 
@@ -178,9 +398,31 @@ Theme=$theme_name
 EOF
 fi
 
-if command -v limine-mkinitcpio >/dev/null 2>&1; then
+if [[ "$boot_backend" == "limine" ]]; then
   echo "==> Rebuilding Limine initramfs entries"
   limine-mkinitcpio
+
+  if have limine-snapper-sync; then
+    echo "==> Regenerating Limine snapshot entries"
+    limine-snapper-sync
+  fi
+
+  if limine_secure_refresh_risk; then
+    if have refresh-limine-secureboot-assets; then
+      echo "==> Refreshing Limine Secure Boot hashes and enrollment"
+      refresh-limine-secureboot-assets --refresh-assets-only
+    else
+      echo "!! Skipped Limine Secure Boot hash/enrollment refresh; helper not found." >&2
+      echo "!! Run scripts/install/secureboot-limine-signing.sh or refresh Limine hashes manually before rebooting." >&2
+    fi
+  else
+    echo "==> Skipping Limine Secure Boot hash/enrollment refresh; not detected as needed"
+  fi
+
+  if have limine-snapper-info; then
+    echo "==> Checking Limine snapshot files"
+    limine-snapper-info
+  fi
 else
   echo "==> Rebuilding initramfs"
   mkinitcpio -P
