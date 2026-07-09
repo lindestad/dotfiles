@@ -88,6 +88,10 @@ $env_var\
 $crystal\
 $custom\
 $sudo\
+$fill\
+$cmd_duration\
+$memory_usage\
+$time\
 $line_break\
 $jobs\
 $battery\
@@ -97,14 +101,7 @@ $container\
 $shell\
 $character"""
 
-right_format = """
-$custom\
-$cmd_duration\
-$line_break\
-$memory_usage\
-$time\
-
-"""
+right_format = ""
 
 
 [directory]
@@ -124,7 +121,7 @@ format = ' [$path]($style) '
 
 [time]
 disabled = false
-format = '[\[ $time \]]($style) '
+format = '[\[ $time \]]($style)'
 time_format = '%T'
 utc_time_offset = 'local'
 
@@ -142,7 +139,10 @@ ssh_only = true
 disabled = false
 threshold = -1
 symbol = ' '
-format = '[${ram}]($style)'
+format = '[${ram}]($style) '
+
+[fill]
+symbol = ' '
 
 [character]
 success_symbol = '[❯](bold green) '
