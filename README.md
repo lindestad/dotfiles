@@ -92,11 +92,14 @@ packages:
 ./scripts/relink.sh --niri --no-kanata --yes
 ```
 
-To remove managed symlinks that point at an old checkout path:
+Before moving a checkout, remove managed symlinks that point at it:
 
 ```bash
-./scripts/unlink.sh --from-root ~/dev/dotfiles
+./scripts/unlink.sh
 ```
+
+If the old checkout is no longer the current directory, pass it explicitly with
+`--from-root`.
 
 ## Zellij Sessions
 
