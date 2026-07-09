@@ -99,6 +99,7 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
   validate_migrated_niri_local_config
   install_niri_helpers
   install_zen_browser_url_handler
+  apply_zen_browser_preferences
 fi
 
 KANATA_CONFIG_SRC=""

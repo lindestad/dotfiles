@@ -269,6 +269,7 @@ install_dotfiles_helpers
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
   install_niri_helpers
   install_zen_browser_url_handler
+  apply_zen_browser_preferences
 fi
 copy_gitconfig
 ensure_codex_config

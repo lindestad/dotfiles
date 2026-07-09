@@ -1,0 +1,375 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+begin_marker="// BEGIN dotfiles zen preferences"
+end_marker="// END dotfiles zen preferences"
+mode="apply"
+dry_run="no"
+manual_profile_dirs=()
+found_profile_dirs=()
+declare -A seen_profile_dirs=()
+
+desired_prefs=(
+  "general.autoScroll|true"
+  "middlemouse.paste|false"
+  "middlemouse.contentLoadURL|false"
+  "browser.tabs.searchclipboardfor.middleclick|false"
+)
+
+usage() {
+  cat <<EOF
+Usage: $(basename "$0") [options]
+
+Apply dotfiles-managed Zen Browser preferences to discovered profiles.
+
+Options:
+  --check             Report drift without writing files
+  --dry-run           Show what would change without writing files
+  --profile-dir DIR   Apply/check a specific Zen profile directory
+  -h, --help          Show this help
+EOF
+}
+
+die() {
+  echo "!! $*" >&2
+  exit 2
+}
+
+while (($#)); do
+  case "$1" in
+    --check)
+      mode="check"
+      ;;
+    --dry-run)
+      dry_run="yes"
+      ;;
+    --profile-dir)
+      shift
+      (($#)) || die "--profile-dir requires a directory"
+      manual_profile_dirs+=("$1")
+      ;;
+    --profile-dir=*)
+      manual_profile_dirs+=("${1#*=}")
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      die "Unknown option: $1"
+      ;;
+  esac
+  shift
+done
+
+desired_keys() {
+  local item
+  for item in "${desired_prefs[@]}"; do
+    printf '%s\n' "${item%%|*}"
+  done
+}
+
+pref_value_from_file() {
+  local file="$1"
+  local key="$2"
+
+  [[ -f "$file" ]] || return 1
+
+  awk -v key="$key" '
+    {
+      line = $0
+      sub(/^[[:space:]]+/, "", line)
+      prefix = "user_pref(\"" key "\","
+      if (index(line, prefix) == 1) {
+        value = substr(line, length(prefix) + 1)
+        sub(/^[[:space:]]*/, "", value)
+        sub(/\);[[:space:]]*(\/\/.*)?$/, "", value)
+        found = 1
+      }
+    }
+    END {
+      if (found) {
+        print value
+      } else {
+        exit 1
+      }
+    }
+  ' "$file"
+}
+
+effective_pref_value() {
+  local profile_dir="$1"
+  local key="$2"
+
+  pref_value_from_file "$profile_dir/user.js" "$key" \
+    || pref_value_from_file "$profile_dir/prefs.js" "$key"
+}
+
+add_profile_dir() {
+  local dir="$1"
+  local resolved
+
+  [[ -d "$dir" ]] || return 0
+  resolved="$(cd "$dir" && pwd -P)"
+
+  if [[ -z "${seen_profile_dirs[$resolved]+x}" ]]; then
+    seen_profile_dirs["$resolved"]=1
+    found_profile_dirs+=("$resolved")
+  fi
+}
+
+zen_profile_roots() {
+  local roots=()
+  local root
+
+  if [[ -n "${ZEN_PROFILE_ROOT:-}" ]]; then
+    roots+=("$ZEN_PROFILE_ROOT")
+  fi
+
+  roots+=(
+    "$HOME/.zen"
+    "$HOME/.var/app/app.zen_browser.zen/.zen"
+    "$HOME/.var/app/app.zen_browser.zen/zen"
+  )
+
+  for root in "${roots[@]}"; do
+    [[ -d "$root" ]] && printf '%s\n' "$root"
+  done
+}
+
+profiles_from_ini() {
+  local root="$1"
+  local profiles_ini="$root/profiles.ini"
+  local installs_ini="$root/installs.ini"
+  local is_relative path profile_dir
+
+  if [[ -f "$profiles_ini" ]]; then
+    while IFS='|' read -r is_relative path; do
+      [[ -n "$path" ]] || continue
+      if [[ "$is_relative" == "1" && "$path" != /* ]]; then
+        profile_dir="$root/$path"
+      else
+        profile_dir="$path"
+      fi
+      add_profile_dir "$profile_dir"
+    done < <(
+      awk '
+        function emit() {
+          if (in_profile && path != "") {
+            print is_relative "|" path
+          }
+          in_profile = 0
+          path = ""
+          is_relative = "1"
+        }
+        BEGIN {
+          in_profile = 0
+          path = ""
+          is_relative = "1"
+        }
+        /^\[Profile[0-9]+\]$/ {
+          emit()
+          in_profile = 1
+          next
+        }
+        /^\[/ {
+          emit()
+          next
+        }
+        in_profile && /^Path=/ {
+          path = substr($0, 6)
+          next
+        }
+        in_profile && /^IsRelative=/ {
+          is_relative = substr($0, 12)
+          next
+        }
+        END {
+          emit()
+        }
+      ' "$profiles_ini"
+    )
+  fi
+
+  if [[ -f "$installs_ini" ]]; then
+    while IFS= read -r path; do
+      [[ -n "$path" ]] || continue
+      if [[ "$path" == /* ]]; then
+        add_profile_dir "$path"
+      else
+        add_profile_dir "$root/$path"
+      fi
+    done < <(awk -F= '$1 == "Default" && $2 != "" { print $2 }' "$installs_ini")
+  fi
+}
+
+profiles_from_files() {
+  local root="$1"
+  local file
+
+  while IFS= read -r -d '' file; do
+    add_profile_dir "$(dirname "$file")"
+  done < <(find "$root" -mindepth 2 -maxdepth 2 -type f \( -name prefs.js -o -name user.js \) -print0 2>/dev/null)
+}
+
+discover_profiles() {
+  local root profile_dir
+
+  if ((${#manual_profile_dirs[@]})); then
+    for profile_dir in "${manual_profile_dirs[@]}"; do
+      [[ -d "$profile_dir" ]] || die "Profile directory does not exist: $profile_dir"
+      add_profile_dir "$profile_dir"
+    done
+    return
+  fi
+
+  while IFS= read -r root; do
+    profiles_from_ini "$root"
+    profiles_from_files "$root"
+  done < <(zen_profile_roots)
+}
+
+write_managed_user_js() {
+  local profile_dir="$1"
+  local user_js="$profile_dir/user.js"
+  local stripped new_file timestamp item key value keys
+
+  stripped="$(mktemp "$profile_dir/.user.js.stripped.XXXXXX")"
+  new_file="$(mktemp "$profile_dir/.user.js.new.XXXXXX")"
+  keys="$(desired_keys)"
+
+  if [[ -f "$user_js" ]]; then
+    awk -v begin="$begin_marker" -v end="$end_marker" -v keys="$keys" '
+      BEGIN {
+        split(keys, key_list, "\n")
+        for (i in key_list) {
+          if (key_list[i] != "") {
+            managed[key_list[i]] = 1
+          }
+        }
+      }
+      index($0, begin) {
+        in_block = 1
+        next
+      }
+      index($0, end) {
+        in_block = 0
+        next
+      }
+      in_block {
+        next
+      }
+      {
+        line = $0
+        sub(/^[[:space:]]+/, "", line)
+        skip = 0
+        for (key in managed) {
+          prefix = "user_pref(\"" key "\","
+          if (index(line, prefix) == 1) {
+            skip = 1
+            break
+          }
+        }
+        if (!skip) {
+          print
+        }
+      }
+    ' "$user_js" >"$stripped"
+  fi
+
+  if [[ -s "$stripped" ]]; then
+    cat "$stripped" >"$new_file"
+    printf '\n' >>"$new_file"
+  fi
+
+  printf '%s\n' "$begin_marker" >>"$new_file"
+  printf '%s\n' '// Managed by ~/.dotfiles/bin/zen-preferences.' >>"$new_file"
+  for item in "${desired_prefs[@]}"; do
+    key="${item%%|*}"
+    value="${item#*|}"
+    printf 'user_pref("%s", %s);\n' "$key" "$value" >>"$new_file"
+  done
+  printf '%s\n' "$end_marker" >>"$new_file"
+
+  if [[ -f "$user_js" ]] && cmp -s "$new_file" "$user_js"; then
+    rm -f "$stripped" "$new_file"
+    echo "== user.js already current"
+    return 0
+  fi
+
+  if [[ "$dry_run" == "yes" ]]; then
+    rm -f "$stripped" "$new_file"
+    echo ">> dry-run: would update $user_js"
+    return 0
+  fi
+
+  if [[ -f "$user_js" ]]; then
+    timestamp="$(date +%Y%m%d-%H%M%S)"
+    cp -p "$user_js" "$user_js.bak.$timestamp.$$"
+  fi
+
+  mv "$new_file" "$user_js"
+  rm -f "$stripped"
+  echo "-> updated $user_js"
+}
+
+check_profile() {
+  local profile_dir="$1"
+  local item key desired effective user_value current_label had_drift="no"
+
+  echo "==> Zen profile: $profile_dir"
+
+  for item in "${desired_prefs[@]}"; do
+    key="${item%%|*}"
+    desired="${item#*|}"
+    effective="$(effective_pref_value "$profile_dir" "$key" 2>/dev/null || true)"
+    user_value="$(pref_value_from_file "$profile_dir/user.js" "$key" 2>/dev/null || true)"
+    current_label="${effective:-missing}"
+
+    if [[ "$user_value" == "$desired" ]]; then
+      echo "== $key=$desired"
+      continue
+    fi
+
+    had_drift="yes"
+    if [[ -n "$user_value" ]]; then
+      echo "-> $key: user.js has $user_value; want $desired"
+    else
+      echo "-> $key: effective value is $current_label; pinning $desired in user.js"
+    fi
+  done
+
+  [[ "$had_drift" == "no" ]]
+}
+
+main() {
+  local profile_dir had_drift="no"
+
+  discover_profiles
+
+  if ((${#found_profile_dirs[@]} == 0)); then
+    echo ">> No Zen profiles found."
+    echo "   Checked: ~/.zen, ~/.var/app/app.zen_browser.zen/.zen, ~/.var/app/app.zen_browser.zen/zen"
+    exit 0
+  fi
+
+  for profile_dir in "${found_profile_dirs[@]}"; do
+    if ! check_profile "$profile_dir"; then
+      had_drift="yes"
+    fi
+
+    if [[ "$mode" == "apply" ]]; then
+      write_managed_user_js "$profile_dir"
+    fi
+  done
+
+  if [[ "$mode" == "check" && "$had_drift" == "yes" ]]; then
+    exit 1
+  fi
+
+  if [[ "$mode" == "apply" && "$dry_run" != "yes" ]]; then
+    echo "== Restart Zen for user.js preferences to take effect."
+  fi
+}
+
+main

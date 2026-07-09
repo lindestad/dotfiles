@@ -264,8 +264,10 @@ check_niri() {
   check_helper niri-move-window-or-workspace
   check_helper niri-screenshot-region
   check_helper noctalia-activate-notification
+  check_helper zen-preferences
   check_helper zen-url-handler
   check_zen_url_handler
+  check_zen_preferences
 
   if [[ -f "$HOME/.config/niri/local.kdl" ]]; then
     info "niri local config present: ~/.config/niri/local.kdl"
@@ -315,6 +317,21 @@ check_zen_url_handler() {
     fi
   else
     warn "xdg-mime is not installed; cannot inspect browser defaults"
+  fi
+}
+
+check_zen_preferences() {
+  local helper="$DOTFILES_DIR/bin/zen-preferences"
+
+  if [[ ! -x "$helper" ]]; then
+    warn "Zen preferences helper is not executable: $helper"
+    return
+  fi
+
+  if "$helper" --check >/dev/null 2>&1; then
+    ok "Zen preferences"
+  else
+    warn "Zen preferences need update; run: zen-preferences"
   fi
 }
 

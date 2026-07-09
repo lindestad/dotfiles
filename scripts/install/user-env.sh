@@ -84,6 +84,7 @@ install_dotfiles_helpers() {
   local helper
   local helpers=(
     dotfiles-doctor
+    zen-preferences
     zen-url-handler
   )
 
@@ -167,6 +168,27 @@ EOF
   fi
 
   echo "-> Set Zen URL handler as default browser for links."
+}
+
+apply_zen_browser_preferences() {
+  ensure_local_bin
+
+  local helper_src="$DOTFILES_DIR/bin/zen-preferences"
+  local helper_dst="$HOME/.local/bin/zen-preferences"
+
+  if [[ ! -f "$helper_src" ]]; then
+    echo "!! Missing Zen preferences helper: $helper_src"
+    return
+  fi
+
+  install -m 0755 "$helper_src" "$helper_dst"
+
+  if ! zen_browser_available; then
+    echo ">> Zen Browser not detected; leaving browser preferences unchanged."
+    return
+  fi
+
+  "$helper_dst"
 }
 
 ensure_shell_shims() {

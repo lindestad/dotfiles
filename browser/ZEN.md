@@ -17,3 +17,20 @@ Enable.
 ## Compact mode
 
 Enable compact mode for both top and side-bar.
+
+## Middle-click autoscroll
+
+Run `zen-preferences` after Zen has created a profile. The helper discovers
+Flatpak and tarball profile roots, then writes a managed block to `user.js`.
+
+Managed preferences:
+
+```js
+user_pref("general.autoScroll", true);
+user_pref("middlemouse.paste", false);
+user_pref("middlemouse.contentLoadURL", false);
+user_pref("browser.tabs.searchclipboardfor.middleclick", false);
+```
+
+Restart Zen after applying. `prefs.js` is browser-managed, so the helper does
+not edit it directly.
