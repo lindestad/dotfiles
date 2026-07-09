@@ -306,8 +306,8 @@ validate_migrated_niri_local_config() {
   local local_config="$HOME/.config/niri/local.kdl"
   local ts
 
-  [[ "${NIRI_LOCAL_MIGRATED:-no}" == "yes" ]] || return
-  [[ -f "$local_config" ]] || return
+  [[ "${NIRI_LOCAL_MIGRATED:-no}" == "yes" ]] || return 0
+  [[ -f "$local_config" ]] || return 0
 
   if ! have niri; then
     echo ">> Skipping migrated Niri local config validation; niri is not installed."

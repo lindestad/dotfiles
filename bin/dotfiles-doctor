@@ -60,8 +60,9 @@ resolve_dotfiles_dir() {
     "${DOTFILES_DIR:-}" \
     "$script_dir/.." \
     "$PWD" \
-    "$HOME/dev/dotfiles" \
-    "$HOME/.dotfiles"; do
+    "$HOME/.dotfiles" \
+    "$HOME/dotfiles" \
+    "$HOME/dev/dotfiles"; do
     [[ -n "$candidate" ]] || continue
     if [[ -f "$candidate/install.sh" && -d "$candidate/config" ]]; then
       readlink -f "$candidate"

@@ -34,8 +34,8 @@ See [apps.md](./apps.md) for the package inventory and platform-specific package
 ### Linux and WSL
 
 ```bash
-git clone https://github.com/lindestad/dotfiles ~/dev/dotfiles
-cd ~/dev/dotfiles
+git clone https://github.com/lindestad/dotfiles ~/.dotfiles
+cd ~/.dotfiles
 ./install.sh
 ```
 
@@ -60,8 +60,8 @@ SDDM autologin using the cached LUKS passphrase is documented in [docs/sddm-luks
 ### Windows (PowerShell)
 
 ```powershell
-git clone https://github.com/lindestad/dotfiles $HOME\dev\dotfiles
-cd $HOME\dev\dotfiles
+git clone https://github.com/lindestad/dotfiles $HOME\.dotfiles
+cd $HOME\.dotfiles
 .\install.ps1
 ```
 
@@ -83,6 +83,19 @@ Run a read-only health check against the current machine:
 just doctor
 # or, after install:
 dotfiles-doctor
+```
+
+After moving the checkout, refresh managed symlinks without reinstalling
+packages:
+
+```bash
+./scripts/relink.sh --niri --no-kanata --yes
+```
+
+To remove managed symlinks that point at an old checkout path:
+
+```bash
+./scripts/unlink.sh --from-root ~/dev/dotfiles
 ```
 
 ## Zellij Sessions
