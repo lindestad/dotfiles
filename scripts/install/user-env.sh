@@ -59,7 +59,9 @@ ensure_zsh_default_shell() {
     return
   fi
 
-  if [[ "$(prompt_yes_no "Set zsh as default shell?")" != "yes" ]]; then
+  if [[ -n "${SET_ZSH_DEFAULT:-}" ]]; then
+    [[ "$SET_ZSH_DEFAULT" == "yes" ]] || return
+  elif [[ "$(prompt_yes_no "Set zsh as default shell?")" != "yes" ]]; then
     return
   fi
 

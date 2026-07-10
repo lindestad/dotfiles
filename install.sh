@@ -5,7 +5,6 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=scripts/install/common.sh
 source "$DOTFILES_DIR/scripts/install/common.sh"
 
-start_install_log
 parse_install_flags "$@"
 
 if is_wsl; then

@@ -7,6 +7,9 @@ check:
 doctor:
     @./bin/dotfiles-doctor
 
+install *ARGS:
+    @./install.sh {{ARGS}}
+
 relink *ARGS:
     @./scripts/relink.sh {{ARGS}}
 

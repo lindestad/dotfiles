@@ -7,6 +7,7 @@ source "$DOTFILES_DIR/scripts/install/common.sh"
 
 parse_install_flags "$@"
 ensure_not_root
+start_install_log
 
 APT_PKGS_COMMON=(
   zsh
@@ -98,7 +99,8 @@ if ! have apt-get; then
   exit 1
 fi
 
-resolve_install_flags yes yes
+show_install_intro
+collect_install_choices yes yes
 add_alacritty_link
 add_wezterm_link
 add_ghostty_link
@@ -117,11 +119,12 @@ ensure_wezterm_ubuntu() {
   fi
 
   echo ">> WezTerm is not available from the configured Ubuntu apt repositories."
-  if [[ "$ASSUME_YES" == "yes" ]]; then
+  if [[ "${ALLOW_WEZTERM_REPO:-}" == "no" || "$ASSUME_YES" == "yes" ]]; then
     echo ">> Skipping WezTerm APT repo setup in non-interactive mode."
     return
   fi
-  if [[ "$(prompt_yes_no "Install WezTerm from the official apt.fury.io APT repo?")" != "yes" ]]; then
+  if [[ "${ALLOW_WEZTERM_REPO:-}" != "yes" ]] && \
+    [[ "$(prompt_yes_no "Install WezTerm from the official apt.fury.io APT repo?")" != "yes" ]]; then
     return
   fi
   if ! have curl; then
@@ -158,11 +161,12 @@ ensure_ghostty_ubuntu() {
   fi
 
   echo ">> Ghostty is not available from the configured Ubuntu apt repositories."
-  if [[ "$ASSUME_YES" == "yes" ]]; then
+  if [[ "${ALLOW_GHOSTTY_INSTALLER:-}" == "no" || "$ASSUME_YES" == "yes" ]]; then
     echo ">> Skipping community ghostty-ubuntu installer in non-interactive mode."
     return
   fi
-  if [[ "$(prompt_yes_no "Install Ghostty from the community ghostty-ubuntu .deb installer?")" != "yes" ]]; then
+  if [[ "${ALLOW_GHOSTTY_INSTALLER:-}" != "yes" ]] && \
+    [[ "$(prompt_yes_no "Install Ghostty from the community ghostty-ubuntu .deb installer?")" != "yes" ]]; then
     return
   fi
   if ! have curl; then
@@ -191,6 +195,29 @@ ensure_ghostty_ubuntu() {
   rm -f "$installer"
 }
 
+collect_ubuntu_repository_choices() {
+  local suite=""
+  ALLOW_WEZTERM_REPO="no"
+  ALLOW_GHOSTTY_INSTALLER="no"
+  ALLOW_NOCTALIA_REPO="no"
+
+  if [[ "$ASSUME_YES" != "yes" ]] && ! have wezterm && ! apt-cache show wezterm >/dev/null 2>&1; then
+    ALLOW_WEZTERM_REPO="$(prompt_yes_no "Allow the official WezTerm APT repository if needed?")"
+  fi
+  if [[ "$ASSUME_YES" != "yes" ]] && ! have ghostty && ! apt-cache show ghostty >/dev/null 2>&1; then
+    ALLOW_GHOSTTY_INSTALLER="$(prompt_yes_no "Allow the community Ghostty .deb installer if needed?")"
+  fi
+  if [[ "$INSTALL_NIRI" == "yes" && "$ASSUME_YES" != "yes" ]] && \
+    ! dpkg-query -W -f='${Status}' noctalia-shell 2>/dev/null | grep -q "install ok installed" && \
+    ! apt-cache show noctalia-shell >/dev/null 2>&1 && suite="$(noctalia_apt_suite)"; then
+    ALLOW_NOCTALIA_REPO="$(prompt_yes_no "Allow the Noctalia APT repository for $suite if needed?")"
+  fi
+}
+
+collect_ubuntu_repository_choices
+
+show_install_plan
+install_progress 1 5 "System packages"
 echo "==> Installing apt packages..."
 install_apt "${APT_PKGS_COMMON[@]}" "${APT_PKGS_OPTIONAL[@]}"
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
@@ -203,6 +230,8 @@ ensure_wezterm_ubuntu
 ensure_ghostty_ubuntu
 ensure_shell_shims
 ensure_neovim_release || install_apt neovim
+
+install_progress 2 5 "Command-line tools"
 ensure_rust_toolchain
 ensure_zsh_patina
 ensure_starship
@@ -221,12 +250,14 @@ ensure_dust_cargo
 ensure_node_lts
 install_fonts
 
+install_progress 3 5 "Optional components"
 KANATA_CONFIG_SRC=""
 if [[ "$INSTALL_KANATA" == "yes" ]]; then
   echo ">> Kanata auto-install is not configured for Ubuntu. Install Kanata manually if needed."
   choose_kanata_config
 fi
 
+install_progress 4 5 "Managed configuration"
 echo "==> Creating config symlinks..."
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
   prepare_niri_config_dir
@@ -244,6 +275,8 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
   install_zen_browser_url_handler
   apply_zen_browser_preferences
 fi
+
+install_progress 5 5 "Finishing setup"
 copy_gitconfig
 ensure_codex_config
 ensure_zsh_default_shell
@@ -259,4 +292,4 @@ fi
 
 ensure_uv_tools ty ruff
 
-echo "==> Done."
+echo "==> Installation complete"

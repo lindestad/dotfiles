@@ -19,7 +19,8 @@ ensure_kanata_cargo() {
 choose_kanata_config() {
   # Read by the sourcing distro installer after this function returns.
   local prompt="Remap ISO to ANSI like? Warning, remaps Enter key."
-  if [[ "$(prompt_yes_no "$prompt")" == "yes" ]]; then
+  if [[ "${KANATA_LAYOUT:-}" == "iso-ansi" ]] || \
+    [[ -z "${KANATA_LAYOUT:-}" && "$(prompt_yes_no "$prompt")" == "yes" ]]; then
     # shellcheck disable=SC2034
     KANATA_CONFIG_SRC="$DOTFILES_DIR/config/kanata/config_iso_to_ansi.kbd"
   else
@@ -39,11 +40,13 @@ setup_kanata_startup() {
   local system_prompt user_prompt
 
   system_prompt="Enable Kanata system-wide (pre-login; copies config to /etc, rerun script after changes)?"
-  if [[ "$(prompt_yes_no "$system_prompt")" == "yes" ]]; then
+  if [[ "${KANATA_STARTUP:-}" == "system" ]] || \
+    [[ -z "${KANATA_STARTUP:-}" && "$(prompt_yes_no "$system_prompt")" == "yes" ]]; then
     KANATA_ENABLE_SYSTEM=yes KANATA_ENABLE_USER=no bash "$helper"
   else
     user_prompt="Enable Kanata for this user (starts after login)?"
-    if [[ "$(prompt_yes_no "$user_prompt")" == "yes" ]]; then
+    if [[ "${KANATA_STARTUP:-}" == "user" ]] || \
+      [[ -z "${KANATA_STARTUP:-}" && "$(prompt_yes_no "$user_prompt")" == "yes" ]]; then
       KANATA_ENABLE_SYSTEM=no KANATA_ENABLE_USER=yes bash "$helper"
     else
       KANATA_ENABLE_SYSTEM=no KANATA_ENABLE_USER=no bash "$helper"

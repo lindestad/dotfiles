@@ -7,6 +7,7 @@ source "$DOTFILES_DIR/scripts/install/common.sh"
 
 parse_install_flags "$@"
 ensure_not_root
+start_install_log
 
 DNF_PKGS=(
   zsh
@@ -122,11 +123,12 @@ ensure_ghostty_fedora() {
   fi
 
   echo ">> Ghostty is not available from the configured Fedora repositories."
-  if [[ "$ASSUME_YES" == "yes" ]]; then
+  if [[ "${ALLOW_GHOSTTY_COPR:-}" == "no" || "$ASSUME_YES" == "yes" ]]; then
     echo ">> Skipping Ghostty COPR setup in non-interactive mode."
     return
   fi
-  if [[ "$(prompt_yes_no "Install Ghostty from the scottames/ghostty COPR?")" != "yes" ]]; then
+  if [[ "${ALLOW_GHOSTTY_COPR:-}" != "yes" ]] && \
+    [[ "$(prompt_yes_no "Install Ghostty from the scottames/ghostty COPR?")" != "yes" ]]; then
     return
   fi
 
@@ -153,11 +155,12 @@ ensure_wezterm_fedora() {
   fi
 
   echo ">> WezTerm is not available from the configured Fedora repositories."
-  if [[ "$ASSUME_YES" == "yes" ]]; then
+  if [[ "${ALLOW_WEZTERM_COPR:-}" == "no" || "$ASSUME_YES" == "yes" ]]; then
     echo ">> Skipping WezTerm COPR setup in non-interactive mode."
     return
   fi
-  if [[ "$(prompt_yes_no "Install WezTerm from the official wezfurlong/wezterm-nightly COPR?")" != "yes" ]]; then
+  if [[ "${ALLOW_WEZTERM_COPR:-}" != "yes" ]] && \
+    [[ "$(prompt_yes_no "Install WezTerm from the official wezfurlong/wezterm-nightly COPR?")" != "yes" ]]; then
     return
   fi
 
@@ -216,7 +219,8 @@ if ! have dnf; then
   exit 1
 fi
 
-resolve_install_flags yes yes
+show_install_intro
+collect_install_choices yes yes
 add_alacritty_link
 add_wezterm_link
 add_ghostty_link
@@ -224,6 +228,30 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
   add_wayland_desktop_links
 fi
 
+collect_fedora_repository_choices() {
+  ALLOW_GHOSTTY_COPR="no"
+  ALLOW_WEZTERM_COPR="no"
+  ALLOW_NOCTALIA_REPO="no"
+
+  if [[ "$ASSUME_YES" != "yes" ]] && ! have ghostty && \
+    ! dnf -q list --available ghostty >/dev/null 2>&1; then
+    ALLOW_GHOSTTY_COPR="$(prompt_yes_no "Allow the scottames/ghostty COPR if needed?")"
+  fi
+  if [[ "$ASSUME_YES" != "yes" ]] && ! have wezterm && \
+    ! dnf -q list --available wezterm >/dev/null 2>&1; then
+    ALLOW_WEZTERM_COPR="$(prompt_yes_no "Allow the official WezTerm nightly COPR if needed?")"
+  fi
+  if [[ "$INSTALL_NIRI" == "yes" && "$ASSUME_YES" != "yes" ]] && \
+    ! rpm -q noctalia-shell >/dev/null 2>&1 && ! rpm -q noctalia-shell-legacy >/dev/null 2>&1 && \
+    ! dnf -q list --available noctalia-shell >/dev/null 2>&1; then
+    ALLOW_NOCTALIA_REPO="$(prompt_yes_no "Allow the Terra repository for Noctalia if needed?")"
+  fi
+}
+
+collect_fedora_repository_choices
+
+show_install_plan
+install_progress 1 5 "System packages"
 echo "==> Installing dnf packages..."
 install_dnf "${DNF_PKGS[@]}" "${DNF_PKGS_OPTIONAL[@]}"
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
@@ -235,6 +263,8 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
 fi
 ensure_wezterm_fedora
 ensure_ghostty_fedora
+
+install_progress 2 5 "Command-line tools"
 ensure_rust_toolchain
 ensure_zsh_patina
 ensure_starship
@@ -256,6 +286,14 @@ ensure_zellij_fedora
 ensure_node_lts
 install_fonts
 
+install_progress 3 5 "Optional components"
+KANATA_CONFIG_SRC=""
+if [[ "$INSTALL_KANATA" == "yes" ]]; then
+  ensure_kanata_cargo
+  choose_kanata_config
+fi
+
+install_progress 4 5 "Managed configuration"
 echo "==> Creating config symlinks..."
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
   prepare_niri_config_dir
@@ -273,15 +311,11 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
   install_zen_browser_url_handler
   apply_zen_browser_preferences
 fi
+
+install_progress 5 5 "Finishing setup"
 copy_gitconfig
 ensure_codex_config
 ensure_zsh_default_shell
-
-KANATA_CONFIG_SRC=""
-if [[ "$INSTALL_KANATA" == "yes" ]]; then
-  ensure_kanata_cargo
-  choose_kanata_config
-fi
 
 if [[ "$INSTALL_KANATA" == "yes" && -n "$KANATA_CONFIG_SRC" ]]; then
   link_kanata_config "$KANATA_CONFIG_SRC"
@@ -294,4 +328,4 @@ fi
 
 ensure_uv_tools ty ruff
 
-echo "==> Done."
+echo "==> Installation complete"

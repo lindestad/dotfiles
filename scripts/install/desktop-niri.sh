@@ -31,11 +31,12 @@ ensure_noctalia_fedora() {
   fi
 
   echo ">> Noctalia Shell is not available from the configured Fedora repositories."
-  if [[ "$ASSUME_YES" == "yes" ]]; then
+  if [[ "${ALLOW_NOCTALIA_REPO:-}" == "no" || "$ASSUME_YES" == "yes" ]]; then
     echo ">> Skipping Terra repository setup in non-interactive mode."
     return
   fi
-  if [[ "$(prompt_yes_no "Install Terra repository and Noctalia Shell?")" != "yes" ]]; then
+  if [[ "${ALLOW_NOCTALIA_REPO:-}" != "yes" ]] && \
+    [[ "$(prompt_yes_no "Install Terra repository and Noctalia Shell?")" != "yes" ]]; then
     return
   fi
 
@@ -145,11 +146,12 @@ ensure_noctalia_ubuntu() {
     return
   fi
 
-  if [[ "$ASSUME_YES" == "yes" ]]; then
+  if [[ "${ALLOW_NOCTALIA_REPO:-}" == "no" || "$ASSUME_YES" == "yes" ]]; then
     echo ">> Skipping Noctalia APT repository setup in non-interactive mode."
     return
   fi
-  if [[ "$(prompt_yes_no "Add Noctalia APT repository for $suite and install Noctalia Shell?")" != "yes" ]]; then
+  if [[ "${ALLOW_NOCTALIA_REPO:-}" != "yes" ]] && \
+    [[ "$(prompt_yes_no "Add Noctalia APT repository for $suite and install Noctalia Shell?")" != "yes" ]]; then
     return
   fi
 

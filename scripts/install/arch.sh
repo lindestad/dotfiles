@@ -7,6 +7,7 @@ source "$DOTFILES_DIR/scripts/install/common.sh"
 
 parse_install_flags "$@"
 ensure_not_root
+start_install_log
 
 PACMAN_PKGS=(
   zsh
@@ -93,7 +94,8 @@ if ! have pacman; then
   exit 1
 fi
 
-resolve_install_flags yes yes
+show_install_intro
+collect_install_choices yes yes
 add_alacritty_link
 add_wezterm_link
 add_ghostty_link
@@ -101,6 +103,8 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
   add_wayland_desktop_links
 fi
 
+show_install_plan
+install_progress 1 5 "System packages"
 echo "==> Installing pacman packages..."
 install_pacman "${PACMAN_PKGS[@]}"
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
@@ -112,6 +116,8 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
     NIRI_AUR_PKGS+=(noctalia-shell)
   fi
 fi
+
+install_progress 2 5 "Command-line tools"
 ensure_rust_toolchain
 ensure_zsh_patina
 ensure_starship
@@ -127,6 +133,7 @@ ensure_dust_cargo
 ensure_node_lts
 install_fonts
 
+install_progress 3 5 "Optional components"
 ensure_carapace_release
 if [[ "$INSTALL_NIRI" == "yes" ]] && ((${#NIRI_AUR_PKGS[@]})); then
   echo "==> Installing Niri + Noctalia AUR packages (if helper found)..."
@@ -157,6 +164,7 @@ if [[ "$INSTALL_KANATA" == "yes" ]]; then
   setup_kanata_startup
 fi
 
+install_progress 4 5 "Managed configuration"
 echo "==> Creating config symlinks..."
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
   prepare_niri_config_dir
@@ -174,6 +182,8 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
   install_zen_browser_url_handler
   apply_zen_browser_preferences
 fi
+
+install_progress 5 5 "Finishing setup"
 copy_gitconfig
 ensure_codex_config
 ensure_zsh_default_shell
@@ -184,4 +194,4 @@ fi
 
 ensure_uv_tools ty ruff
 
-echo "==> Done."
+echo "==> Installation complete"

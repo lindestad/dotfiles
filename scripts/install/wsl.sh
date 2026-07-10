@@ -9,6 +9,7 @@ source "$DOTFILES_DIR/scripts/install/common.sh"
 
 parse_install_flags "$@"
 ensure_not_root
+start_install_log
 
 APT_PKGS=(
   zsh
@@ -122,11 +123,15 @@ if ! have apt-get; then
   exit 1
 fi
 
-resolve_install_flags no no
+show_install_intro
+collect_install_choices no no
 
+show_install_plan
+install_progress 1 4 "System packages"
 echo "==> Installing apt packages..."
 install_apt "${APT_PKGS[@]}" "${APT_PKGS_OPTIONAL[@]}"
 
+install_progress 2 4 "Command-line tools"
 echo "==> Installing Rust and cargo tools..."
 ensure_rust_toolchain
 
@@ -154,6 +159,7 @@ ensure_helix
 ensure_vivid_cargo
 install_fonts
 
+install_progress 3 4 "Managed configuration"
 echo "==> Creating WSL config symlinks..."
 link_pairs "${LINKS[@]}"
 ensure_broot_launcher
@@ -162,8 +168,9 @@ install_dotfiles_helpers
 copy_gitconfig
 ensure_codex_config
 
+install_progress 4 4 "Finishing setup"
 ensure_zsh_default_shell
 
 ensure_uv_tools ty ruff
 
-echo "==> Done."
+echo "==> Installation complete"
