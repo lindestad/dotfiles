@@ -104,6 +104,7 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
 fi
 
 show_install_plan
+request_sudo_access
 install_progress 1 5 "System packages"
 echo "==> Installing pacman packages..."
 install_pacman "${PACMAN_PKGS[@]}"

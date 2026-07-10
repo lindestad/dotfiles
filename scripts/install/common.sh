@@ -13,9 +13,9 @@ have() { command -v "$1" >/dev/null 2>&1; }
 export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
 
 render_install_output() {
-  local line current total label width filled_count empty_count percent filled empty
+  local line current=0 total=1 label="" progress_active="no"
   local reset=$'\033[0m' bold=$'\033[1m' muted=$'\033[2m'
-  local cyan=$'\033[38;5;81m' green=$'\033[38;5;114m'
+  local violet=$'\033[38;5;176m' green=$'\033[38;5;114m'
   local yellow=$'\033[38;5;214m' red=$'\033[38;5;203m'
 
   while IFS= read -r line || [[ -n "$line" ]]; do
@@ -23,21 +23,21 @@ render_install_output() {
       current="${BASH_REMATCH[1]}"
       total="${BASH_REMATCH[2]}"
       label="${BASH_REMATCH[3]}"
-      width=28
-      percent=$((current * 100 / total))
-      filled_count=$((current * width / total))
-      empty_count=$((width - filled_count))
-      printf -v filled '%*s' "$filled_count" ''
-      printf -v empty '%*s' "$empty_count" ''
-      filled="${filled// /■}"
-      empty="${empty// /･}"
-      printf '\n%b%s%s %3d%%%b  %b%s%b\n' \
-        "$yellow" "$filled" "$empty" "$percent" "$reset" "$bold" "$label" "$reset"
+      progress_active="yes"
+      draw_install_progress "$current" "$total" "$label"
       continue
     fi
 
+    if [[ "$progress_active" == "yes" ]]; then
+      printf '\r\033[2K'
+    fi
+
     case "$line" in
-      '==> '*) printf '\n%b◆%b %b%s%b\n' "$cyan" "$reset" "$bold" "${line#==> }" "$reset" ;;
+      '==> Installation complete')
+        printf '\n%b◆%b %b%s%b\n' "$violet" "$reset" "$bold" "${line#==> }" "$reset"
+        progress_active="no"
+        ;;
+      '==> '*) printf '\n%b◆%b %b%s%b\n' "$violet" "$reset" "$bold" "${line#==> }" "$reset" ;;
       '== '*) printf '%b✓%b %s\n' "$green" "$reset" "${line#== }" ;;
       '-> '*) printf '%b✓%b %s\n' "$green" "$reset" "${line#-> }" ;;
       '>> '*) printf '%b⚠%b %s\n' "$yellow" "$reset" "${line#>> }" ;;
@@ -45,7 +45,33 @@ render_install_output() {
       '   '*) printf '%b%s%b\n' "$muted" "$line" "$reset" ;;
       *) printf '%s\n' "$line" ;;
     esac
+
+    if [[ "$progress_active" == "yes" ]]; then
+      draw_install_progress "$current" "$total" "$label"
+    fi
   done
+
+  if [[ "$progress_active" == "yes" ]]; then
+    printf '\r\033[2K'
+    draw_install_progress "$current" "$total" "$label"
+    printf '\n'
+  fi
+}
+
+draw_install_progress() {
+  local current="$1" total="$2" label="$3"
+  local width=28 filled_count empty_count percent filled empty
+  local reset=$'\033[0m' bold=$'\033[1m' yellow=$'\033[38;5;214m'
+
+  percent=$((current * 100 / total))
+  filled_count=$((current * width / total))
+  empty_count=$((width - filled_count))
+  printf -v filled '%*s' "$filled_count" ''
+  printf -v empty '%*s' "$empty_count" ''
+  filled="${filled// /■}"
+  empty="${empty// /･}"
+  printf '\r\033[2K%b%s%s %3d%%%b  %b%s%b' \
+    "$yellow" "$filled" "$empty" "$percent" "$reset" "$bold" "$label" "$reset"
 }
 
 start_install_log() {
@@ -103,21 +129,21 @@ EOF
 )"
   details="Personal workstation bootstrap
 Installs tools, links managed config, and preserves replaced files as timestamped backups.
-Choices are collected before installation; package managers may still request sudo credentials.
+Choices are collected first, then administrator access is requested once for system changes.
 Log: ${DOTFILES_INSTALL_LOG_FILE:-disabled}"
 
   if [[ "${DOTFILES_INSTALL_INTERACTIVE:-no}" == "yes" ]]; then
-    printf '\033[38;5;81m%s\033[0m\n\n\033[1m%s\033[0m\n\033[2m%s\n%s\n%s\033[0m\n' \
+    printf '\n\n\n\033[38;5;214m%s\033[0m\n\n\033[1m%s\033[0m\n\033[2m%s\n%s\n%s\033[0m\n' \
       "$logo" \
       "${details%%$'\n'*}" \
       "$(printf '%s\n' "$details" | sed -n '2p')" \
       "$(printf '%s\n' "$details" | sed -n '3p')" \
       "$(printf '%s\n' "$details" | sed -n '4p')" >&3
     {
-      printf '%s\n\n%s\n' "$logo" "$details"
+      printf '\n\n\n%s\n\n%s\n' "$logo" "$details"
     } >>"$DOTFILES_INSTALL_LOG_FILE"
   else
-    printf '%s\n\n%s\n' "$logo" "$details"
+    printf '\n\n\n%s\n\n%s\n' "$logo" "$details"
   fi
 }
 
@@ -290,6 +316,13 @@ show_install_plan() {
   if [[ -n "$SET_ZSH_DEFAULT" ]]; then
     echo "-> Set zsh as default: $SET_ZSH_DEFAULT"
   fi
+}
+
+request_sudo_access() {
+  echo "==> Administrator access"
+  echo "   Authenticate now so package installation can run uninterrupted."
+  sudo -v
+  echo "== Administrator access confirmed"
 }
 
 install_progress() {

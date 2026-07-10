@@ -251,6 +251,7 @@ collect_fedora_repository_choices() {
 collect_fedora_repository_choices
 
 show_install_plan
+request_sudo_access
 install_progress 1 5 "System packages"
 echo "==> Installing dnf packages..."
 install_dnf "${DNF_PKGS[@]}" "${DNF_PKGS_OPTIONAL[@]}"

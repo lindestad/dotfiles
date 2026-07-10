@@ -217,6 +217,7 @@ collect_ubuntu_repository_choices() {
 collect_ubuntu_repository_choices
 
 show_install_plan
+request_sudo_access
 install_progress 1 5 "System packages"
 echo "==> Installing apt packages..."
 install_apt "${APT_PKGS_COMMON[@]}" "${APT_PKGS_OPTIONAL[@]}"

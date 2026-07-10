@@ -127,6 +127,7 @@ show_install_intro
 collect_install_choices no no
 
 show_install_plan
+request_sudo_access
 install_progress 1 4 "System packages"
 echo "==> Installing apt packages..."
 install_apt "${APT_PKGS[@]}" "${APT_PKGS_OPTIONAL[@]}"
