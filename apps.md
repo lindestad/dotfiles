@@ -9,13 +9,14 @@ These are the main package and tool installs managed by the platform installers.
 | Tool | Arch | Ubuntu | Fedora | WSL | Windows |
 | --- | --- | --- | --- | --- | --- |
 | 7zip/p7zip | `7zip` | `p7zip-full` | `7zip` | `p7zip-full` | `7zip.7zip` |
-| Alacritty | not installed | not installed | `alacritty` | not installed | not installed |
+| Alacritty | not installed | not installed | `alacritty` | not installed | `Alacritty.Alacritty` |
 | Atuin | `atuin` | `atuin` or cargo fallback | `atuin` | `atuin` or cargo fallback | `Atuinsh.Atuin` |
 | bat | `bat` | `bat` | `bat` | `bat` | `sharkdp.bat` |
 | bottom/btm | `bottom` | `btm` | cargo fallback | `btm` | `Clement.bottom` |
+| btop | `btop` | `btop` | `btop` | `btop` | `aristocratos.btop4win` |
 | Broot | `broot` | `broot` or cargo fallback | cargo fallback | `broot` or cargo fallback | `Dystroy.broot` |
 | carapace | release fallback | `carapace` or release fallback | release fallback | `carapace` or release fallback | `rsteube.Carapace` |
-| difftastic | cargo install | cargo install | cargo install | cargo install | not installed |
+| difftastic | cargo install | cargo install | cargo install | cargo install | `Wilfred.difftastic` |
 | direnv | `direnv` | `direnv` | `direnv` | `direnv` | `direnv.direnv` |
 | dust | `dust` with cargo fallback | `du-dust` with cargo fallback | `du-dust` with cargo fallback | `du-dust` with cargo fallback | `bootandy.dust` |
 | eza | `eza` | `eza` (optional) | `eza` | `eza` (optional) | `eza-community.eza` |
@@ -38,15 +39,19 @@ These are the main package and tool installs managed by the platform installers.
 | pipx | `python-pipx` | `pipx` | `pipx` | `pipx` | installed with `py -3.12 -m pip install --user pipx` |
 | procs | `procs` | `procs` or cargo fallback | `procs` | `procs` or cargo fallback | `dalance.procs` |
 | Python | `python` | `python3`, `python3.12`, `python3.12-venv` | `python3.12` | `python3`, `python3.12`, `python3.12-venv` | `Python.Python.3.12` |
+| Qalculate! | `qalculate-qt` with `--niri` | not installed | `qalculate-qt` with `--niri` | not installed | `Qalculate.Qalculate` |
 | ripgrep | `ripgrep` | `ripgrep` | `ripgrep` | `ripgrep` | `BurntSushi.ripgrep.MSVC` |
+| rustup/cargo | install script | install script | install script | install script | `Rustlang.Rustup` |
 | sd | `sd` | `sd` or cargo fallback | cargo fallback | `sd` or cargo fallback | `chmln.sd` |
 | ShellCheck | `shellcheck` | `shellcheck` | `ShellCheck` | `shellcheck` | `koalaman.shellcheck` |
 | shfmt | `shfmt` | `shfmt` or release fallback | `shfmt` | `shfmt` or release fallback | `mvdan.shfmt` |
 | starship | cargo fallback | cargo fallback | cargo fallback | cargo fallback | `Starship.Starship` |
+| tealdeer/tldr | cargo install | cargo install | cargo install | cargo install | `dbrgn.tealdeer` |
 | Typst CLI | `typst` | cargo fallback | cargo fallback | cargo fallback | `Typst.Typst` |
 | uutils coreutils | `uutils-coreutils` | `uutils-coreutils` (optional) | `uutils-coreutils` (optional) | not installed | `uutils.coreutils` |
 | uv | `uv` | standalone installer | `uv` with standalone fallback | standalone installer | `astral-sh.uv` |
 | uv tools | `ty`, `ruff` | `ty`, `ruff` | `ty`, `ruff` | `ty`, `ruff` | `ty`, `ruff` |
+| vivid | `vivid` | `vivid` (optional) | cargo fallback | `vivid` (optional) | `sharkdp.vivid` |
 | watchexec | `watchexec` | `watchexec` or cargo fallback | cargo fallback | `watchexec` or cargo fallback | upstream release fallback |
 | WezTerm | `wezterm` | prompted official APT repo | `wezterm` or prompted official COPR | not installed | `wez.wezterm` |
 | xh | `xh` | `xh` or cargo fallback | cargo fallback | `xh` or cargo fallback | `ducaale.xh` |
@@ -62,7 +67,6 @@ These are installed only by the Linux/WSL shell installers.
 | Tool | Arch | Ubuntu | Fedora | WSL |
 | --- | --- | --- | --- | --- |
 | browser automation | not installed | not installed | `chromium`, `chromium-headless`, `chromedriver`, `xorg-x11-server-Xvfb` | not installed |
-| btop | `btop` | `btop` | `btop` | `btop` |
 | build tools | not installed | `build-essential`, `cmake` | `gcc`, `gcc-c++`, `make`, `cmake` | `build-essential`, `cmake` |
 | ca-certificates | not installed | `ca-certificates` | not installed | `ca-certificates` |
 | containers | not installed | not installed | `podman`, `podman-compose`, `buildah` | not installed |
@@ -76,11 +80,8 @@ These are installed only by the Linux/WSL shell installers.
 | OpenSSL headers | not installed | `libssl-dev` | `openssl-devel` | `libssl-dev` |
 | pkg-config | not installed | `pkg-config` | `pkgconf-pkg-config` | `pkg-config` |
 | resvg | cargo fallback | cargo fallback | cargo fallback | cargo fallback |
-| rustup/cargo | install script | install script | install script | install script |
-| tealdeer/tldr | cargo install | cargo install | cargo install | cargo install |
 | unzip | `unzip` | `unzip` | `unzip` | `unzip` |
 | user fonts | bundled fonts copied to `~/.local/share/fonts` | same | same | same |
-| vivid | `vivid` | `vivid` (optional) | cargo fallback | `vivid` (optional) |
 | Fedora workflow extras | not installed | not installed | `entr`, `git-lfs`, `tokei`, `tree` | not installed |
 | zsh | `zsh` | `zsh` | `zsh` | `zsh` |
 | zsh-patina | cargo install with `target-cpu=native` | same | same | same |
@@ -169,7 +170,7 @@ These are not package installs, but the installers manage them alongside the too
 | Noctalia color scheme | optional with `--niri` | not managed |
 | Kanata | optional | optional |
 | Starship | symlinked | linked/copied |
-| Tealdeer | config symlinked with 30-day automatic cache updates | not managed |
+| Tealdeer | config symlinked with 30-day automatic cache updates | linked/copied to the path reported by `tldr --show-paths` |
 | WezTerm | non-WSL Linux only | linked/copied to `.wezterm.lua` and `.config/wezterm/wezterm.lua` |
 | Windows Terminal | not managed | Git Bash profile/default configured when settings exist |
 | Yazi | symlinked | linked/copied |

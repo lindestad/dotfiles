@@ -146,6 +146,7 @@ function Write-InstallProgress {
 }
 
 $apps = @(
+    "Alacritty.Alacritty",
     "Helix.Helix",
     "Neovim.Neovim",
     "Starship.Starship",
@@ -156,7 +157,6 @@ $apps = @(
     "Gyan.FFmpeg",
     "7zip.7zip",
     "jqlang.jq",
-    "sharkdp.fd",
     "sharkdp.bat",
     "junegunn.fzf",
     "ajeetdsouza.zoxide",
@@ -173,7 +173,9 @@ $apps = @(
     "astral-sh.uv",
     "jftuga.less",
     "dandavison.delta",
+    "Wilfred.difftastic",
     "Microsoft.PowerShell",
+    "Rustlang.Rustup",
     "uutils.coreutils",
     "wez.wezterm",
     "direnv.direnv",
@@ -182,6 +184,8 @@ $apps = @(
     "tamasfe.taplo",
     "MikeFarah.yq",
     "sharkdp.hyperfine",
+    "dbrgn.tealdeer",
+    "sharkdp.vivid",
     "Atuinsh.Atuin",
     "chmln.sd",
     "ducaale.xh",
@@ -189,6 +193,8 @@ $apps = @(
     "Dystroy.broot",
     "JesseDuffield.lazygit",
     "StephanDilly.gitui",
+    "Qalculate.Qalculate",
+    "aristocratos.btop4win",
     # Kanata is optional; installed only if selected
     # "jtroo.kanata_gui",
     "rsteube.Carapace"
@@ -1032,6 +1038,20 @@ function Resolve-WindowsInstallChoice {
     }
 }
 
+function Get-TealdeerConfigPath {
+    $tldr = Get-WinGetLinkedCommand -Name "tldr"
+    if (-not $tldr) { return $null }
+
+    $configLine = & $tldr --show-paths 2>$null |
+        Where-Object { $_ -match '^Config path:' } |
+        Select-Object -First 1
+    if ($LASTEXITCODE -ne 0 -or -not $configLine) { return $null }
+
+    $match = [regex]::Match($configLine, '^Config path:\s+(.+?)(?:\s+\([^)]+\))?$')
+    if (-not $match.Success) { return $null }
+    return $match.Groups[1].Value
+}
+
 function Install-WindowsKanata {
     param(
         [Parameter(Mandatory)] [string]$SelectedLayout
@@ -1131,6 +1151,13 @@ New-SafeLink -Src (Join-Path $Dotfiles "config/nvim") -Dst (Join-Path $UserHome 
 New-SafeLink -Src (Join-Path $Dotfiles "shells/.bashrc") -Dst (Join-Path $UserHome ".bashrc")
 Set-GitBashProfile -UserHome $UserHome
 New-SafeLink -Src (Join-Path $Dotfiles "config/starship/windows/starship.toml") -Dst (Join-Path $UserHome ".config/starship.toml")
+$tealdeerConfigPath = Get-TealdeerConfigPath
+if ($tealdeerConfigPath) {
+    New-SafeLink -Src (Join-Path $Dotfiles "config/tealdeer/config.toml") -Dst $tealdeerConfigPath
+}
+else {
+    Write-Status ">> Could not determine the tealdeer config path; run 'tldr --show-paths' after opening a new shell"
+}
 New-SafeLink -Src (Join-Path $Dotfiles "config/yazi") -Dst (Join-Path $Roaming "yazi/config")
 Set-WindowsTerminalGitBashDefault
 

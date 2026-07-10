@@ -68,6 +68,14 @@ cd $HOME\.dotfiles
 `install.sh` and `install.ps1` are the supported entrypoints. Platform-specific installer code lives under `scripts/install/`.
 
 On Windows, the installer can optionally install and enable the tracked US+NO keyboard layout for `RightAlt` Norwegian characters.
+It collects optional-component choices before requesting elevation and writes a transcript to `logs/`.
+Use flags for repeatable installs:
+
+```powershell
+.\install.ps1 -UsNoLayout -Kanata -KanataLayout iso-ansi
+.\install.ps1 -NoUsNoLayout -NoKanata
+.\install.ps1 -Yes # non-interactive defaults; optional components stay disabled
+```
 
 ## Maintenance
 
