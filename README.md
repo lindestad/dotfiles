@@ -15,7 +15,7 @@
 
 This repository provides a unified development environment across **Linux**, **Windows**, and **WSL**, with version-controlled configuration for editors, terminals, shells, and CLI tools.
 
-<img width="1262" height="147" alt="image" src="https://github.com/user-attachments/assets/fd6f5ba9-df9c-4bbb-ab7f-e4ec99f44daf" />
+<img width="1262" height="346" alt="image" src="https://github.com/user-attachments/assets/12857e87-bd5d-4a77-8d99-021fe795047a" />
 
 ## Contents
 
