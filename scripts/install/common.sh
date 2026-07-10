@@ -129,16 +129,14 @@ EOF
 )"
   details="Personal workstation bootstrap
 Installs tools, links managed config, and preserves replaced files as timestamped backups.
-Choices are collected first, then administrator access is requested once for system changes.
 Log: ${DOTFILES_INSTALL_LOG_FILE:-disabled}"
 
   if [[ "${DOTFILES_INSTALL_INTERACTIVE:-no}" == "yes" ]]; then
-    printf '\n\n\n\033[38;5;214m%s\033[0m\n\n\033[1m%s\033[0m\n\033[2m%s\n%s\n%s\033[0m\n' \
+    printf '\n\n\n\033[38;5;214m%s\033[0m\n\n\033[1m%s\033[0m\n\033[2m%s\n%s\033[0m\n' \
       "$logo" \
       "${details%%$'\n'*}" \
       "$(printf '%s\n' "$details" | sed -n '2p')" \
-      "$(printf '%s\n' "$details" | sed -n '3p')" \
-      "$(printf '%s\n' "$details" | sed -n '4p')" >&3
+      "$(printf '%s\n' "$details" | sed -n '3p')" >&3
     {
       printf '\n\n\n%s\n\n%s\n' "$logo" "$details"
     } >>"$DOTFILES_INSTALL_LOG_FILE"
