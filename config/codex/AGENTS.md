@@ -11,7 +11,7 @@
 
 - Use short, human-readable, lowercase commit messages.
 - Match the existing commit style in the repo when it is clear.
-- Avoid `codex` in branch names unless explicitly requested.
+- Do not use assistant or automation identifiers in branch names or commit messages, including `agent`, `claude`, `codex`, `copilot`, or similar terms, unless explicitly instructed. If you believe such a name would be better, consult the user before using it.
 - Treat explicit commit requests as part of the task.
 - Keep branch and PR scope focused; use stacked PRs when requested.
 
