@@ -1,0 +1,4 @@
+interface:
+  display_name: "GitHub Publish"
+  short_description: "Safely commit, push, and open pull requests"
+  default_prompt: "Use $gh-publish to prepare and publish these changes safely."

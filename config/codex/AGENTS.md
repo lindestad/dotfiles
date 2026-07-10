@@ -12,7 +12,8 @@
 - Use short, human-readable, lowercase commit messages.
 - Match the existing commit style in the repo when it is clear.
 - Do not use assistant or automation identifiers in branch names or commit messages, including `agent`, `claude`, `codex`, `copilot`, or similar terms, unless explicitly instructed. If you believe such a name would be better, consult the user before using it.
-- Treat explicit commit requests as part of the task.
+- Commit when an atomic unit of work is complete and a commit is a sensible checkpoint, as well as when explicitly requested.
+- Do not use the bundled `github:yeet` skill because its naming and publishing instructions conflict with these agreements. Use the personal `gh-publish` skill for commits, pushes, and pull requests.
 - Keep branch and PR scope focused; use stacked PRs when requested.
 
 ## Pull Requests

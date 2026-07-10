@@ -747,6 +747,7 @@ New-SafeLink -Src (Join-Path $Dotfiles "config/broot/conf.toml") -Dst (Join-Path
 New-SafeLink -Src (Join-Path $Dotfiles "config/broot/skins") -Dst (Join-Path $brootConfigDir "skins")
 Install-BrootShellIntegration -UserHome $UserHome
 New-SafeLink -Src (Join-Path $Dotfiles "config/codex/AGENTS.md") -Dst (Join-Path $UserHome ".codex/AGENTS.md")
+New-SafeLink -Src (Join-Path $Dotfiles "config/codex/skills/gh-publish") -Dst (Join-Path $UserHome ".codex/skills/gh-publish")
 New-SafeLink -Src (Join-Path $Dotfiles "config/alacritty/alacritty-windows.toml") -Dst (Join-Path $Roaming "alacritty/alacritty.toml")
 $weztermConfig = Join-Path $Dotfiles "config/wezterm/wezterm-windows.lua"
 New-SafeLink -Src $weztermConfig -Dst (Join-Path $UserHome ".wezterm.lua")

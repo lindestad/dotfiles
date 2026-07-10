@@ -412,6 +412,7 @@ check_managed_link "$DOTFILES_DIR/config/atuin/themes" "$HOME/.config/atuin/them
 check_managed_link "$DOTFILES_DIR/config/broot/conf.toml" "$HOME/.config/broot/conf.toml" "broot config"
 check_managed_link "$DOTFILES_DIR/config/broot/skins" "$HOME/.config/broot/skins" "broot skins"
 check_managed_link "$DOTFILES_DIR/config/codex/AGENTS.md" "$HOME/.codex/AGENTS.md" "Codex instructions"
+check_managed_link "$DOTFILES_DIR/config/codex/skills/gh-publish" "$HOME/.codex/skills/gh-publish" "Codex GitHub publish skill"
 check_managed_link "$DOTFILES_DIR/config/copilot/copilot-instructions.md" "$HOME/.copilot/copilot-instructions.md" "Copilot instructions"
 check_managed_link "$DOTFILES_DIR/config/git/ignore" "$HOME/.config/git/ignore" "git ignore"
 check_managed_link "$DOTFILES_DIR/config/helix/config.toml" "$HOME/.config/helix/config.toml" "helix config"
