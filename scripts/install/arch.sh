@@ -67,6 +67,7 @@ NIRI_PACMAN_PKGS=(
   bluez-utils
   network-manager-applet
   pavucontrol
+  qalculate-qt
   niri
   fuzzel
   grim

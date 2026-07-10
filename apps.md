@@ -118,6 +118,7 @@ These are installed when the Linux installer runs with `--niri`.
 | pavucontrol | `pavucontrol` | `pavucontrol` | `pavucontrol` |
 | polkit auth agent | not installed | not installed | `xfce-polkit` |
 | power profiles | `power-profiles-daemon` | `power-profiles-daemon` | `power-profiles-daemon` unless `tuned-ppd` is installed |
+| Qalculate! | `qalculate-qt` | not installed | `qalculate-qt` |
 | sensors | `lm_sensors` | `lm-sensors` | `lm_sensors` |
 | swayidle | `swayidle` | `swayidle` | `swayidle` |
 | upower | `upower` | `upower` | `upower` |
