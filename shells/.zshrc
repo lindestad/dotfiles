@@ -33,6 +33,7 @@ SAVEHIST=100000
 setopt SHARE_HISTORY INC_APPEND_HISTORY HIST_IGNORE_DUPS HIST_IGNORE_SPACE
 
 # Path and prompt config need to exist before tool initialization below.
+typeset -U path PATH
 export PATH="$HOME/go/bin:$HOME/.cargo/bin:$HOME/.local/bin:$PATH"
 export STARSHIP_CONFIG="$HOME/.config/starship.toml"
 
@@ -153,17 +154,6 @@ if command -v direnv >/dev/null 2>&1; then
   eval "$(direnv hook zsh)"
 fi
 
-# fzf keybindings + completion (installed via pacman)
-if [ -f /usr/share/fzf/key-bindings.zsh ]; then
-  source /usr/share/fzf/key-bindings.zsh
-fi
-if [ -f /usr/share/fzf/completion.zsh ]; then
-  source /usr/share/fzf/completion.zsh
-fi
-
-# Show ~10 history entries inline rather than full-screen; prompt at top.
-export FZF_CTRL_R_OPTS="--height=~40% --layout=reverse --preview-window=hidden"
-
 # Atuin history
 if command -v atuin >/dev/null 2>&1; then
   eval "$(atuin init zsh)"
@@ -193,13 +183,12 @@ export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense'
 
 # true  = lazy-load carapace on first Tab (faster shell startup)
 # false = load carapace eagerly at shell startup
-CARAPACE_LAZY=false
+CARAPACE_LAZY=true
 
 if command -v carapace >/dev/null 2>&1; then
   if [[ "$CARAPACE_LAZY" == true ]]; then
     # Lazy-load all available completers on first Tab to keep shell startup fast.
-    # Remember the current Tab binding (e.g. fzf-completion) so we can chain to it
-    # after carapace is loaded.
+    # Remember the current Tab binding so we can chain to it after loading.
     _carapace_tab_fallback="${${(z)$(bindkey '^I')}[-1]}"
     case "$_carapace_tab_fallback" in
       ''|undefined-key|_carapace_lazy_widget) _carapace_tab_fallback=expand-or-complete ;;
