@@ -88,10 +88,15 @@ $env_var\
 $crystal\
 $custom\
 $sudo\
+${env_var.DOTFILES_STARSHIP_RIGHT_START}\
 $fill\
+${env_var.DOTFILES_STARSHIP_DURATION_START}\
 $cmd_duration\
+${env_var.DOTFILES_STARSHIP_MEMORY_START}\
 $memory_usage\
+${env_var.DOTFILES_STARSHIP_TIME_START}\
 $time\
+${env_var.DOTFILES_STARSHIP_RIGHT_END}\
 $line_break\
 $jobs\
 $battery\
@@ -143,6 +148,28 @@ format = '[${ram}]($style) '
 
 [fill]
 symbol = ' '
+
+# Zsh uses these empty-by-default modules as boundaries when deciding which
+# right-aligned prompt segments fit. Other shells retain Starship's normal fill.
+[env_var.DOTFILES_STARSHIP_RIGHT_START]
+variable = 'DOTFILES_STARSHIP_RIGHT_START'
+format = '$env_value'
+
+[env_var.DOTFILES_STARSHIP_DURATION_START]
+variable = 'DOTFILES_STARSHIP_DURATION_START'
+format = '$env_value'
+
+[env_var.DOTFILES_STARSHIP_MEMORY_START]
+variable = 'DOTFILES_STARSHIP_MEMORY_START'
+format = '$env_value'
+
+[env_var.DOTFILES_STARSHIP_TIME_START]
+variable = 'DOTFILES_STARSHIP_TIME_START'
+format = '$env_value'
+
+[env_var.DOTFILES_STARSHIP_RIGHT_END]
+variable = 'DOTFILES_STARSHIP_RIGHT_END'
+format = '$env_value'
 
 [character]
 success_symbol = '[❯](bold green) '

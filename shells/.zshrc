@@ -59,7 +59,88 @@ export COLORTERM=truecolor
 ####--------------------------------------------------
 # Starship
 if command -v starship >/dev/null 2>&1; then
+  typeset -g +x DOTFILES_STARSHIP_RIGHT_START='__DOTFILES_STARSHIP_RIGHT_START__'
+  typeset -g +x DOTFILES_STARSHIP_DURATION_START='__DOTFILES_STARSHIP_DURATION_START__'
+  typeset -g +x DOTFILES_STARSHIP_MEMORY_START='__DOTFILES_STARSHIP_MEMORY_START__'
+  typeset -g +x DOTFILES_STARSHIP_TIME_START='__DOTFILES_STARSHIP_TIME_START__'
+  typeset -g +x DOTFILES_STARSHIP_RIGHT_END='__DOTFILES_STARSHIP_RIGHT_END__'
+
   eval "$(starship init zsh)"
+
+  # Ask Zsh how many terminal columns a rendered prompt fragment occupies.
+  # This handles prompt escapes and wide glyphs more accurately than ${#value}.
+  _dotfiles_prompt_length() {
+    emulate -L zsh
+    local -i COLUMNS=$(( ${#1} * 2 + 2 ))
+    local -i x=0 y=${#1} midpoint
+
+    if (( y )); then
+      while (( ${${(%):-$1%$y(l.1.0)}[-1]} )); do
+        x=$y
+        (( y *= 2 ))
+      done
+
+      while (( y > x + 1 )); do
+        (( midpoint = x + (y - x) / 2 ))
+        (( ${${(%):-$1%$midpoint(l.x.y)}[-1]} = midpoint ))
+      done
+    fi
+
+    REPLY=$x
+  }
+
+  # Keep the left side intact. When the first prompt line is too wide, remove
+  # RAM first, then the clock, and finally the command duration if necessary.
+  _dotfiles_starship_prompt() {
+    emulate -L zsh
+    local rendered remainder left duration memory timestamp suffix
+    local right padding=''
+    local -i left_width right_width gap columns=${COLUMNS:-80}
+
+    rendered="$(
+      export DOTFILES_STARSHIP_RIGHT_START DOTFILES_STARSHIP_DURATION_START
+      export DOTFILES_STARSHIP_MEMORY_START DOTFILES_STARSHIP_TIME_START
+      export DOTFILES_STARSHIP_RIGHT_END
+      command starship prompt "$@"
+    )" || {
+      print -rn -- "$rendered"
+      return
+    }
+
+    if [[ $rendered != *$DOTFILES_STARSHIP_RIGHT_START* ||
+          $rendered != *$DOTFILES_STARSHIP_RIGHT_END* ]]; then
+      print -rn -- "$rendered"
+      return
+    fi
+
+    left=${rendered%%${DOTFILES_STARSHIP_RIGHT_START}*}
+    remainder=${rendered#*${DOTFILES_STARSHIP_RIGHT_START}}
+    remainder=${remainder#*${DOTFILES_STARSHIP_DURATION_START}}
+    duration=${remainder%%${DOTFILES_STARSHIP_MEMORY_START}*}
+    remainder=${remainder#*${DOTFILES_STARSHIP_MEMORY_START}}
+    memory=${remainder%%${DOTFILES_STARSHIP_TIME_START}*}
+    remainder=${remainder#*${DOTFILES_STARSHIP_TIME_START}}
+    timestamp=${remainder%%${DOTFILES_STARSHIP_RIGHT_END}*}
+    suffix=${remainder#*${DOTFILES_STARSHIP_RIGHT_END}}
+
+    _dotfiles_prompt_length "$left"
+    left_width=$REPLY
+
+    for right in "$duration$memory$timestamp" "$duration$timestamp" "${duration% }" ''; do
+      _dotfiles_prompt_length "$right"
+      right_width=$REPLY
+      (( left_width + right_width <= columns )) && break
+    done
+
+    (( gap = columns - left_width - right_width ))
+    if (( gap > 0 )); then
+      printf -v padding '%*s' $gap ''
+    fi
+
+    print -rn -- "$left$padding$right$suffix"
+  }
+
+  PROMPT='$(_dotfiles_starship_prompt --terminal-width="$COLUMNS" --keymap="${KEYMAP:-}" --status="${STARSHIP_CMD_STATUS:-}" --pipestatus="${STARSHIP_PIPE_STATUS[*]:-}" --cmd-duration="${STARSHIP_DURATION:-}" --jobs="$STARSHIP_JOBS_COUNT")'
 fi
 
 # zoxide (better cd)
