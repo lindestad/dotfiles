@@ -87,7 +87,7 @@ fi
 step "PowerShell"
 if have pwsh; then
   # shellcheck disable=SC2016
-  pwsh -NoProfile -Command '
+  TERM=dumb pwsh -NoLogo -NoProfile -NonInteractive -Command '
     $module = Get-Module -ListAvailable -Name PSScriptAnalyzer | Select-Object -First 1
     if (-not $module) {
       Write-Host ">> skipping PSScriptAnalyzer: module is not installed"

@@ -284,7 +284,7 @@ ensure_powershell_release() {
   curl -fL "$asset_url" -o "$archive"
   tar -C "$extracted" -xzf "$archive"
   chmod 0755 "$extracted/pwsh"
-  if ! "$extracted/pwsh" -NoProfile -NonInteractive -Command 'exit 0'; then
+  if ! TERM=dumb "$extracted/pwsh" -NoLogo -NoProfile -NonInteractive -Command 'exit 0'; then
     echo "!! PowerShell could not start; its native runtime dependencies may be missing."
     rm -rf "$tmp_dir"
     return 1
@@ -319,13 +319,13 @@ ensure_psscriptanalyzer() {
     return 1
   fi
 
-  if pwsh -NoProfile -NonInteractive -Command \
+  if TERM=dumb pwsh -NoLogo -NoProfile -NonInteractive -Command \
     'if (Get-Module -ListAvailable -Name PSScriptAnalyzer) { exit 0 }; exit 1'; then
     return
   fi
 
   echo "==> Installing PSScriptAnalyzer for the current user..."
-  pwsh -NoProfile -NonInteractive -Command \
+  TERM=dumb pwsh -NoLogo -NoProfile -NonInteractive -Command \
     'Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser -Repository PSGallery -ErrorAction Stop'
 }
 

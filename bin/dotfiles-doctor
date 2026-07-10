@@ -457,7 +457,7 @@ for cmd in git zsh starship nvim hx yazi zellij atuin direnv just jq rg taplo pw
 done
 
 if have pwsh; then
-  if pwsh -NoProfile -NonInteractive -Command \
+  if TERM=dumb pwsh -NoLogo -NoProfile -NonInteractive -Command \
     'if (Get-Module -ListAvailable -Name PSScriptAnalyzer) { exit 0 }; exit 1' >/dev/null 2>&1; then
     ok "PSScriptAnalyzer"
   else
