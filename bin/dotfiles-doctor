@@ -3,27 +3,76 @@ set -uo pipefail
 
 failures=0
 warnings=0
+issue_levels=()
+issue_messages=()
+
+if [[ -t 1 && -z "${NO_COLOR:-}" && "${TERM:-}" != "dumb" ]]; then
+  reset=$'\033[0m'
+  bold=$'\033[1m'
+  green=$'\033[32m'
+  blue=$'\033[34m'
+  yellow=$'\033[33m'
+  red=$'\033[31m'
+else
+  reset=""
+  bold=""
+  green=""
+  blue=""
+  yellow=""
+  red=""
+fi
 
 ok() {
-  printf 'ok   %s\n' "$*"
+  printf '%s✓%s %s\n' "$green" "$reset" "$*"
 }
 
 info() {
-  printf 'info %s\n' "$*"
+  printf '%s●%s %s\n' "$blue" "$reset" "$*"
 }
 
 warn() {
   warnings=$((warnings + 1))
-  printf 'warn %s\n' "$*"
+  issue_levels+=(warn)
+  issue_messages+=("$*")
+  printf '%s⚠%s %s\n' "$yellow" "$reset" "$*"
 }
 
 fail() {
   failures=$((failures + 1))
-  printf 'fail %s\n' "$*"
+  issue_levels+=(fail)
+  issue_messages+=("$*")
+  printf '%s✗%s %s\n' "$red" "$reset" "$*"
 }
 
 section() {
-  printf '\n==> %s\n' "$*"
+  printf '\n%s◆ %s%s\n' "$bold$blue" "$*" "$reset"
+}
+
+print_issues() {
+  local i
+
+  ((${#issue_messages[@]})) || return
+  section "issues"
+  for i in "${!issue_messages[@]}"; do
+    if [[ "${issue_levels[$i]}" == "fail" ]]; then
+      printf '%s✗%s %s\n' "$red" "$reset" "${issue_messages[$i]}"
+    else
+      printf '%s⚠%s %s\n' "$yellow" "$reset" "${issue_messages[$i]}"
+    fi
+  done
+}
+
+print_summary() {
+  section "summary"
+  if ((failures > 0)); then
+    printf '%s✗%s doctor found %d failure(s), %d warning(s)\n' \
+      "$red" "$reset" "$failures" "$warnings"
+  elif ((warnings > 0)); then
+    printf '%s⚠%s doctor found %d warning(s)\n' "$yellow" "$reset" "$warnings"
+  else
+    printf '%s✓%s doctor found no issues\n' "$green" "$reset"
+  fi
+  print_issues
 }
 
 have() {
@@ -375,8 +424,7 @@ check_zen_preferences() {
 DOTFILES_DIR="$(resolve_dotfiles_dir || true)"
 if [[ -z "$DOTFILES_DIR" ]]; then
   fail "could not locate dotfiles repo; set DOTFILES_DIR=/path/to/dotfiles"
-  printf '\n==> summary\n'
-  printf 'doctor found %d failure(s), %d warning(s)\n' "$failures" "$warnings"
+  print_summary
   exit 1
 fi
 
@@ -399,7 +447,9 @@ case ":$PATH:" in
 esac
 
 for cmd in git zsh starship nvim hx yazi zellij atuin direnv just jq rg; do
-  if have "$cmd"; then
+  if [[ "$cmd" == "hx" ]] && ! have hx && have helix; then
+    ok "hx: $(command -v helix) (installed as helix)"
+  elif have "$cmd"; then
     ok "$cmd: $(command -v "$cmd")"
   else
     warn "$cmd is not installed or not on PATH"
@@ -452,14 +502,7 @@ if [[ -e "$HOME/.config/niri/config.kdl" ]] || have niri; then
   check_niri
 fi
 
-section "summary"
+print_summary
 if ((failures > 0)); then
-  printf 'doctor found %d failure(s), %d warning(s)\n' "$failures" "$warnings"
   exit 1
-fi
-
-if ((warnings > 0)); then
-  printf 'doctor found %d warning(s)\n' "$warnings"
-else
-  printf 'doctor found no issues\n'
 fi

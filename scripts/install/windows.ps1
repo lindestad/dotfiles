@@ -850,7 +850,8 @@ function Get-TomlRootValueContent {
     if ($match.Success) {
         $existing = $match.Groups[1].Value.Trim()
         if ($existing -ne $Value) {
-            Write-Warning "$Path already has $Key=$existing; leaving desired value unapplied: $Value"
+            Write-Status "Updated Codex config $Key"
+            return $Content.Remove($match.Index, $match.Length).Insert($match.Index, $line)
         }
         return $Content
     }
@@ -889,7 +890,9 @@ function Get-TomlTableValueContent {
         if ($keyMatch.Success) {
             $existing = $keyMatch.Groups[1].Value.Trim()
             if ($existing -ne $Value) {
-                Write-Warning "$Path already has [$Table].$Key=$existing; leaving desired value unapplied: $Value"
+                Write-Status "Updated Codex TUI config $Key"
+                $updatedBody = $body.Remove($keyMatch.Index, $keyMatch.Length).Insert($keyMatch.Index, "$Key = $Value")
+                return $Content.Remove($match.Groups[1].Index, $match.Groups[1].Length).Insert($match.Groups[1].Index, $updatedBody)
             }
             return $Content
         }

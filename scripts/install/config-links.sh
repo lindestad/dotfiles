@@ -133,10 +133,29 @@ ensure_codex_root_config() {
   local value="$3"
 
   local existing
-  existing="$(sed -nE "s/^[[:space:]]*${key}[[:space:]]*=[[:space:]]*(.*)$/\1/p" "$dst" | head -n 1)"
+  existing="$(awk -v key="$key" '
+    /^[[:space:]]*\[/ { exit }
+    $0 ~ "^[[:space:]]*" key "[[:space:]]*=" {
+      sub("^[[:space:]]*" key "[[:space:]]*=[[:space:]]*", "")
+      print
+      exit
+    }
+  ' "$dst")"
   if [[ -n "$existing" ]]; then
     if [[ "$existing" != "$value" ]]; then
-      echo "!! ~/.codex/config.toml already has $key=$existing; leaving desired value unapplied: $value"
+      local tmp
+      tmp="$(mktemp)"
+      awk -v key="$key" -v value="$value" '
+        !in_table && $0 ~ "^[[:space:]]*" key "[[:space:]]*=" {
+          print key " = " value
+          next
+        }
+        /^[[:space:]]*\[/ { in_table = 1 }
+        { print }
+      ' "$dst" >"$tmp"
+      cp "$tmp" "$dst"
+      rm -f "$tmp"
+      echo "-> Updated Codex config $key"
     fi
     return
   fi
@@ -177,7 +196,20 @@ ensure_codex_tui_config() {
   ' "$dst")"
   if [[ -n "$existing" ]]; then
     if [[ "$existing" != "$value" ]]; then
-      echo "!! ~/.codex/config.toml already has [tui].$key=$existing; leaving desired value unapplied: $value"
+      local tmp
+      tmp="$(mktemp)"
+      awk -v key="$key" -v value="$value" '
+        /^\[tui\][[:space:]]*$/ { in_tui = 1; print; next }
+        /^\[/ { in_tui = 0 }
+        in_tui && $0 ~ "^[[:space:]]*" key "[[:space:]]*=" {
+          print key " = " value
+          next
+        }
+        { print }
+      ' "$dst" >"$tmp"
+      cp "$tmp" "$dst"
+      rm -f "$tmp"
+      echo "-> Updated Codex TUI config $key"
     fi
     return
   fi
