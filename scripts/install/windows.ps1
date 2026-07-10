@@ -1,3 +1,21 @@
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', '', Justification = 'The interactive installer uses host colors for its presentation layer.')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Entrypoint parameters are consumed through PowerShell script scope by the choice resolver.')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseBOMForUnicodeEncodedFile', '', Justification = 'The repository standardizes text files on UTF-8 without a BOM.')]
+[CmdletBinding()]
+param(
+    [switch]$Yes,
+    [switch]$UsNoLayout,
+    [switch]$NoUsNoLayout,
+    [switch]$Kanata,
+    [switch]$NoKanata,
+    [ValidateSet("default", "iso-ansi")] [string]$KanataLayout,
+    [string]$InstallLog
+)
+
+$ScriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Definition }
+$Dotfiles = (Resolve-Path (Join-Path $ScriptDir "..\..")).Path
+$script:InstallLogStarted = $false
+
 function Test-IsAdministrator {
     $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
     $principal = [Security.Principal.WindowsPrincipal]::new($identity)
@@ -5,33 +23,126 @@ function Test-IsAdministrator {
 }
 
 function Request-Administrator {
-    if (Test-IsAdministrator) { return }
+    param(
+        [Parameter(Mandatory)] [bool]$InstallUsNoLayout,
+        [Parameter(Mandatory)] [bool]$InstallKanata,
+        [Parameter(Mandatory)] [AllowEmptyString()] [string]$SelectedKanataLayout,
+        [Parameter(Mandatory)] [string]$LogFile
+    )
 
-    $answer = Read-Host "This installer creates symlinks and works best as Administrator. Restart elevated now? Y/n"
+    if (Test-IsAdministrator) { return $false }
+
+    $answer = Read-Host "Administrator access is needed for system packages and symlinks. Restart elevated now? Y/n"
     if ($answer -match '^[Nn]$') {
         Write-Warning "Continuing without elevation; symlink creation may fall back to copying files."
-        return
+        return $false
     }
 
     $hostExe = (Get-Process -Id $PID).Path
     if (-not $hostExe) { $hostExe = "powershell.exe" }
     $scriptPath = $PSCommandPath
-    $arguments = "-NoExit -NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`""
+    $arguments = @(
+        "-NoExit",
+        "-NoProfile",
+        "-ExecutionPolicy", "Bypass",
+        "-File", "`"$scriptPath`"",
+        "-InstallLog", "`"$LogFile`""
+    )
+    $arguments += if ($InstallUsNoLayout) { "-UsNoLayout" } else { "-NoUsNoLayout" }
+    $arguments += if ($InstallKanata) { "-Kanata" } else { "-NoKanata" }
+    if ($InstallKanata) {
+        $arguments += @("-KanataLayout", $SelectedKanataLayout)
+    }
+
+    Close-InstallLog
     Start-Process -FilePath $hostExe -ArgumentList $arguments -Verb RunAs
-    exit
+    return $true
 }
-
-Request-Administrator
-
-$ScriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Definition }
-$Dotfiles = (Resolve-Path (Join-Path $ScriptDir "..\..")).Path
 
 function Write-Status {
     param(
         [Parameter(Mandatory)] [AllowEmptyString()] [string]$Message
     )
 
-    Write-Information -MessageData $Message -InformationAction Continue
+    if ([string]::IsNullOrEmpty($Message)) {
+        Write-Host ""
+        return
+    }
+
+    switch -Regex ($Message) {
+        '^==> ' { Write-Host "`n◆ " -ForegroundColor Magenta -NoNewline; Write-Host $Message.Substring(4) -ForegroundColor White; break }
+        '^== ' { Write-Host "✓ " -ForegroundColor Green -NoNewline; Write-Host $Message.Substring(3); break }
+        '^-> ' { Write-Host "✓ " -ForegroundColor Green -NoNewline; Write-Host $Message.Substring(3); break }
+        '^>> ' { Write-Host "⚠ " -ForegroundColor Yellow -NoNewline; Write-Host $Message.Substring(3); break }
+        '^!! ' { Write-Host "✗ " -ForegroundColor Red -NoNewline; Write-Host $Message.Substring(3); break }
+        '^   ' { Write-Host $Message -ForegroundColor DarkGray; break }
+        default { Write-Host $Message }
+    }
+}
+
+function Open-InstallLog {
+    if ($script:InstallLogStarted) { return }
+
+    if ([string]::IsNullOrWhiteSpace($script:InstallLog)) {
+        $logDir = Join-Path $Dotfiles "logs"
+        New-Item -ItemType Directory -Force -Path $logDir | Out-Null
+        $script:InstallLog = Join-Path $logDir "install-$(Get-Date -Format 'yyyyMMdd-HHmmss').log"
+    }
+
+    Start-Transcript -Path $script:InstallLog -Append | Out-Null
+    $script:InstallLogStarted = $true
+}
+
+function Close-InstallLog {
+    if (-not $script:InstallLogStarted) { return }
+
+    Stop-Transcript | Out-Null
+    $script:InstallLogStarted = $false
+}
+
+function Show-InstallIntro {
+    $logo = @'
+   ██████╗  ██████╗ ████████╗███████╗██╗██╗     ███████╗███████╗
+   ██╔══██╗██╔═══██╗╚══██╔══╝██╔════╝██║██║     ██╔════╝██╔════╝
+   ██║  ██║██║   ██║   ██║   █████╗  ██║██║     █████╗  ███████╗
+   ██║  ██║██║   ██║   ██║   ██╔══╝  ██║██║     ██╔══╝  ╚════██║
+██╗██████╔╝╚██████╔╝   ██║   ██║     ██║███████╗███████╗███████║
+╚═╝╚═════╝  ╚═════╝    ╚═╝   ╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝
+'@
+
+    Write-Host "`n`n$logo" -ForegroundColor Yellow
+    Write-Host "`nPersonal workstation bootstrap" -ForegroundColor White
+    Write-Host "Installs tools, links managed config, and preserves replaced files as timestamped backups." -ForegroundColor DarkGray
+    Write-Host "Log: $script:InstallLog" -ForegroundColor DarkGray
+}
+
+function Show-InstallPlan {
+    param(
+        [Parameter(Mandatory)] [bool]$InstallUsNoLayout,
+        [Parameter(Mandatory)] [bool]$InstallKanata,
+        [Parameter(Mandatory)] [AllowEmptyString()] [string]$SelectedKanataLayout
+    )
+
+    Write-Status "==> Installation plan"
+    Write-Status "-> US+NO keyboard layout: $($InstallUsNoLayout.ToString().ToLowerInvariant())"
+    $kanataDetail = if ($InstallKanata) { "true ($SelectedKanataLayout)" } else { "false" }
+    Write-Status "-> Kanata: $kanataDetail"
+}
+
+function Write-InstallProgress {
+    param(
+        [Parameter(Mandatory)] [int]$Current,
+        [Parameter(Mandatory)] [int]$Total,
+        [Parameter(Mandatory)] [string]$Label
+    )
+
+    $width = 28
+    $filledCount = [Math]::Floor($Current * $width / $Total)
+    $emptyCount = $width - $filledCount
+    $percent = [Math]::Floor($Current * 100 / $Total)
+    $bar = ("■" * $filledCount) + ("･" * $emptyCount)
+    Write-Host "`n$bar $($percent.ToString().PadLeft(3))%  " -ForegroundColor Yellow -NoNewline
+    Write-Host $Label -ForegroundColor White
 }
 
 $apps = @(
@@ -85,7 +196,9 @@ $apps = @(
 
 function Invoke-WinGetImport {
     param(
-        [Parameter(Mandatory)] [string[]]$Packages
+        [Parameter(Mandatory)] [string[]]$Packages,
+        [ValidateRange(0, 10)] [int]$RetryCount = 1,
+        [ValidateRange(0, 300)] [int]$RetryDelaySeconds = 5
     )
 
     $uniquePackages = @($Packages | Select-Object -Unique)
@@ -116,19 +229,33 @@ function Invoke-WinGetImport {
     Write-Status "==> Installing or upgrading $($uniquePackages.Count) winget packages"
     Write-Status "    Import manifest: $importPath"
 
-    winget import -i $importPath `
-        --ignore-unavailable `
-        --ignore-versions `
-        --accept-source-agreements `
-        --accept-package-agreements `
-        --disable-interactivity
+    for ($attempt = 0; $attempt -le $RetryCount; $attempt++) {
+        winget import -i $importPath `
+            --ignore-unavailable `
+            --ignore-versions `
+            --accept-source-agreements `
+            --accept-package-agreements `
+            --disable-interactivity
+        $exitCode = $LASTEXITCODE
 
-    if ($LASTEXITCODE -ne 0) {
-        Write-Warning "winget import exited with code $LASTEXITCODE"
+        if ($exitCode -eq 0) {
+            if ($attempt -gt 0) {
+                Write-Status "== winget retry completed successfully"
+            }
+            return $true
+        }
+
+        if ($attempt -lt $RetryCount) {
+            Write-Status ">> winget import exited with code $exitCode; retrying in $RetryDelaySeconds seconds"
+            Start-Sleep -Seconds $RetryDelaySeconds
+        }
+        else {
+            Write-Status "!! winget import still failed after $($attempt + 1) attempts (exit code $exitCode)"
+        }
     }
-}
 
-Invoke-WinGetImport -Packages $apps
+    return $false
+}
 
 function Get-WinGetLinkedCommand {
     param(
@@ -348,13 +475,6 @@ function Install-BrootShellIntegration {
 
     & $broot --set-install-state installed 2>$null | Out-Null
 }
-
-Install-NodeLtsVersion
-Install-Pipx
-Install-PSScriptAnalyzer
-Enable-UserLocalBinPowerShellProfile
-Enable-StarshipPowerShellProfile
-Enable-AtuinPowerShellProfile
 
 function Set-WindowsTerminalGitBashDefault {
     [CmdletBinding(SupportsShouldProcess)]
@@ -607,46 +727,6 @@ function Install-WindowsUsNoKeyboardLayout {
     }
 }
 
-if (Read-YesNo "Install US+NO Windows keyboard layout (AltGr Norwegian)?") {
-    Install-WindowsUsNoKeyboardLayout -DotfilesDir $Dotfiles
-}
-else {
-    Write-Status "Skipping US+NO keyboard layout install."
-}
-
-# Optional: Kanata
-$installKanata = Read-YesNo "Install Kanata (Keyboard remapping)?"
-$chosenKanataCfg = $null
-if ($installKanata) {
-    winget install --id "jtroo.kanata_gui" --accept-source-agreements --accept-package-agreements -e
-
-    $isoToAnsi = Read-YesNo "Remap ISO to ANSI like? Warning, remaps Enter key."
-    if ($isoToAnsi) {
-        $chosenKanataCfg = Join-Path $Dotfiles "config/kanata/config_iso_to_ansi.kbd"
-    }
-    else {
-        $chosenKanataCfg = Join-Path $Dotfiles "config/kanata/config.kbd"
-    }
-
-    $appDataKanata = Join-Path $env:APPDATA "kanata"
-    New-Item -ItemType Directory -Force -Path $appDataKanata | Out-Null
-    $dstCfg = Join-Path $appDataKanata "config.kbd"
-    # Create or update a symlink/junction for config; fallback to copy if not permitted
-    try {
-        if (Test-Path $dstCfg) { Remove-Item $dstCfg -Force }
-        New-Item -ItemType SymbolicLink -Path $dstCfg -Target $chosenKanataCfg | Out-Null
-    }
-    catch {
-        Copy-Item $chosenKanataCfg $dstCfg -Force
-    }
-
-    # Add kanata autostart
-    & (Join-Path $Dotfiles "scripts\install\kanata-windows-startup.ps1")
-}
-else {
-    Write-Status "Skipping Kanata install."
-}
-
 # --- Windows symlinks (inline, no external symlink.ps1) ---
 function New-SafeLink {
     [CmdletBinding(SupportsShouldProcess)]
@@ -752,36 +832,6 @@ fi
         Write-Status "Created $bashProfile"
     }
 }
-
-$UserHome = [Environment]::GetFolderPath('UserProfile')
-$Roaming = [Environment]::GetFolderPath('ApplicationData')
-
-Install-UserFont -FontDir (Join-Path $Dotfiles "fonts")
-Install-Watchexec -UserHome $UserHome
-
-# Links specific to Windows setup
-New-SafeLink -Src (Join-Path $Dotfiles "config/atuin/config.toml") -Dst (Join-Path $UserHome ".config/atuin/config.toml")
-New-SafeLink -Src (Join-Path $Dotfiles "config/atuin/themes") -Dst (Join-Path $UserHome ".config/atuin/themes")
-$brootConfigDir = Join-Path $Roaming "dystroy/broot/config"
-New-SafeLink -Src (Join-Path $Dotfiles "config/broot/conf.toml") -Dst (Join-Path $brootConfigDir "conf.toml")
-New-SafeLink -Src (Join-Path $Dotfiles "config/broot/skins") -Dst (Join-Path $brootConfigDir "skins")
-Install-BrootShellIntegration -UserHome $UserHome
-New-SafeLink -Src (Join-Path $Dotfiles "config/codex/AGENTS.md") -Dst (Join-Path $UserHome ".codex/AGENTS.md")
-New-SafeLink -Src (Join-Path $Dotfiles "config/codex/skills/gh-publish") -Dst (Join-Path $UserHome ".codex/skills/gh-publish")
-New-SafeLink -Src (Join-Path $Dotfiles "config/alacritty/alacritty-windows.toml") -Dst (Join-Path $Roaming "alacritty/alacritty.toml")
-$weztermConfig = Join-Path $Dotfiles "config/wezterm/wezterm-windows.lua"
-New-SafeLink -Src $weztermConfig -Dst (Join-Path $UserHome ".wezterm.lua")
-New-SafeLink -Src $weztermConfig -Dst (Join-Path $UserHome ".config/wezterm/wezterm.lua")
-New-SafeLink -Src (Join-Path $Dotfiles "config/copilot/copilot-instructions.md") -Dst (Join-Path $UserHome ".copilot/copilot-instructions.md")
-New-SafeLink -Src (Join-Path $Dotfiles "config/git/ignore") -Dst (Join-Path $UserHome ".config/git/ignore")
-New-SafeLink -Src (Join-Path $Dotfiles "config/helix/config.toml") -Dst (Join-Path $Roaming "helix/config.toml")
-New-SafeLink -Src (Join-Path $Dotfiles "config/helix/languages.toml") -Dst (Join-Path $Roaming "helix/languages.toml")
-New-SafeLink -Src (Join-Path $Dotfiles "config/nvim") -Dst (Join-Path $UserHome ".config/nvim")
-New-SafeLink -Src (Join-Path $Dotfiles "shells/.bashrc") -Dst (Join-Path $UserHome ".bashrc")
-Set-GitBashProfile -UserHome $UserHome
-New-SafeLink -Src (Join-Path $Dotfiles "config/starship/windows/starship.toml") -Dst (Join-Path $UserHome ".config/starship.toml")
-New-SafeLink -Src (Join-Path $Dotfiles "config/yazi") -Dst (Join-Path $Roaming "yazi/config")
-Set-WindowsTerminalGitBashDefault
 
 function Merge-GitConfig {
     param(
@@ -934,14 +984,163 @@ function Get-TomlTableValueContent {
     return "$Content[$Table]`n$Key = $Value`n"
 }
 
-# Ensure ~/.gitconfig exists and contains repo-managed defaults without overwriting user values
+function Resolve-WindowsInstallChoice {
+    if ($UsNoLayout -and $NoUsNoLayout) {
+        throw "Choose only one of -UsNoLayout and -NoUsNoLayout."
+    }
+    if ($Kanata -and $NoKanata) {
+        throw "Choose only one of -Kanata and -NoKanata."
+    }
+
+    $installUsNo = if ($UsNoLayout) {
+        $true
+    }
+    elseif ($NoUsNoLayout -or $Yes) {
+        $false
+    }
+    else {
+        Read-YesNo "Install US+NO Windows keyboard layout (AltGr Norwegian)?"
+    }
+
+    $installKanata = if ($Kanata) {
+        $true
+    }
+    elseif ($NoKanata -or $Yes) {
+        $false
+    }
+    else {
+        Read-YesNo "Install Kanata (keyboard remapping)?"
+    }
+
+    $selectedLayout = $KanataLayout
+    if ($installKanata -and [string]::IsNullOrWhiteSpace($selectedLayout)) {
+        if ($Yes) {
+            $selectedLayout = "default"
+        }
+        elseif (Read-YesNo "Use the ISO-to-ANSI Kanata layout (remaps Enter)?") {
+            $selectedLayout = "iso-ansi"
+        }
+        else {
+            $selectedLayout = "default"
+        }
+    }
+
+    return [pscustomobject]@{
+        InstallUsNoLayout = $installUsNo
+        InstallKanata = $installKanata
+        KanataLayout = $selectedLayout
+    }
+}
+
+function Install-WindowsKanata {
+    param(
+        [Parameter(Mandatory)] [string]$SelectedLayout
+    )
+
+    winget install --id "jtroo.kanata_gui" --accept-source-agreements --accept-package-agreements --disable-interactivity -e
+    if ($LASTEXITCODE -ne 0) {
+        Write-Status "!! Kanata installation failed with winget exit code $LASTEXITCODE"
+        return
+    }
+
+    $chosenKanataCfg = if ($SelectedLayout -eq "iso-ansi") {
+        Join-Path $Dotfiles "config/kanata/config_iso_to_ansi.kbd"
+    }
+    else {
+        Join-Path $Dotfiles "config/kanata/config.kbd"
+    }
+
+    $appDataKanata = Join-Path $env:APPDATA "kanata"
+    New-Item -ItemType Directory -Force -Path $appDataKanata | Out-Null
+    $dstCfg = Join-Path $appDataKanata "config.kbd"
+    try {
+        if (Test-Path $dstCfg) { Remove-Item $dstCfg -Force }
+        New-Item -ItemType SymbolicLink -Path $dstCfg -Target $chosenKanataCfg -ErrorAction Stop | Out-Null
+    }
+    catch {
+        Copy-Item $chosenKanataCfg $dstCfg -Force
+    }
+
+    & (Join-Path $Dotfiles "scripts\install\kanata-windows-startup.ps1")
+}
+
+Open-InstallLog
+Show-InstallIntro
+$choices = Resolve-WindowsInstallChoice
+Show-InstallPlan `
+    -InstallUsNoLayout $choices.InstallUsNoLayout `
+    -InstallKanata $choices.InstallKanata `
+    -SelectedKanataLayout $choices.KanataLayout
+
+if (Request-Administrator `
+        -InstallUsNoLayout $choices.InstallUsNoLayout `
+        -InstallKanata $choices.InstallKanata `
+        -SelectedKanataLayout $choices.KanataLayout `
+        -LogFile $script:InstallLog) {
+    return
+}
+
+$UserHome = [Environment]::GetFolderPath('UserProfile')
+$Roaming = [Environment]::GetFolderPath('ApplicationData')
+
+Write-InstallProgress -Current 1 -Total 5 -Label "System packages"
+Invoke-WinGetImport -Packages $apps | Out-Null
+
+Write-InstallProgress -Current 2 -Total 5 -Label "Command-line tools"
+Install-NodeLtsVersion
+Install-Pipx
+Install-PSScriptAnalyzer
+Install-Watchexec -UserHome $UserHome
+Install-UserFont -FontDir (Join-Path $Dotfiles "fonts")
+Enable-UserLocalBinPowerShellProfile
+Enable-StarshipPowerShellProfile
+Enable-AtuinPowerShellProfile
+
+Write-InstallProgress -Current 3 -Total 5 -Label "Optional components"
+if ($choices.InstallUsNoLayout) {
+    Install-WindowsUsNoKeyboardLayout -DotfilesDir $Dotfiles
+}
+else {
+    Write-Status ">> Skipping US+NO keyboard layout"
+}
+if ($choices.InstallKanata) {
+    Install-WindowsKanata -SelectedLayout $choices.KanataLayout
+}
+else {
+    Write-Status ">> Skipping Kanata"
+}
+
+Write-InstallProgress -Current 4 -Total 5 -Label "Managed configuration"
+New-SafeLink -Src (Join-Path $Dotfiles "config/atuin/config.toml") -Dst (Join-Path $UserHome ".config/atuin/config.toml")
+New-SafeLink -Src (Join-Path $Dotfiles "config/atuin/themes") -Dst (Join-Path $UserHome ".config/atuin/themes")
+$brootConfigDir = Join-Path $Roaming "dystroy/broot/config"
+New-SafeLink -Src (Join-Path $Dotfiles "config/broot/conf.toml") -Dst (Join-Path $brootConfigDir "conf.toml")
+New-SafeLink -Src (Join-Path $Dotfiles "config/broot/skins") -Dst (Join-Path $brootConfigDir "skins")
+Install-BrootShellIntegration -UserHome $UserHome
+New-SafeLink -Src (Join-Path $Dotfiles "config/codex/AGENTS.md") -Dst (Join-Path $UserHome ".codex/AGENTS.md")
+New-SafeLink -Src (Join-Path $Dotfiles "config/codex/skills/gh-publish") -Dst (Join-Path $UserHome ".codex/skills/gh-publish")
+New-SafeLink -Src (Join-Path $Dotfiles "config/alacritty/alacritty-windows.toml") -Dst (Join-Path $Roaming "alacritty/alacritty.toml")
+$weztermConfig = Join-Path $Dotfiles "config/wezterm/wezterm-windows.lua"
+New-SafeLink -Src $weztermConfig -Dst (Join-Path $UserHome ".wezterm.lua")
+New-SafeLink -Src $weztermConfig -Dst (Join-Path $UserHome ".config/wezterm/wezterm.lua")
+New-SafeLink -Src (Join-Path $Dotfiles "config/copilot/copilot-instructions.md") -Dst (Join-Path $UserHome ".copilot/copilot-instructions.md")
+New-SafeLink -Src (Join-Path $Dotfiles "config/git/ignore") -Dst (Join-Path $UserHome ".config/git/ignore")
+New-SafeLink -Src (Join-Path $Dotfiles "config/helix/config.toml") -Dst (Join-Path $Roaming "helix/config.toml")
+New-SafeLink -Src (Join-Path $Dotfiles "config/helix/languages.toml") -Dst (Join-Path $Roaming "helix/languages.toml")
+New-SafeLink -Src (Join-Path $Dotfiles "config/nvim") -Dst (Join-Path $UserHome ".config/nvim")
+New-SafeLink -Src (Join-Path $Dotfiles "shells/.bashrc") -Dst (Join-Path $UserHome ".bashrc")
+Set-GitBashProfile -UserHome $UserHome
+New-SafeLink -Src (Join-Path $Dotfiles "config/starship/windows/starship.toml") -Dst (Join-Path $UserHome ".config/starship.toml")
+New-SafeLink -Src (Join-Path $Dotfiles "config/yazi") -Dst (Join-Path $Roaming "yazi/config")
+Set-WindowsTerminalGitBashDefault
+
+Write-InstallProgress -Current 5 -Total 5 -Label "Finishing setup"
 $srcGitCfg = Join-Path $Dotfiles "config/git/gitconfig"
 $dstGitCfg = Join-Path $UserHome ".gitconfig"
 Merge-GitConfig -Src $srcGitCfg -Dst $dstGitCfg
-
 $dstCodexCfg = Join-Path $UserHome ".codex/config.toml"
 Set-CodexConfig -Dst $dstCodexCfg
-
 Install-UvTool -Tools @("ty", "ruff")
 
-Write-Status "Windows config links completed."
+Write-Status "==> Installation complete"
+Close-InstallLog
