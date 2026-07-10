@@ -209,6 +209,8 @@ ensure_starship
 ensure_zellij_cargo
 ensure_typst_cli
 ensure_shfmt_release
+ensure_taplo_release
+ensure_powershell_linting
 ensure_yq_mikefarah
 ensure_lazygit_release
 ensure_carapace_release

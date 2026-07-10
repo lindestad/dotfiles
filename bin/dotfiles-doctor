@@ -446,7 +446,7 @@ case ":$PATH:" in
   *) warn "$HOME/.local/bin is not on PATH" ;;
 esac
 
-for cmd in git zsh starship nvim hx yazi zellij atuin direnv just jq rg; do
+for cmd in git zsh starship nvim hx yazi zellij atuin direnv just jq rg taplo pwsh; do
   if [[ "$cmd" == "hx" ]] && ! have hx && have helix; then
     ok "hx: $(command -v helix) (installed as helix)"
   elif have "$cmd"; then
@@ -455,6 +455,15 @@ for cmd in git zsh starship nvim hx yazi zellij atuin direnv just jq rg; do
     warn "$cmd is not installed or not on PATH"
   fi
 done
+
+if have pwsh; then
+  if pwsh -NoProfile -NonInteractive -Command \
+    'if (Get-Module -ListAvailable -Name PSScriptAnalyzer) { exit 0 }; exit 1' >/dev/null 2>&1; then
+    ok "PSScriptAnalyzer"
+  else
+    warn "PSScriptAnalyzer is not installed for PowerShell"
+  fi
+fi
 
 section "managed config"
 check_managed_link "$DOTFILES_DIR/config/atuin/config.toml" "$HOME/.config/atuin/config.toml" "atuin config"

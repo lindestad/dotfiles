@@ -68,6 +68,7 @@ $apps = @(
     "direnv.direnv",
     "Casey.Just",
     "mvdan.shfmt",
+    "tamasfe.taplo",
     "MikeFarah.yq",
     "sharkdp.hyperfine",
     "Atuinsh.Atuin",
@@ -260,6 +261,24 @@ function Install-UvTool {
     $env:Path = "$uvToolBin;$env:Path"
 }
 
+function Install-PSScriptAnalyzer {
+    $pwsh = Get-WinGetLinkedCommand -Name "pwsh"
+    if (-not $pwsh) {
+        Write-Warning "PowerShell 7 was installed but pwsh is not available yet. Start a new shell and run: Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser"
+        return
+    }
+
+    & $pwsh -NoProfile -NonInteractive -Command 'if (Get-Module -ListAvailable -Name PSScriptAnalyzer) { exit 0 }; exit 1'
+    if ($LASTEXITCODE -eq 0) { return }
+
+    Write-Status ""
+    Write-Status "==> Installing PSScriptAnalyzer for the current user"
+    & $pwsh -NoProfile -NonInteractive -Command 'Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser -Repository PSGallery -ErrorAction Stop'
+    if ($LASTEXITCODE -ne 0) {
+        Write-Warning "PSScriptAnalyzer installation exited with code $LASTEXITCODE"
+    }
+}
+
 function Install-Watchexec {
     param(
         [Parameter(Mandatory)] [string]$UserHome
@@ -332,6 +351,7 @@ function Install-BrootShellIntegration {
 
 Install-NodeLtsVersion
 Install-Pipx
+Install-PSScriptAnalyzer
 Enable-UserLocalBinPowerShellProfile
 Enable-StarshipPowerShellProfile
 Enable-AtuinPowerShellProfile
@@ -827,12 +847,12 @@ function Set-CodexConfig {
 
     $content = Get-Content $Dst -Raw
     if ($null -eq $content) { $content = "" }
-    $content = Get-TomlRootValueContent -Content $content -Key "sandbox_mode" -Value '"danger-full-access"' -Path $Dst
-    $content = Get-TomlRootValueContent -Content $content -Key "approval_policy" -Value '"never"' -Path $Dst
-    $content = Get-TomlTableValueContent -Content $content -Table "tui" -Key "vim_mode_default" -Value "true" -Path $Dst
-    $content = Get-TomlTableValueContent -Content $content -Table "tui" -Key "status_line" -Value '["model-with-reasoning", "current-dir", "context-used", "five-hour-limit", "weekly-limit"]' -Path $Dst
-    $content = Get-TomlTableValueContent -Content $content -Table "tui" -Key "status_line_use_colors" -Value "true" -Path $Dst
-    $content = Get-TomlTableValueContent -Content $content -Table "tui" -Key "theme" -Value '"monokai-extended"' -Path $Dst
+    $content = Get-TomlRootValueContent -Content $content -Key "sandbox_mode" -Value '"danger-full-access"'
+    $content = Get-TomlRootValueContent -Content $content -Key "approval_policy" -Value '"never"'
+    $content = Get-TomlTableValueContent -Content $content -Table "tui" -Key "vim_mode_default" -Value "true"
+    $content = Get-TomlTableValueContent -Content $content -Table "tui" -Key "status_line" -Value '["model-with-reasoning", "current-dir", "context-used", "five-hour-limit", "weekly-limit"]'
+    $content = Get-TomlTableValueContent -Content $content -Table "tui" -Key "status_line_use_colors" -Value "true"
+    $content = Get-TomlTableValueContent -Content $content -Table "tui" -Key "theme" -Value '"monokai-extended"'
 
     [System.IO.File]::WriteAllText($Dst, $content, $utf8NoBom)
 }
@@ -841,8 +861,7 @@ function Get-TomlRootValueContent {
     param(
         [Parameter(Mandatory)] [AllowEmptyString()] [string]$Content,
         [Parameter(Mandatory)] [string]$Key,
-        [Parameter(Mandatory)] [string]$Value,
-        [Parameter(Mandatory)] [string]$Path
+        [Parameter(Mandatory)] [string]$Value
     )
 
     $line = "$Key = $Value"
@@ -876,8 +895,7 @@ function Get-TomlTableValueContent {
         [Parameter(Mandatory)] [AllowEmptyString()] [string]$Content,
         [Parameter(Mandatory)] [string]$Table,
         [Parameter(Mandatory)] [string]$Key,
-        [Parameter(Mandatory)] [string]$Value,
-        [Parameter(Mandatory)] [string]$Path
+        [Parameter(Mandatory)] [string]$Value
     )
 
     $escapedTable = [regex]::Escape($Table)

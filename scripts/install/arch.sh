@@ -116,6 +116,8 @@ ensure_rust_toolchain
 ensure_zsh_patina
 ensure_starship
 ensure_shfmt_release
+ensure_taplo_release
+ensure_powershell_linting
 ensure_yq_mikefarah
 ensure_lazygit_release
 ensure_modern_cli_cargo_tools

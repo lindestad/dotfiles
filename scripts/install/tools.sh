@@ -198,6 +198,142 @@ install_github_release_archive_binary() {
   export PATH="$HOME/.local/bin:$PATH"
 }
 
+install_github_release_gzip_binary() {
+  local label="$1" repo="$2" asset_pattern="$3" bin_name="$4"
+  local asset_url tmp_dir archive
+
+  if ! have curl || ! have gzip; then
+    echo "!! curl and gzip are required to install $label."
+    return 1
+  fi
+
+  asset_url="$(github_latest_asset_url "$repo" "$asset_pattern" || true)"
+  if [[ -z "$asset_url" ]]; then
+    echo "!! Could not resolve latest $label release asset matching: $asset_pattern"
+    return 1
+  fi
+
+  ensure_local_bin
+  tmp_dir="$(mktemp -d)"
+  archive="$tmp_dir/$bin_name.gz"
+  echo "==> Installing $label from upstream release..."
+  curl -fL "$asset_url" -o "$archive"
+  gzip -dc "$archive" >"$tmp_dir/$bin_name"
+  install -m 0755 "$tmp_dir/$bin_name" "$HOME/.local/bin/$bin_name"
+  rm -rf "$tmp_dir"
+  export PATH="$HOME/.local/bin:$PATH"
+}
+
+ensure_taplo_release() {
+  if have taplo; then
+    return
+  fi
+
+  local machine asset_arch
+  machine="$(uname -m)"
+  case "$machine" in
+    x86_64|amd64) asset_arch="x86_64" ;;
+    aarch64|arm64) asset_arch="aarch64" ;;
+    i386|i686) asset_arch="x86" ;;
+    armv7l|armv7) asset_arch="armv7" ;;
+    riscv64) asset_arch="riscv64" ;;
+    *)
+      echo ">> Unsupported Taplo release architecture: $machine"
+      return 1
+      ;;
+  esac
+
+  install_github_release_gzip_binary \
+    "Taplo" "tamasfe/taplo" "taplo-linux-${asset_arch}\\.gz$" "taplo"
+}
+
+ensure_powershell_release() {
+  if have pwsh; then
+    return
+  fi
+
+  local machine asset_arch asset_url tmp_dir archive extracted install_root install_dir bin_link ts
+  machine="$(uname -m)"
+  case "$machine" in
+    x86_64|amd64) asset_arch="x64" ;;
+    aarch64|arm64) asset_arch="arm64" ;;
+    *)
+      echo ">> Unsupported PowerShell release architecture: $machine"
+      return 1
+      ;;
+  esac
+
+  if ! have curl || ! have tar; then
+    echo "!! curl and tar are required to install PowerShell."
+    return 1
+  fi
+
+  asset_url="$(github_latest_asset_url \
+    "PowerShell/PowerShell" "powershell-[0-9.]+-linux-${asset_arch}\\.tar\\.gz$" || true)"
+  if [[ -z "$asset_url" ]]; then
+    echo "!! Could not resolve the latest PowerShell release for $asset_arch."
+    return 1
+  fi
+
+  tmp_dir="$(mktemp -d)"
+  archive="$tmp_dir/powershell.tar.gz"
+  extracted="$tmp_dir/powershell"
+  mkdir -p "$extracted"
+
+  echo "==> Installing PowerShell from upstream release..."
+  curl -fL "$asset_url" -o "$archive"
+  tar -C "$extracted" -xzf "$archive"
+  chmod 0755 "$extracted/pwsh"
+  if ! "$extracted/pwsh" -NoProfile -NonInteractive -Command 'exit 0'; then
+    echo "!! PowerShell could not start; its native runtime dependencies may be missing."
+    rm -rf "$tmp_dir"
+    return 1
+  fi
+
+  ensure_local_bin
+  install_root="$HOME/.local/opt"
+  install_dir="$install_root/powershell"
+  bin_link="$HOME/.local/bin/pwsh"
+  mkdir -p "$install_root"
+  if [[ -e "$install_dir" ]]; then
+    ts="$(date +%Y%m%d-%H%M%S)"
+    mv "$install_dir" "${install_dir}.bak.${ts}"
+  fi
+  mv "$extracted" "$install_dir"
+  if [[ -L "$bin_link" ]]; then
+    ln -sfn "$install_dir/pwsh" "$bin_link"
+  elif [[ -e "$bin_link" ]]; then
+    ts="$(date +%Y%m%d-%H%M%S)"
+    mv "$bin_link" "${bin_link}.bak.${ts}"
+    ln -s "$install_dir/pwsh" "$bin_link"
+  else
+    ln -s "$install_dir/pwsh" "$bin_link"
+  fi
+  rm -rf "$tmp_dir"
+  export PATH="$HOME/.local/bin:$PATH"
+}
+
+ensure_psscriptanalyzer() {
+  if ! have pwsh; then
+    echo "!! PowerShell is required to install PSScriptAnalyzer."
+    return 1
+  fi
+
+  if pwsh -NoProfile -NonInteractive -Command \
+    'if (Get-Module -ListAvailable -Name PSScriptAnalyzer) { exit 0 }; exit 1'; then
+    return
+  fi
+
+  echo "==> Installing PSScriptAnalyzer for the current user..."
+  pwsh -NoProfile -NonInteractive -Command \
+    'Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser -Repository PSGallery -ErrorAction Stop'
+}
+
+ensure_powershell_linting() {
+  ensure_powershell_release || return
+  ensure_psscriptanalyzer
+}
+
 ensure_shfmt_release() {
   if have shfmt; then
     return
