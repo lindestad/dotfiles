@@ -63,7 +63,7 @@ layout {
 }
 
 // Noctalia v4 shell.
-spawn-at-startup "qs" "-c" "noctalia-shell"
+spawn-sh-at-startup "gsettings set org.gnome.desktop.interface color-scheme prefer-dark && exec qs -c noctalia-shell"
 
 // Lightweight polkit auth agent for GUI elevation prompts.
 spawn-at-startup "/usr/libexec/xfce-polkit"
