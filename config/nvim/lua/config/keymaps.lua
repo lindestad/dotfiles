@@ -40,6 +40,13 @@ vim.keymap.set({ "n", "v" }, "gl", "$", { desc = "End of line" })
 vim.keymap.set("x", "<Tab>", ">gv", { desc = "Indent right" })
 vim.keymap.set("x", "<S-Tab>", "<gv", { desc = "Indent left" })
 
+-- Toggle comments with Ctrl-/
+pcall(vim.keymap.del, "t", "<C-/>")
+pcall(vim.keymap.del, { "n", "t" }, "<C-_>")
+vim.keymap.set("n", "<C-/>", "gcc", { remap = true, desc = "Toggle comment" })
+vim.keymap.set("x", "<C-/>", "gc", { remap = true, desc = "Toggle comment" })
+vim.keymap.set("i", "<C-/>", "<C-o>gcc", { remap = true, desc = "Toggle comment" })
+
 -- Insert mode navigation / editing
 vim.keymap.set("i", "<C-h>", "<Left>", { desc = "Move left" })
 vim.keymap.set("i", "<C-j>", "<Down>", { desc = "Move down" })
@@ -54,8 +61,4 @@ local function root_terminal()
   Snacks.terminal.focus(nil, { cwd = LazyVim.root() })
 end
 
-vim.keymap.set({ "n", "t" }, "<C-/>", root_terminal, { desc = "Terminal (Root Dir)" })
-vim.keymap.set({ "n", "t" }, "<C-S-/>", root_terminal, { desc = "which_key_ignore" })
-vim.keymap.set({ "n", "t" }, "<C-_>", root_terminal, { desc = "which_key_ignore" })
-vim.keymap.set({ "n", "t" }, "<C-7>", root_terminal, { desc = "which_key_ignore" })
-vim.keymap.set({ "n", "t" }, "<C-S-7>", root_terminal, { desc = "which_key_ignore" })
+vim.keymap.set({ "n", "t" }, "<C-;>", root_terminal, { desc = "Terminal (Root Dir)" })
