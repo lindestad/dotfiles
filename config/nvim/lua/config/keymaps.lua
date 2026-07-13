@@ -10,13 +10,16 @@ vim.keymap.set({ "n", "i" }, "<C-S-s>", function()
 end, { desc = "Save without formatting" })
 
 -- Quit with Shift-Tab
-vim.keymap.set("n", "<S-Tab>", function()
+vim.keymap.set({ "n", "i" }, "<S-Tab>", function()
   if vim.bo.modified then
     print("Unsaved changes!")
   else
     vim.cmd("quit")
   end
-end)
+end, { desc = "Quit" })
+
+-- Force quit with Ctrl-Shift-Tab
+vim.keymap.set({ "n", "i" }, "<C-S-Tab>", "<Cmd>quit!<CR>", { desc = "Force quit" })
 
 -- Clipboard yanks/pastes with leader shortcuts
 vim.keymap.set({ "n", "x" }, "<leader>y", [["+y]], { desc = "Copy to system clipboard" })
