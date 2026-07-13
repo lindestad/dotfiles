@@ -43,6 +43,7 @@ cursor-color = #bfbdb6
 
 selection-foreground = #bfbdb6
 selection-background = #1b3a5b
+copy-on-select = clipboard
 
 # Cursor shaders
 custom-shader = shaders/warp.glsl
