@@ -139,9 +139,7 @@ fi
 #### Aliases & functions
 ####--------------------------------------------------
 
-# pacman
-alias sps='sudo pacman -S'
-
+# ls -> eza
 if command -v eza >/dev/null 2>&1; then
   alias ls='eza --group-directories-first --icons'
   alias lsa='eza --all --oneline --group-directories-first --long --git --no-user --no-time --no-permissions --icons --color=auto'

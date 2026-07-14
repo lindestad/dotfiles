@@ -305,9 +305,6 @@ fi
 #### Aliases & functions
 ####--------------------------------------------------
 
-# pacman
-alias sps='sudo pacman -S'
-
 # Safe ls → eza (fallback to ls if eza missing)
 if command -v eza >/dev/null 2>&1; then
   alias ls='eza --oneline --group-directories-first --long --git --no-user --no-time --no-permissions --icons --color=auto'
