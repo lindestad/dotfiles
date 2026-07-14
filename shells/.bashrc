@@ -159,6 +159,13 @@ if command -v bat >/dev/null 2>&1; then
   alias cat='bat --plain'
 fi
 
+# Opencode, codex
+alias oc='opencode'
+# alias ocr='opencode resume' ->TODO Need to PR a fix, there is --continue but does not put you into the picker like codex
+alias cx='codex'
+alias cxr='codex resume'
+
+# helix
 if ! command -v hx >/dev/null 2>&1 && command -v helix >/dev/null 2>&1; then
   alias hx='helix'
 fi
