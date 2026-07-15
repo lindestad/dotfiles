@@ -381,15 +381,15 @@ check_zen_url_handler() {
   local current_https=""
 
   if [[ ! -f "$desktop_file" ]]; then
-    warn "Zen URL desktop handler is not installed: $desktop_file"
+    warn "Zen Browser desktop integration is not installed: $desktop_file"
     return
   fi
 
   if have desktop-file-validate; then
     if desktop-file-validate "$desktop_file" >/dev/null 2>&1; then
-      ok "Zen URL desktop handler validates"
+      ok "Zen Browser desktop entry validates"
     else
-      warn "Zen URL desktop handler does not validate"
+      warn "Zen Browser desktop entry does not validate"
     fi
   fi
 
@@ -397,7 +397,7 @@ check_zen_url_handler() {
     current_http="$(xdg-mime query default x-scheme-handler/http 2>/dev/null || true)"
     current_https="$(xdg-mime query default x-scheme-handler/https 2>/dev/null || true)"
     if [[ "$current_http" == "$expected_http" && "$current_https" == "$expected_http" ]]; then
-      ok "Zen URL handler is default for http/https"
+      ok "Zen Browser is default for http/https"
     else
       warn "http/https defaults are $current_http/$current_https; expected $expected_http"
     fi

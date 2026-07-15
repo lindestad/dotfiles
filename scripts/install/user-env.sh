@@ -144,7 +144,7 @@ install_zen_browser_url_handler() {
   local desktop_file="$applications_dir/zen-url-handler.desktop"
 
   if [[ ! -f "$helper_src" ]]; then
-    echo "!! Missing Zen URL helper: $helper_src"
+    echo "!! Missing Zen Browser launcher helper: $helper_src"
     return
   fi
 
@@ -152,7 +152,7 @@ install_zen_browser_url_handler() {
   mkdir -p "$applications_dir"
   cat >"$desktop_file" <<EOF
 [Desktop Entry]
-Name=Zen Browser URL Handler
+Name=Zen Browser
 Comment=Open links in Zen Browser
 Exec=$helper_dst %u
 Icon=app.zen_browser.zen
@@ -163,7 +163,7 @@ NoDisplay=true
 Terminal=false
 Categories=Network;WebBrowser;
 EOF
-  echo "-> Installed Zen URL desktop handler: ~/.local/share/applications/zen-url-handler.desktop"
+  echo "-> Installed Zen Browser desktop integration: ~/.local/share/applications/zen-url-handler.desktop"
 
   if have desktop-file-validate; then
     desktop-file-validate "$desktop_file" || return
@@ -179,7 +179,7 @@ EOF
   fi
 
   if ! have xdg-mime; then
-    echo ">> xdg-mime not found; cannot set Zen URL defaults."
+    echo ">> xdg-mime not found; cannot set Zen Browser defaults."
     return
   fi
 
@@ -196,7 +196,7 @@ EOF
     update-desktop-database "$applications_dir" || true
   fi
 
-  echo "-> Set Zen URL handler as default browser for links."
+  echo "-> Set Zen Browser as the default browser for links."
 }
 
 apply_zen_browser_preferences() {
