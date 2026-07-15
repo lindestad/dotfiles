@@ -112,6 +112,7 @@ These are installed when the Linux installer runs with `--niri`.
 | BlueZ | `bluez`, `bluez-utils` | `bluez` | `bluez`, `bluez-tools` |
 | brightnessctl | `brightnessctl` | `brightnessctl` | `brightnessctl` |
 | cliphist | `cliphist` | `cliphist` | `cliphist` |
+| Flatpak | `flatpak` | `flatpak` | `flatpak` |
 | fuzzel | `fuzzel` | `fuzzel` | `fuzzel` |
 | network applet | `network-manager-applet` | `network-manager-gnome` | `NetworkManager-applet` |
 | niri | `niri` | `niri` | `niri` |
@@ -126,6 +127,7 @@ These are installed when the Linux installer runs with `--niri`.
 | wlsunset | `wlsunset` | `wlsunset` | `wlsunset` |
 | wl-clipboard | `wl-clipboard` | `wl-clipboard` | `wl-clipboard` |
 | xdg desktop portal | not installed | `xdg-desktop-portal` | not installed |
+| Zen Browser | Flathub `app.zen_browser.zen` | Flathub `app.zen_browser.zen` | Flathub `app.zen_browser.zen` |
 
 ## Optional Keyboard Remapping
 

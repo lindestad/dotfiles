@@ -108,6 +108,33 @@ zen_browser_available() {
   have zen-browser || have zen
 }
 
+ensure_zen_browser() {
+  if zen_browser_available; then
+    echo "== Zen Browser is already installed."
+    return
+  fi
+
+  if ! have flatpak; then
+    echo ">> Flatpak is not installed; skipping Zen Browser installation."
+    return
+  fi
+
+  echo "==> Enabling Flathub for the current user..."
+  if ! flatpak remote-add --user --if-not-exists \
+    flathub https://flathub.org/repo/flathub.flatpakrepo; then
+    echo ">> Could not enable Flathub; skipping Zen Browser installation."
+    return
+  fi
+
+  echo "==> Installing Zen Browser from Flathub..."
+  if ! flatpak install --user --noninteractive flathub app.zen_browser.zen; then
+    echo ">> Could not install Zen Browser from Flathub."
+    return
+  fi
+
+  echo "-> Installed Zen Browser from Flathub."
+}
+
 install_zen_browser_url_handler() {
   ensure_local_bin
 

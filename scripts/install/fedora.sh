@@ -93,6 +93,7 @@ DNF_PKGS=(
 NIRI_DNF_PKGS=(
   lm_sensors
   brightnessctl
+  flatpak
   cliphist
   bluez
   bluez-tools
@@ -310,6 +311,7 @@ ensure_local_bin
 install_dotfiles_helpers
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
   install_niri_helpers
+  ensure_zen_browser
   install_zen_browser_url_handler
   apply_zen_browser_preferences
 fi

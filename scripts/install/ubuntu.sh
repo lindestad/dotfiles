@@ -48,6 +48,7 @@ APT_PKGS_COMMON=(
 NIRI_APT_PKGS=(
   niri
   fuzzel
+  flatpak
   grim
   slurp
   swayidle
@@ -273,6 +274,7 @@ ensure_local_bin
 install_dotfiles_helpers
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
   install_niri_helpers
+  ensure_zen_browser
   install_zen_browser_url_handler
   apply_zen_browser_preferences
 fi
