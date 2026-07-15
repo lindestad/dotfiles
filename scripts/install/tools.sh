@@ -128,19 +128,28 @@ ensure_tealdeer() {
   update_tealdeer_cache
 }
 
+github_latest_release_json() {
+  local repo="$1"
+  if ! have curl || ! have jq; then
+    echo ">> curl and jq are required to inspect GitHub releases." >&2
+    return 1
+  fi
+
+  curl -fsSL \
+    -H "Accept: application/vnd.github+json" \
+    -H "X-GitHub-Api-Version: 2022-11-28" \
+    "https://api.github.com/repos/$repo/releases/latest"
+}
+
 github_latest_asset_url() {
   local repo="$1" pattern="$2"
-  curl -fsSL "https://api.github.com/repos/$repo/releases/latest" \
-    | sed -nE 's/.*"browser_download_url": "([^"]+)".*/\1/p' \
-    | grep -E "$pattern" \
-    | head -n1
+  github_latest_release_json "$repo" \
+    | jq -r --arg pattern "$pattern" \
+      '[.assets[]?.browser_download_url | select(test($pattern))][0] // empty'
 }
 
 github_latest_release_tag() {
-  local repo="$1"
-  curl -fsSL "https://api.github.com/repos/$repo/releases/latest" \
-    | sed -nE 's/^[[:space:]]*"tag_name":[[:space:]]*"([^"]+)".*/\1/p' \
-    | head -n1
+  github_latest_release_json "$1" | jq -r '.tag_name // empty'
 }
 
 install_github_release_binary() {
