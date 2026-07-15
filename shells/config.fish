@@ -14,7 +14,7 @@ fish_add_path --path --prepend --move \
 # sessions without shadowing system commands.
 fish_add_path --path --append --move "$HOME/.local/bin"
 
-set -gx STARSHIP_CONFIG "$HOME/.config/starship.toml"
+set -gx STARSHIP_CONFIG "$HOME/.config/starship/fish.toml"
 set -gx EDITOR nvim
 set -gx VISUAL nvim
 set -gx COLORTERM truecolor
@@ -71,9 +71,123 @@ end
 ####--------------------------------------------------
 
 if command -q starship
-    # The shared Starship config leaves its Zsh-only boundary variables unset in
-    # Fish, so Starship's native $fill handles the right side of the prompt.
     starship init fish | source
+
+    # Keep the first prompt line intact. As space gets tight, remove RAM first,
+    # then the clock, and finally command duration. Fish measures ANSI escapes
+    # and wide glyphs natively, so padding matches the terminal's actual width.
+    function __dotfiles_starship_prompt
+        set -lx DOTFILES_STARSHIP_RIGHT_START __DOTFILES_STARSHIP_RIGHT_START__
+        set -lx DOTFILES_STARSHIP_DURATION_START __DOTFILES_STARSHIP_DURATION_START__
+        set -lx DOTFILES_STARSHIP_MEMORY_START __DOTFILES_STARSHIP_MEMORY_START__
+        set -lx DOTFILES_STARSHIP_TIME_START __DOTFILES_STARSHIP_TIME_START__
+        set -lx DOTFILES_STARSHIP_RIGHT_END __DOTFILES_STARSHIP_RIGHT_END__
+
+        set -l rendered (command starship prompt $argv | string collect)
+        if test $status -ne 0
+            printf '%s' "$rendered"
+            return
+        end
+
+        for marker in \
+            "$DOTFILES_STARSHIP_RIGHT_START" \
+            "$DOTFILES_STARSHIP_DURATION_START" \
+            "$DOTFILES_STARSHIP_MEMORY_START" \
+            "$DOTFILES_STARSHIP_TIME_START" \
+            "$DOTFILES_STARSHIP_RIGHT_END"
+            if not string match --quiet -- "*$marker*" "$rendered"
+                printf '%s' "$rendered"
+                return
+            end
+        end
+
+        set -l parts (string split --max 1 "$DOTFILES_STARSHIP_RIGHT_START" "$rendered")
+        set -l left "$parts[1]"
+        set -l remainder "$parts[2]"
+
+        set parts (string split --max 1 "$DOTFILES_STARSHIP_DURATION_START" "$remainder")
+        set remainder "$parts[2]"
+        set parts (string split --max 1 "$DOTFILES_STARSHIP_MEMORY_START" "$remainder")
+        set -l duration "$parts[1]"
+        set remainder "$parts[2]"
+        set parts (string split --max 1 "$DOTFILES_STARSHIP_TIME_START" "$remainder")
+        set -l memory "$parts[1]"
+        set remainder "$parts[2]"
+        set parts (string split --max 1 "$DOTFILES_STARSHIP_RIGHT_END" "$remainder")
+        set -l timestamp "$parts[1]"
+        set -l suffix "$parts[2]"
+
+        set -l left_width (string length --visible "$left")
+        set -l right
+        set -l right_width 0
+        set -l duration_only (string trim --right "$duration")
+        for candidate in \
+            "$duration$memory$timestamp" \
+            "$duration$timestamp" \
+            "$duration_only" \
+            ''
+            set right "$candidate"
+            set right_width (string length --visible "$right")
+            if test (math "$left_width + $right_width") -le "$COLUMNS"
+                break
+            end
+        end
+
+        set -l gap (math "$COLUMNS - $left_width - $right_width")
+        set -l padding
+        if test "$gap" -gt 0
+            set padding (string repeat --count "$gap" ' ')
+        end
+
+        printf '%s' "$left$padding$right$suffix"
+    end
+
+    # Starship's generated function captures command state before rendering.
+    # Mirror that entry point and substitute only the normal prompt renderer.
+    function fish_prompt
+        set STARSHIP_CMD_PIPESTATUS $pipestatus
+        set STARSHIP_CMD_STATUS $status
+        set STARSHIP_DURATION "$CMD_DURATION$cmd_duration"
+
+        switch "$fish_key_bindings"
+            case fish_hybrid_key_bindings fish_vi_key_bindings fish_helix_key_bindings
+                set STARSHIP_KEYMAP "$fish_bind_mode"
+            case '*'
+                set STARSHIP_KEYMAP insert
+        end
+
+        __starship_set_job_count
+
+        if contains -- --final-rendering $argv; or test "$TRANSIENT" = 1
+            if test "$TRANSIENT" = 1
+                set -g TRANSIENT 0
+                printf '\e[0J'
+            end
+            if type -q starship_transient_prompt_func
+                starship_transient_prompt_func \
+                    --terminal-width="$COLUMNS" \
+                    --status="$STARSHIP_CMD_STATUS" \
+                    --pipestatus="$STARSHIP_CMD_PIPESTATUS" \
+                    --keymap="$STARSHIP_KEYMAP" \
+                    --cmd-duration="$STARSHIP_DURATION" \
+                    --jobs="$STARSHIP_JOBS"
+            else
+                printf '\e[1;32m❯\e[0m '
+            end
+        else
+            __dotfiles_starship_prompt \
+                --terminal-width="$COLUMNS" \
+                --status="$STARSHIP_CMD_STATUS" \
+                --pipestatus="$STARSHIP_CMD_PIPESTATUS" \
+                --keymap="$STARSHIP_KEYMAP" \
+                --cmd-duration="$STARSHIP_DURATION" \
+                --jobs="$STARSHIP_JOBS"
+        end
+    end
+
+    # right_format is intentionally empty; alignment lives on the first line.
+    function fish_right_prompt
+    end
 end
 
 if command -q zoxide

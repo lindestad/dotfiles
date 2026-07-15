@@ -1,0 +1,231 @@
+# Fish uses marker modules as boundaries for its width-aware prompt wrapper.
+# Keep this separate from Zsh so each shell can evolve independently.
+
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Inserts a blank line between shell prompts
+add_newline = false
+
+continuation_prompt = '▶▶ '
+
+format = """
+$os\
+$username\
+$hostname\
+$localip\
+$shlvl\
+$singularity\
+$kubernetes\
+$directory\
+$vcsh\
+$fossil_branch\
+$fossil_metrics\
+${custom.giturl}\
+$git_branch\
+$git_commit\
+$git_state\
+$git_metrics\
+$git_status\
+$hg_branch\
+$pijul_channel\
+$docker_context\
+$package\
+$c\
+$cmake\
+$cobol\
+$daml\
+$dart\
+$deno\
+$dotnet\
+$elixir\
+$elm\
+$erlang\
+$fennel\
+$gleam\
+$golang\
+$guix_shell\
+$haskell\
+$haxe\
+$helm\
+$java\
+$julia\
+$kotlin\
+$gradle\
+$lua\
+$nim\
+$nodejs\
+$ocaml\
+$opa\
+$perl\
+$php\
+$pulumi\
+$purescript\
+$python\
+$quarto\
+$raku\
+$rlang\
+$red\
+$ruby\
+$rust\
+$scala\
+$solidity\
+$swift\
+$terraform\
+$typst\
+$vlang\
+$vagrant\
+$zig\
+$buf\
+$nix_shell\
+$conda\
+$meson\
+$spack\
+$aws\
+$gcloud\
+$openstack\
+$azure\
+$nats\
+$direnv\
+$env_var\
+$crystal\
+$custom\
+$sudo\
+${env_var.DOTFILES_STARSHIP_RIGHT_START}\
+$fill\
+${env_var.DOTFILES_STARSHIP_DURATION_START}\
+$cmd_duration\
+${env_var.DOTFILES_STARSHIP_MEMORY_START}\
+$memory_usage\
+${env_var.DOTFILES_STARSHIP_TIME_START}\
+$time\
+${env_var.DOTFILES_STARSHIP_RIGHT_END}\
+$line_break\
+$jobs\
+$battery\
+$status\
+
+$container\
+$shell\
+$character"""
+
+right_format = ""
+
+
+[directory]
+truncation_length = 4
+truncation_symbol = '…/'
+use_os_path_sep = false
+home_symbol = "~"
+format = ' [$path]($style) '
+
+[directory.substitutions]
+"Documents" = "󰈙"
+"Downloads" = ""
+"Music" = "󰝚"
+"Pictures" = ""
+"Developer" = "󰲋"
+"dev" = "󰲋"
+
+[time]
+disabled = false
+format = '[\[ $time \]]($style)'
+time_format = '%T'
+utc_time_offset = 'local'
+
+[git_status]
+ahead = '⇡${count}'
+diverged = '⇕⇡${ahead_count}⇣${behind_count}'
+behind = '⇣${count}'
+format = '([\[$all_status$ahead_behind\]]($style) )'
+
+[hostname]
+format = '[$ssh_symbol$hostname]($style) '
+ssh_only = true
+
+[memory_usage]
+disabled = false
+threshold = -1
+symbol = ' '
+format = '[${ram}]($style) '
+
+[fill]
+symbol = ' '
+
+# The Fish prompt wrapper splits Starship output at these invisible boundaries,
+# chooses the right-side segments that fit, and replaces $fill itself.
+[env_var.DOTFILES_STARSHIP_RIGHT_START]
+variable = 'DOTFILES_STARSHIP_RIGHT_START'
+format = '$env_value'
+
+[env_var.DOTFILES_STARSHIP_DURATION_START]
+variable = 'DOTFILES_STARSHIP_DURATION_START'
+format = '$env_value'
+
+[env_var.DOTFILES_STARSHIP_MEMORY_START]
+variable = 'DOTFILES_STARSHIP_MEMORY_START'
+format = '$env_value'
+
+[env_var.DOTFILES_STARSHIP_TIME_START]
+variable = 'DOTFILES_STARSHIP_TIME_START'
+format = '$env_value'
+
+[env_var.DOTFILES_STARSHIP_RIGHT_END]
+variable = 'DOTFILES_STARSHIP_RIGHT_END'
+format = '$env_value'
+
+[character]
+success_symbol = '[❯](bold green) '
+error_symbol = '[❯](bold red) '
+
+[line_break]
+disabled = false
+
+[os]
+disabled = false
+format = '[$symbol]($style) '
+
+[os.symbols]
+CachyOS = "󰣇"
+Ubuntu = ""
+Linux = ""
+Windows = ""
+SUSE = ""
+Raspbian = "󰐿"
+Mint = "󰣭"
+Macos = " "
+Manjaro = ""
+Gentoo = "󰣨"
+Fedora = "󰣛"
+Alpine = ""
+Amazon = ""
+Android = ""
+Arch = "󰣇"
+Artix = "󰣇"
+CentOS = ""
+Debian = "󰣚"
+Redhat = "󱄛"
+RedHatEnterprise = "󱄛"
+
+[cmd_duration]
+format = "[]($style) [$duration]($style) "
+style = "yellow"
+min_time = 2_000
+disabled = false
+
+[custom.giturl]
+description = "Display symbol for remote Git server"
+format = "at $output  "
+command = """
+#!/usr/bin/env sh
+url="$(git ls-remote --get-url 2>/dev/null || printf '')"
+case "$url" in
+  *github*)    printf '' ;;
+  *gitlab*)    printf '' ;;
+  *bitbucket*) printf '' ;;
+  *codeberg*)  printf '' ;;
+  *git*)       printf '' ;;
+  *)           printf '' ;;
+esac
+"""
+when = 'git rev-parse --is-inside-work-tree 2>/dev/null'
