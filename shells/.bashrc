@@ -79,6 +79,7 @@ fi
 ####--------------------------------------------------
 
 export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense'
+export CARAPACE_MATCH=1
 
 # true  = lazy-load carapace on first Tab (faster shell startup)
 # false = load carapace eagerly at shell startup

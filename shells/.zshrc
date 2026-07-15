@@ -184,6 +184,7 @@ zstyle ':completion:*:*:-command-:*:*' group-order alias builtins functions comm
 ####--------------------------------------------------
 # let carapace reuse other shells' completion data when helpful
 export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense'
+export CARAPACE_MATCH=1
 
 # true  = lazy-load carapace on first Tab (faster shell startup)
 # false = load carapace eagerly at shell startup
