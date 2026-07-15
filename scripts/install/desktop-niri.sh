@@ -62,9 +62,55 @@ ensure_power_profiles_fedora() {
   install_dnf power-profiles-daemon
 }
 
+update_nirimod_checkout() {
+  local install_dir="$1"
+  local branch before after
+
+  if ! have git; then
+    echo ">> Git is required to update NiriMod; leaving the existing installation unchanged."
+    return
+  fi
+
+  branch="$(git -C "$install_dir" symbolic-ref --quiet --short HEAD 2>/dev/null || true)"
+  if [[ "$branch" != "main" ]]; then
+    echo ">> NiriMod is on '${branch:-a detached HEAD}', not main; skipping update."
+    return
+  fi
+
+  if [[ -n "$(git -C "$install_dir" status --porcelain 2>/dev/null)" ]]; then
+    echo ">> NiriMod checkout has local changes; skipping update: $install_dir"
+    return
+  fi
+
+  before="$(git -C "$install_dir" rev-parse HEAD 2>/dev/null || true)"
+  echo "==> Checking NiriMod for updates..."
+  if ! git -C "$install_dir" fetch --quiet origin main; then
+    echo ">> Could not fetch NiriMod updates; leaving the existing installation unchanged."
+    return
+  fi
+  if ! git -C "$install_dir" merge --ff-only --quiet FETCH_HEAD; then
+    echo ">> NiriMod has diverged from origin/main; skipping update."
+    return
+  fi
+
+  after="$(git -C "$install_dir" rev-parse HEAD 2>/dev/null || true)"
+  if [[ "$before" == "$after" ]]; then
+    echo "-> NiriMod is already up to date (${after:0:8})."
+  else
+    echo "-> Updated NiriMod: ${before:0:8} -> ${after:0:8}"
+  fi
+}
+
 ensure_nirimod() {
   if have nirimod; then
-    echo "-> NiriMod already installed: $(command -v nirimod)"
+    local command_path install_dir
+    command_path="$(command -v nirimod)"
+    install_dir="$HOME/.local/share/nirimod"
+    if [[ "$command_path" == "$HOME/.local/bin/nirimod" && -d "$install_dir/.git" ]]; then
+      update_nirimod_checkout "$install_dir"
+    else
+      echo "-> NiriMod already installed: $command_path"
+    fi
     return
   fi
 
