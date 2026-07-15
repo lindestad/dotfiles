@@ -65,15 +65,33 @@ ensure_fish_default_shell() {
     return
   fi
 
-  if ! grep -qxF "$fish_path" /etc/shells; then
-    echo "==> Adding $fish_path to /etc/shells..."
-    echo "$fish_path" | sudo tee -a /etc/shells >/dev/null
+  if ! sudo -n -v 2>/dev/null; then
+    echo "==> Administrator access required to change the default shell"
+    echo "   The earlier sudo authorization expired; authenticate once more."
+    if ! sudo -v; then
+      echo ">> Could not refresh administrator access; leaving the default shell unchanged."
+      echo "   Run manually: sudo chsh -s $fish_path $USER"
+      return
+    fi
   fi
 
-  chsh -s "$fish_path" "$USER" || sudo chsh -s "$fish_path" "$USER" || {
+  if ! grep -qxF "$fish_path" /etc/shells; then
+    echo "==> Adding $fish_path to /etc/shells..."
+    if ! echo "$fish_path" | sudo -n tee -a /etc/shells >/dev/null; then
+      echo ">> Could not add $fish_path to /etc/shells; leaving the default shell unchanged."
+      echo "   Run manually: echo '$fish_path' | sudo tee -a /etc/shells"
+      echo "                 sudo chsh -s $fish_path $USER"
+      return
+    fi
+  fi
+
+  echo "==> Setting fish as the default shell..."
+  if sudo -n chsh -s "$fish_path" "$USER"; then
+    echo "== Default shell changed to fish."
+  else
     echo ">> Could not change default shell automatically."
-    echo "   Run manually: chsh -s $fish_path"
-  }
+    echo "   Run manually: sudo chsh -s $fish_path $USER"
+  fi
 }
 
 ensure_local_bin() {
