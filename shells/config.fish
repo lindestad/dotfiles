@@ -354,7 +354,7 @@ abbr --add ff fastfetch
 if command -q helix
     abbr --add hx helix
 end
-abbr --add h hx
+abbr --add h helix
 abbr --add n nvim
 
 abbr --add rg 'rg --hidden --glob "!.git"'
