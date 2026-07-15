@@ -1,4 +1,5 @@
 config/yazi/state
 config/niri/local.kdl
+config/zellij/plugins/*.wasm
 .codex
 logs/

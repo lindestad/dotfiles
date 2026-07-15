@@ -451,7 +451,6 @@ install_niri_helpers() {
     niri-focus-workspace-all
     niri-lock-screen
     niri-move-window-or-workspace
-    niri-navigate
     niri-screenshot-region
     noctalia-activate-notification
   )
