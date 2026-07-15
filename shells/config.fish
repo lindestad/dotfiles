@@ -356,6 +356,7 @@ if command -q helix
 end
 abbr --add h helix
 abbr --add n nvim
+abbr --add nn 'nvim --cmd "let g:skip_startup_explorer = 1"'
 
 abbr --add rg 'rg --hidden --glob "!.git"'
 abbr --add fd 'fd --hidden --exclude .git'

@@ -1,6 +1,10 @@
 local uv = vim.uv or vim.loop
 
 local function should_open_startup_explorer()
+  if vim.g.skip_startup_explorer then
+    return false
+  end
+
   if vim.fn.argc(-1) ~= 0 then
     return false
   end
@@ -41,6 +45,7 @@ return {
   {
     "folke/snacks.nvim",
     opts = {
+      dashboard = { enabled = false },
       terminal = {
         win = {
           keys = {
