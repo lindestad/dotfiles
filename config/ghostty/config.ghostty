@@ -79,4 +79,4 @@ palette = 14=#95e6cb
 palette = 15=#ffffff
 
 # Exec
-command = direct:/usr/bin/zsh -l
+command = direct:/usr/bin/fish -l
