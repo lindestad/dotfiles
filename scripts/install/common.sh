@@ -158,7 +158,7 @@ source "$DOTFILES_DIR/scripts/install/user-env.sh"
 
 INSTALL_NIRI=""
 INSTALL_KANATA=""
-SET_ZSH_DEFAULT=""
+SET_FISH_DEFAULT=""
 KANATA_LAYOUT=""
 KANATA_STARTUP=""
 ASSUME_YES="no"
@@ -297,11 +297,11 @@ collect_install_choices() {
   fi
 
   current_shell="$(getent passwd "$USER" 2>/dev/null | cut -d: -f7 || true)"
-  if [[ "${current_shell##*/}" != "zsh" ]]; then
+  if [[ "${current_shell##*/}" != "fish" ]]; then
     if [[ "$ASSUME_YES" == "yes" ]]; then
-      SET_ZSH_DEFAULT="no"
+      SET_FISH_DEFAULT="no"
     else
-      SET_ZSH_DEFAULT="$(prompt_yes_no "Set zsh as the default shell?")"
+      SET_FISH_DEFAULT="$(prompt_yes_no "Set fish as the default shell?")"
     fi
   fi
 
@@ -311,8 +311,8 @@ show_install_plan() {
   echo "==> Installation plan"
   echo "-> Desktop stack: $INSTALL_NIRI"
   echo "-> Kanata: $INSTALL_KANATA${KANATA_LAYOUT:+ ($KANATA_LAYOUT, $KANATA_STARTUP startup)}"
-  if [[ -n "$SET_ZSH_DEFAULT" ]]; then
-    echo "-> Set zsh as default: $SET_ZSH_DEFAULT"
+  if [[ -n "$SET_FISH_DEFAULT" ]]; then
+    echo "-> Set fish as default: $SET_FISH_DEFAULT"
   fi
 }
 

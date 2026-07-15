@@ -12,6 +12,7 @@ ensure_not_root
 start_install_log
 
 APT_PKGS=(
+  fish
   zsh
   curl
   unzip
@@ -171,7 +172,7 @@ copy_gitconfig
 ensure_codex_config
 
 install_progress 4 4 "Finishing setup"
-ensure_zsh_default_shell
+ensure_fish_default_shell
 
 ensure_uv_tools ty ruff
 

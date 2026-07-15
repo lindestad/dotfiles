@@ -10,6 +10,7 @@ ensure_not_root
 start_install_log
 
 DNF_PKGS=(
+  fish
   zsh
   curl
   wget
@@ -320,7 +321,7 @@ fi
 install_progress 5 5 "Finishing setup"
 copy_gitconfig
 ensure_codex_config
-ensure_zsh_default_shell
+ensure_fish_default_shell
 
 if [[ "$INSTALL_KANATA" == "yes" && -n "$KANATA_CONFIG_SRC" ]]; then
   link_kanata_config "$KANATA_CONFIG_SRC"

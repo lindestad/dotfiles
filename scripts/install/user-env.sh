@@ -44,35 +44,35 @@ install_fonts() {
   fi
 }
 
-ensure_zsh_default_shell() {
-  if ! have zsh; then
-    echo ">> zsh is not installed; leaving default shell unchanged."
+ensure_fish_default_shell() {
+  if ! have fish; then
+    echo ">> fish is not installed; leaving default shell unchanged."
     return
   fi
 
-  local zsh_path current_shell
-  zsh_path="$(command -v zsh)"
+  local fish_path current_shell
+  fish_path="$(command -v fish)"
   current_shell="$(getent passwd "$USER" | cut -d: -f7)"
 
-  if [[ "$current_shell" == "$zsh_path" ]]; then
-    echo "== zsh is already the default shell."
+  if [[ "${current_shell##*/}" == "fish" ]]; then
+    echo "== fish is already the default shell."
     return
   fi
 
-  if [[ -n "${SET_ZSH_DEFAULT:-}" ]]; then
-    [[ "$SET_ZSH_DEFAULT" == "yes" ]] || return
-  elif [[ "$(prompt_yes_no "Set zsh as default shell?")" != "yes" ]]; then
+  if [[ -n "${SET_FISH_DEFAULT:-}" ]]; then
+    [[ "$SET_FISH_DEFAULT" == "yes" ]] || return
+  elif [[ "$(prompt_yes_no "Set fish as default shell?")" != "yes" ]]; then
     return
   fi
 
-  if ! grep -qxF "$zsh_path" /etc/shells; then
-    echo "==> Adding $zsh_path to /etc/shells..."
-    echo "$zsh_path" | sudo tee -a /etc/shells >/dev/null
+  if ! grep -qxF "$fish_path" /etc/shells; then
+    echo "==> Adding $fish_path to /etc/shells..."
+    echo "$fish_path" | sudo tee -a /etc/shells >/dev/null
   fi
 
-  chsh -s "$zsh_path" "$USER" || sudo chsh -s "$zsh_path" "$USER" || {
+  chsh -s "$fish_path" "$USER" || sudo chsh -s "$fish_path" "$USER" || {
     echo ">> Could not change default shell automatically."
-    echo "   Run manually: chsh -s $zsh_path"
+    echo "   Run manually: chsh -s $fish_path"
   }
 }
 

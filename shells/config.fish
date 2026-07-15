@@ -8,8 +8,11 @@
 fish_add_path --path --prepend --move \
     "$HOME/.local/share/fnm" \
     "$HOME/go/bin" \
-    "$HOME/.cargo/bin" \
-    "$HOME/.local/bin"
+    "$HOME/.cargo/bin"
+
+# Match .zprofile: user-installed executables should be available to login
+# sessions without shadowing system commands.
+fish_add_path --path --append --move "$HOME/.local/bin"
 
 set -gx STARSHIP_CONFIG "$HOME/.config/starship.toml"
 set -gx EDITOR nvim
