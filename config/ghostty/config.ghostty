@@ -53,6 +53,8 @@ custom-shader = shaders/rectangle-boom.glsl
 # Ctrl-Backspace otherwise arrives as Ctrl-H in Ghostty. Send ESC DEL, which
 # shells and editors commonly interpret as backward-kill-word / Meta-Backspace.
 keybind = ctrl+backspace=text:\x1b\x7f
+# Preserve all modifiers so Neovim can distinguish this from Shift-Tab.
+keybind = ctrl+shift+tab=text:\x1b[9;6u
 keybind = ctrl+alt+k=scroll_page_lines:-3
 keybind = ctrl+alt+j=scroll_page_lines:3
 keybind = ctrl+alt+u=scroll_page_fractional:-0.5
