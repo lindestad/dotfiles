@@ -167,6 +167,7 @@ keybinds clear-defaults=true {
         }
     }
     shared_among "normal" "locked" {
+        bind "Ctrl Alt e" { EditScrollback; SwitchToMode "locked"; }
         bind "Alt left" { MoveFocusOrTab "left"; }
         bind "Alt down" { MoveFocus "down"; }
         bind "Alt up" { MoveFocus "up"; }
@@ -403,7 +404,7 @@ default_mode "locked"
  
 // Path to the default editor to use to edit pane scrollbuffer
 // Default: $EDITOR or $VISUAL
-// scrollback_editor "/usr/bin/vim"
+scrollback_editor "nvim +"
  
 // A fixed name to always give the Zellij session.
 // Consider also setting `attach_to_session true,`
