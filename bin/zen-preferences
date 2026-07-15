@@ -3,6 +3,9 @@ set -euo pipefail
 
 begin_marker="// BEGIN dotfiles zen preferences"
 end_marker="// END dotfiles zen preferences"
+shortcuts_filename="zen-keyboard-shortcuts.json"
+next_tab_shortcut_id="dotfiles-next-tab"
+previous_tab_shortcut_id="dotfiles-previous-tab"
 mode="apply"
 dry_run="no"
 manual_profile_dirs=()
@@ -20,7 +23,7 @@ usage() {
   cat <<EOF
 Usage: $(basename "$0") [options]
 
-Apply dotfiles-managed Zen Browser preferences to discovered profiles.
+Apply dotfiles-managed Zen Browser preferences and shortcuts to discovered profiles.
 
 Options:
   --check             Report drift without writing files
@@ -103,6 +106,151 @@ effective_pref_value() {
 
   pref_value_from_file "$profile_dir/user.js" "$key" \
     || pref_value_from_file "$profile_dir/prefs.js" "$key"
+}
+
+render_managed_shortcuts() {
+  local shortcuts_file="$1"
+  local output_file="$2"
+
+  jq --compact-output --join-output \
+    --arg next_id "$next_tab_shortcut_id" \
+    --arg previous_id "$previous_tab_shortcut_id" \
+    '
+      def has_ctrl_binding($key):
+        ((.key // "") | ascii_downcase) == $key
+        and ((.modifiers.accel // false) or (.modifiers.control // false))
+        and ((.modifiers.alt // false) | not)
+        and ((.modifiers.shift // false) | not)
+        and ((.modifiers.meta // false) | not);
+
+      def clear_binding:
+        .key = ""
+        | .keycode = ""
+        | .modifiers = {
+            control: false,
+            alt: false,
+            shift: false,
+            meta: false,
+            accel: false
+          };
+
+      def managed_shortcut($id; $key; $action): {
+        id: $id,
+        key: $key,
+        keycode: "",
+        group: "windowAndTabManagement",
+        l10nId: null,
+        modifiers: {
+          control: false,
+          alt: false,
+          shift: false,
+          meta: false,
+          accel: true
+        },
+        action: $action,
+        disabled: false,
+        reserved: false,
+        internal: false
+      };
+
+      .shortcuts |= (
+        map(
+          if .id == $next_id or .id == $previous_id then
+            empty
+          elif has_ctrl_binding("j") or has_ctrl_binding("k") then
+            clear_binding
+          else
+            .
+          end
+        )
+        + [
+            managed_shortcut($next_id; "j"; "Browser:NextTab"),
+            managed_shortcut($previous_id; "k"; "Browser:PrevTab")
+          ]
+      )
+    ' "$shortcuts_file" >"$output_file"
+}
+
+shortcuts_file_is_valid() {
+  local shortcuts_file="$1"
+
+  jq -e '.shortcuts | type == "array"' "$shortcuts_file" >/dev/null 2>&1
+}
+
+shortcut_files_are_equal() {
+  local current_file="$1"
+  local desired_file="$2"
+
+  jq -e --slurpfile desired "$desired_file" '. == $desired[0]' \
+    "$current_file" >/dev/null 2>&1
+}
+
+check_managed_shortcuts() {
+  local profile_dir="$1"
+  local shortcuts_file="$profile_dir/$shortcuts_filename"
+  local rendered
+
+  if [[ ! -f "$shortcuts_file" ]]; then
+    if [[ ! -f "$profile_dir/prefs.js" ]]; then
+      echo "== keyboard shortcuts skipped for uninitialized profile"
+      return 0
+    fi
+    echo "-> keyboard shortcuts are not initialized; open and close Zen, then rerun"
+    return 1
+  fi
+
+  if ! shortcuts_file_is_valid "$shortcuts_file"; then
+    echo "-> $shortcuts_file is not a valid Zen shortcuts file"
+    return 1
+  fi
+
+  rendered="$(mktemp "$profile_dir/.zen-keyboard-shortcuts.check.XXXXXX")"
+  render_managed_shortcuts "$shortcuts_file" "$rendered"
+
+  if shortcut_files_are_equal "$shortcuts_file" "$rendered"; then
+    rm -f "$rendered"
+    echo "== Ctrl+J/Ctrl+K use next/previous tab in list order"
+    return 0
+  fi
+
+  rm -f "$rendered"
+  echo "-> Ctrl+J/Ctrl+K need next/previous tab bindings"
+  return 1
+}
+
+write_managed_shortcuts() {
+  local profile_dir="$1"
+  local shortcuts_file="$profile_dir/$shortcuts_filename"
+  local new_file timestamp
+
+  if [[ ! -f "$shortcuts_file" ]]; then
+    echo ">> Skipping keyboard shortcuts until Zen initializes $shortcuts_filename"
+    return 0
+  fi
+
+  if ! shortcuts_file_is_valid "$shortcuts_file"; then
+    die "$shortcuts_file is not a valid Zen shortcuts file"
+  fi
+
+  new_file="$(mktemp "$profile_dir/.zen-keyboard-shortcuts.new.XXXXXX")"
+  render_managed_shortcuts "$shortcuts_file" "$new_file"
+
+  if shortcut_files_are_equal "$shortcuts_file" "$new_file"; then
+    rm -f "$new_file"
+    echo "== keyboard shortcuts already current"
+    return 0
+  fi
+
+  if [[ "$dry_run" == "yes" ]]; then
+    rm -f "$new_file"
+    echo ">> dry-run: would update $shortcuts_file"
+    return 0
+  fi
+
+  timestamp="$(date +%Y%m%d-%H%M%S)"
+  cp -p "$shortcuts_file" "$shortcuts_file.bak.$timestamp.$$"
+  mv "$new_file" "$shortcuts_file"
+  echo "-> updated $shortcuts_file"
 }
 
 add_profile_dir() {
@@ -339,6 +487,10 @@ check_profile() {
     fi
   done
 
+  if ! check_managed_shortcuts "$profile_dir"; then
+    had_drift="yes"
+  fi
+
   [[ "$had_drift" == "no" ]]
 }
 
@@ -360,6 +512,7 @@ main() {
 
     if [[ "$mode" == "apply" ]]; then
       write_managed_user_js "$profile_dir"
+      write_managed_shortcuts "$profile_dir"
     fi
   done
 
@@ -368,7 +521,7 @@ main() {
   fi
 
   if [[ "$mode" == "apply" && "$dry_run" != "yes" ]]; then
-    echo "== Restart Zen for user.js preferences to take effect."
+    echo "== Restart Zen for preferences and keyboard shortcuts to take effect."
   fi
 }
 
