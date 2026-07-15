@@ -34,10 +34,10 @@ binds {
     // Focus
     Mod+O repeat=false { toggle-overview; }
     Mod+Q repeat=false { close-window; }
-    Mod+Left  { focus-column-left; }
-    Mod+Down  { focus-window-down; }
-    Mod+Up    { focus-window-up; }
-    Mod+Right { focus-column-right; }
+    Mod+Left  { spawn "niri-navigate" "left"; }
+    Mod+Down  { spawn "niri-navigate" "down"; }
+    Mod+Up    { spawn "niri-navigate" "up"; }
+    Mod+Right { spawn "niri-navigate" "right"; }
     Mod+H     { focus-column-or-monitor-left; }
     Mod+J     { focus-window-or-workspace-down; }
     Mod+K     { focus-window-or-workspace-up; }

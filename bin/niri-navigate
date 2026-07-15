@@ -1,0 +1,243 @@
+#!/usr/bin/env bash
+
+set -u
+set -o pipefail
+
+direction="${1:-}"
+
+case "$direction" in
+  left|down|up|right) ;;
+  *)
+    echo "usage: ${0##*/} left|down|up|right" >&2
+    exit 2
+    ;;
+esac
+
+runtime_dir="${XDG_RUNTIME_DIR:-/tmp}"
+nav_timeout="${NIRI_NAV_TIMEOUT:-0.15s}"
+
+descendant_pids() {
+  local parent="$1"
+  local child
+
+  while IFS= read -r child; do
+    printf '%s\n' "$child"
+    descendant_pids "$child"
+  done < <(pgrep --parent "$parent" 2>/dev/null)
+}
+
+zellij_session_from_args() {
+  local pid="$1"
+  local -a args=()
+  local i j arg
+
+  mapfile -d '' -t args <"/proc/$pid/cmdline" 2>/dev/null || return 1
+
+  for ((i = 1; i < ${#args[@]}; i++)); do
+    arg="${args[$i]}"
+    case "$arg" in
+      --session|-s)
+        [[ -n "${args[$((i + 1))]:-}" ]] && printf '%s\n' "${args[$((i + 1))]}"
+        return
+        ;;
+      --session=*)
+        printf '%s\n' "${arg#*=}"
+        return
+        ;;
+      -s?*)
+        printf '%s\n' "${arg#-s}"
+        return
+        ;;
+      attach|a)
+        for ((j = i + 1; j < ${#args[@]}; j++)); do
+          arg="${args[$j]}"
+          [[ "$arg" == -* ]] && continue
+          printf '%s\n' "$arg"
+          return
+        done
+        ;;
+    esac
+  done
+
+  return 1
+}
+
+zellij_session_from_socket() {
+  local pid="$1"
+  local socket_root="${ZELLIJ_SOCKET_DIR:-$runtime_dir/zellij}"
+  local fd target line local_address peer_inode
+  local -A client_inodes=()
+
+  command -v ss >/dev/null 2>&1 || return 1
+
+  for fd in "/proc/$pid/fd"/*; do
+    target="$(readlink "$fd" 2>/dev/null || true)"
+    if [[ "$target" =~ ^socket:\[([0-9]+)\]$ ]]; then
+      client_inodes["${BASH_REMATCH[1]}"]=1
+    fi
+  done
+
+  while IFS= read -r line; do
+    read -r _ _ _ _ local_address _ _ peer_inode _ <<<"$line"
+    [[ "$local_address" == "$socket_root"/contract_version_*/* ]] || continue
+    [[ -n "$peer_inode" ]] || continue
+    [[ -n "${client_inodes[$peer_inode]:-}" ]] || continue
+    printf '%s\n' "${local_address##*/}"
+    return
+  done < <(ss -xnpH 2>/dev/null)
+
+  return 1
+}
+
+find_zellij_session() {
+  local root_pid="$1"
+  local pid comm session
+
+  while IFS= read -r pid; do
+    [[ -r "/proc/$pid/comm" ]] || continue
+    read -r comm <"/proc/$pid/comm"
+    [[ "$comm" == zellij ]] || continue
+
+    session="$(zellij_session_from_args "$pid" 2>/dev/null || true)"
+    if [[ -z "$session" ]]; then
+      session="$(zellij_session_from_socket "$pid" 2>/dev/null || true)"
+    fi
+    if [[ -n "$session" ]]; then
+      printf '%s\n' "$session"
+      return
+    fi
+  done < <(descendant_pids "$root_pid")
+
+  return 1
+}
+
+zellij_current_client() {
+  local session="$1"
+  local output line pane command
+  local -a clients=()
+
+  output="$(zellij --session "$session" action list-clients 2>/dev/null)" || return 1
+  mapfile -t clients < <(sed '1d; /^[[:space:]]*$/d' <<<"$output")
+
+  # External Zellij actions cannot select among multiple attached clients.
+  [[ ${#clients[@]} -eq 1 ]] || return 1
+
+  line="${clients[0]}"
+  read -r _ pane command _ <<<"$line"
+  [[ -n "$pane" ]] || return 1
+  printf '%s\t%s\n' "$pane" "${command:-}"
+}
+
+is_foreground_process() {
+  local pid="$1"
+  local pgrp tpgid parent
+
+  while [[ "$pid" =~ ^[0-9]+$ && "$pid" -gt 1 ]]; do
+    pgrp="$(ps -o pgrp= -p "$pid" 2>/dev/null | tr -d ' ')"
+    tpgid="$(ps -o tpgid= -p "$pid" 2>/dev/null | tr -d ' ')"
+    if [[ -n "$tpgid" && "$tpgid" != -1 ]]; then
+      [[ -n "$pgrp" && "$pgrp" == "$tpgid" ]]
+      return
+    fi
+    parent="$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ')"
+    [[ -n "$parent" && "$parent" != "$pid" ]] || return 1
+    pid="$parent"
+  done
+
+  return 1
+}
+
+nvim_navigate() {
+  local root_pid="$1"
+  local session="${2:-}"
+  local pane="${3:-}"
+  local running_command="${4:-}"
+  local metadata pid server metadata_session metadata_pane normalized_pane result
+  local -A descendants=()
+
+  if [[ -n "$session" ]]; then
+    running_command="${running_command##*/}"
+    [[ "$running_command" == nvim || "$running_command" == nvim-* ]] || return 1
+    normalized_pane="${pane#terminal_}"
+  else
+    while IFS= read -r pid; do
+      descendants["$pid"]=1
+    done < <(descendant_pids "$root_pid")
+  fi
+
+  for metadata in "$runtime_dir"/niri-navigate.nvim.*; do
+    [[ -f "$metadata" ]] || continue
+    pid="${metadata##*.}"
+
+    if ! kill -0 "$pid" 2>/dev/null; then
+      rm -f "$metadata"
+      continue
+    fi
+
+    {
+      IFS= read -r server
+      IFS= read -r metadata_session
+      IFS= read -r metadata_pane
+    } <"$metadata"
+
+    if [[ -n "$session" ]]; then
+      metadata_pane="${metadata_pane#terminal_}"
+      [[ "$metadata_session" == "$session" && "$metadata_pane" == "$normalized_pane" ]] || continue
+    else
+      [[ -n "${descendants[$pid]:-}" ]] || continue
+      is_foreground_process "$pid" || continue
+    fi
+
+    result="$(timeout "$nav_timeout" nvim --headless --server "$server" \
+      --remote-expr "v:lua.NiriNavigate('$direction')" 2>/dev/null || true)"
+    [[ "$result" == true ]] && return 0
+    return 1
+  done
+
+  return 1
+}
+
+niri_navigate() {
+  case "$direction" in
+    left|right) niri msg action "focus-column-$direction" ;;
+    up|down) niri msg action "focus-window-$direction" ;;
+  esac
+}
+
+main() {
+  local focused_pid session client pane running_command next_client next_pane
+
+  focused_pid="${NIRI_NAV_FOCUSED_PID:-}"
+  if [[ -z "$focused_pid" ]]; then
+    focused_pid="$(niri msg --json focused-window 2>/dev/null | jq -r '.pid // empty')"
+  fi
+  [[ -n "$focused_pid" ]] || return 1
+
+  session="$(find_zellij_session "$focused_pid" 2>/dev/null || true)"
+  if [[ -n "$session" ]]; then
+    client="$(zellij_current_client "$session" || true)"
+    if [[ -n "$client" ]]; then
+      IFS=$'\t' read -r pane running_command <<<"$client"
+      nvim_navigate "$focused_pid" "$session" "$pane" "$running_command" && return
+
+      zellij --session "$session" action move-focus "$direction" >/dev/null 2>&1 || {
+        niri_navigate
+        return
+      }
+      next_client="$(zellij_current_client "$session" || true)"
+      IFS=$'\t' read -r next_pane _ <<<"$next_client"
+      [[ -n "$next_pane" && "$next_pane" != "$pane" ]] && return
+    fi
+  else
+    nvim_navigate "$focused_pid" && return
+  fi
+
+  niri_navigate
+}
+
+if command -v flock >/dev/null 2>&1; then
+  exec 9>"$runtime_dir/niri-navigate.lock"
+  flock -w 0.2 9 || exit 0
+fi
+
+main

@@ -18,3 +18,37 @@ vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
     end
   end,
 })
+
+-- Let Niri navigate Neovim splits before falling through to Zellij or a window.
+local niri_navigation_group = vim.api.nvim_create_augroup("niri_navigation", { clear = true })
+local niri_navigation_file
+
+_G.NiriNavigate = function(direction)
+  local key = ({ left = "h", down = "j", up = "k", right = "l" })[direction]
+  if not key then
+    return false
+  end
+
+  local previous_window = vim.api.nvim_get_current_win()
+  vim.cmd("wincmd " .. key)
+  return vim.api.nvim_get_current_win() ~= previous_window
+end
+
+if vim.env.NIRI_SOCKET and vim.v.servername ~= "" then
+  local runtime_dir = vim.env.XDG_RUNTIME_DIR or "/tmp"
+  niri_navigation_file = string.format("%s/niri-navigate.nvim.%d", runtime_dir, vim.fn.getpid())
+  vim.fn.writefile({
+    vim.v.servername,
+    vim.env.ZELLIJ_SESSION_NAME or "",
+    vim.env.ZELLIJ_PANE_ID or "",
+  }, niri_navigation_file)
+end
+
+vim.api.nvim_create_autocmd("VimLeavePre", {
+  group = niri_navigation_group,
+  callback = function()
+    if niri_navigation_file then
+      vim.fn.delete(niri_navigation_file)
+    end
+  end,
+})
