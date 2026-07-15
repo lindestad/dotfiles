@@ -22,7 +22,7 @@ input {
 }
 
 layout {
-    gaps 4
+    gaps 8
 
     // Noctalia draws the wallpaper.
     background-color "transparent"
@@ -38,16 +38,16 @@ layout {
     default-column-width { proportion 0.5; }
 
     focus-ring {
+        off
+
         width 2
         active-color "#ededed"
         inactive-color "#505050"
     }
 
     border {
-        off
-
-        width 4
-        active-color "#ffc87f"
+        width 2
+        active-color "#ededed"
         inactive-color "#505050"
         urgent-color "#9b0000"
     }
@@ -97,6 +97,8 @@ blur {
 window-rule { clip-to-geometry true; geometry-corner-radius 2; }
 
 window-rule {
+    geometry-corner-radius 9
+    clip-to-geometry true
     background-effect {
         blur true
         xray false
@@ -137,4 +139,6 @@ include "keybinds.kdl"
 prefer-no-csd
 
 // Keep outputs, renderer device choices, and host-specific tweaks local.
-include optional=true "local.kdl"
+include "local.kdl" optional=true
+
+environment
