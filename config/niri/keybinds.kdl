@@ -4,6 +4,7 @@ binds {
     Mod+T hotkey-overlay-title="Open a Terminal: ghostty" { spawn "ghostty"; }
     Mod+Return hotkey-overlay-title="Open a Terminal: ghostty" { spawn "ghostty"; }
     Mod+D hotkey-overlay-title="Noctalia Launcher" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "toggle"; }
+    Mod+B hotkey-overlay-title="Open Zen" { spawn-sh "$HOME/.local/bin/zen-url-handler"; }
     Mod+Ctrl+Shift+D hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen" { spawn-sh "$HOME/.local/bin/niri-lock-screen"; }
 
