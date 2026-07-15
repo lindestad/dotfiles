@@ -71,6 +71,7 @@ existing_kanata_config_src() {
 LINKS=()
 add_common_cli_links
 add_zsh_link
+add_fish_link
 
 if is_wsl; then
   resolve_install_flags no no

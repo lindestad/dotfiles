@@ -93,6 +93,7 @@ unlink_managed_link() {
 LINKS=()
 add_common_cli_links
 add_zsh_link
+add_fish_link
 add_bash_link
 add_alacritty_link
 add_wezterm_link

@@ -46,6 +46,11 @@ if have zsh; then
 else
   skip "zsh syntax" "zsh is not installed"
 fi
+if have fish; then
+  fish --no-execute shells/config.fish
+else
+  skip "fish syntax" "fish is not installed"
+fi
 
 step "justfile"
 if have just; then

@@ -34,6 +34,10 @@ add_zsh_link() {
   )
 }
 
+add_fish_link() {
+  LINKS+=("$DOTFILES_DIR/shells/config.fish|$HOME/.config/fish/config.fish")
+}
+
 add_bash_link() {
   LINKS+=("$DOTFILES_DIR/shells/.bashrc|$HOME/.bashrc")
 }

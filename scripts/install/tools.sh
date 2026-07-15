@@ -604,7 +604,7 @@ ensure_broot_launcher() {
   fi
 
   local shell_name launcher_dir launcher_file
-  for shell_name in bash zsh; do
+  for shell_name in bash zsh fish; do
     launcher_dir="$HOME/.config/broot/launcher/$shell_name"
     launcher_file="$launcher_dir/br"
     mkdir -p "$launcher_dir"

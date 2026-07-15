@@ -161,13 +161,14 @@ These are not package installs, but the installers manage them alongside the too
 | Alacritty | non-WSL Linux only | linked/copied |
 | Atuin config + themes | symlinked | linked/copied |
 | Bash profile | Ubuntu only | `.bashrc` linked/copied; `.bash_profile` created if no login profile exists |
-| Broot config + skins | symlinked; launchers generated when `broot` is installed | linked/copied to the Broot AppData config directory; Git Bash launcher generated when `broot` is installed |
+| Broot config + skins | symlinked; Bash, Zsh, and Fish launchers generated when `broot` is installed | linked/copied to the Broot AppData config directory; Git Bash launcher generated when `broot` is installed |
 | Codex instructions | symlinked | linked/copied |
 | Dotfiles doctor | installed to `~/.local/bin/dotfiles-doctor` | not managed |
 | Git config | copied if missing; missing keys merged | copied if missing; missing keys merged |
 | Git global ignore | symlinked | linked/copied |
 | Ghostty config + shaders | non-WSL Linux only | not linked |
 | Helix | symlinked | linked/copied |
+| Fish | `config.fish` symlinked; package/default shell unchanged | not linked |
 | Neovim | symlinked | linked/copied |
 | Noctalia color scheme | optional with `--niri` | not managed |
 | Kanata | optional | optional |

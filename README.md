@@ -8,7 +8,7 @@
   <a href="https://github.com/lindestad/dotfiles/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/lindestad/dotfiles?style=for-the-badge&labelColor=101418&color=ffd700"></a>
   <a href="https://github.com/lindestad/dotfiles/actions"><img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/lindestad/dotfiles/lint.yml?branch=main&style=for-the-badge&labelColor=101418"></a>
   <a href="#contents"><img alt="Compositor: Niri" src="https://img.shields.io/badge/compositor-niri-9ccbfb?style=for-the-badge&labelColor=101418"></a>
-  <a href="#installation"><img alt="Shells: zsh, bash" src="https://img.shields.io/badge/shells-zsh%20%7C%20bash-b9c8da?style=for-the-badge&labelColor=101418"></a>
+  <a href="#installation"><img alt="Shells: zsh, fish, bash" src="https://img.shields.io/badge/shells-zsh%20%7C%20fish%20%7C%20bash-b9c8da?style=for-the-badge&labelColor=101418"></a>
 </div>
 
 ---
@@ -40,6 +40,8 @@ cd ~/.dotfiles
 ```
 
 `install.sh` detects Arch-based, Debian/Ubuntu-based, Fedora, and WSL installs, then dispatches to the matching implementation under `scripts/install/`.
+
+The Fish configuration is linked for experimentation, but Fish is not installed or selected as the default shell automatically.
 
 The installer prompts for optional components when no flags are provided. Use flags for repeatable installs:
 

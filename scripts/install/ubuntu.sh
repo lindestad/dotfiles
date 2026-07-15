@@ -89,6 +89,7 @@ LINKS=()
 add_common_cli_links
 add_bash_link
 add_zsh_link
+add_fish_link
 
 if is_wsl; then
   echo "!! WSL detected. Use ./install.sh for WSL installs."

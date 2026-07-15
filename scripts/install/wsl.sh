@@ -66,6 +66,7 @@ APT_PKGS_OPTIONAL=(
 
 LINKS=()
 add_zsh_link
+add_fish_link
 add_common_cli_links
 
 ensure_helix() {
