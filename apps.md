@@ -176,5 +176,5 @@ These are not package installs, but the installers manage them alongside the too
 | WezTerm | non-WSL Linux only | linked/copied to `.wezterm.lua` and `.config/wezterm/wezterm.lua` |
 | Windows Terminal | not managed | Git Bash profile/default configured when settings exist |
 | Yazi | symlinked | linked/copied |
-| Zsh | symlinked | not linked |
+| Zsh | `.zshrc` and `.zprofile` symlinked | not linked |
 | zsh-patina | config symlinked | not managed |

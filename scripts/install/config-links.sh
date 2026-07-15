@@ -28,7 +28,10 @@ add_common_cli_links() {
 }
 
 add_zsh_link() {
-  LINKS+=("$DOTFILES_DIR/shells/.zshrc|$HOME/.zshrc")
+  LINKS+=(
+    "$DOTFILES_DIR/shells/.zshrc|$HOME/.zshrc"
+    "$DOTFILES_DIR/shells/.zprofile|$HOME/.zprofile"
+  )
 }
 
 add_bash_link() {

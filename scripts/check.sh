@@ -42,6 +42,7 @@ done
 bash -n shells/.bashrc
 if have zsh; then
   zsh -n shells/.zshrc
+  zsh -n shells/.zprofile
 else
   skip "zsh syntax" "zsh is not installed"
 fi

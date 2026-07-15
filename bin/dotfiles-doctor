@@ -482,6 +482,7 @@ check_managed_link "$DOTFILES_DIR/config/tealdeer/config.toml" "$HOME/.config/te
 check_managed_link "$DOTFILES_DIR/config/yazi" "$HOME/.config/yazi" "yazi config"
 check_managed_link "$DOTFILES_DIR/config/zellij" "$HOME/.config/zellij" "zellij config"
 check_managed_link "$DOTFILES_DIR/shells/.zshrc" "$HOME/.zshrc" "zsh config"
+check_managed_link "$DOTFILES_DIR/shells/.zprofile" "$HOME/.zprofile" "zsh login config"
 if same_path "$DOTFILES_DIR/shells/.bashrc" "$HOME/.bashrc"; then
   check_managed_link "$DOTFILES_DIR/shells/.bashrc" "$HOME/.bashrc" "bash config"
 elif ! is_wsl && is_debian_like; then
