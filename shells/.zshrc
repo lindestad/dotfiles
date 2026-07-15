@@ -159,6 +159,10 @@ if command -v atuin >/dev/null 2>&1; then
   eval "$(atuin init zsh)"
 fi
 
+# Cycle through command history without opening Atuin's search interface.
+bindkey -M emacs '^K' up-history
+bindkey -M emacs '^J' down-history
+
 ####--------------------------------------------------
 #### Completion (native Zsh)
 ####--------------------------------------------------
