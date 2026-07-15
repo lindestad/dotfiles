@@ -15,6 +15,7 @@ add_common_cli_links() {
     "$DOTFILES_DIR/config/codex/AGENTS.md|$HOME/.codex/AGENTS.md"
     "$DOTFILES_DIR/config/codex/skills/gh-publish|$HOME/.codex/skills/gh-publish"
     "$DOTFILES_DIR/config/copilot/copilot-instructions.md|$HOME/.copilot/copilot-instructions.md"
+    "$DOTFILES_DIR/config/fastfetch|$HOME/.config/fastfetch"
     "$DOTFILES_DIR/config/git/ignore|$HOME/.config/git/ignore"
     "$DOTFILES_DIR/config/helix/config.toml|$HOME/.config/helix/config.toml"
     "$DOTFILES_DIR/config/helix/languages.toml|$HOME/.config/helix/languages.toml"
