@@ -432,7 +432,7 @@ end
 ####--------------------------------------------------
 
 # Fish uses a Fish-syntax local file rather than trying to parse .zshrc.local.
-set -l _fish_local_config "$HOME/.config/fish/config.local.fish"
+set -l _fish_local_config "$HOME/.config/fish/.config.local.fish"
 if test -f "$_fish_local_config"
     source "$_fish_local_config"
 end
