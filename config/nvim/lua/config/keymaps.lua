@@ -32,6 +32,8 @@ vim.keymap.set("n", "<leader>Y", function()
   vim.fn.winrestview(view)
 end, { desc = "Copy buffer to system clipboard" })
 
+vim.keymap.set("n", "<leader>bn", "<cmd>enew<cr>", { desc = "New buffer" })
+
 -- Line navigation
 vim.keymap.set({ "n", "v" }, "gh", "^", { desc = "Start of line" })
 vim.keymap.set({ "n", "v" }, "gl", "$", { desc = "End of line" })
