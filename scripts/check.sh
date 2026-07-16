@@ -118,16 +118,8 @@ check_toml() {
   taplo lint --no-auto-config "${toml_files[@]}"
 }
 
-check_lua_syntax() {
-  local lua_files=()
-  while IFS= read -r -d '' file; do
-    lua_files+=("$file")
-  done < <(find config/nvim config/yazi -type f -name '*.lua' -print0 | sort -z)
-
-  local file
-  for file in "${lua_files[@]}"; do
-    luac -p "$file" || return
-  done
+check_lua() {
+  selene config/nvim config/yazi
 }
 
 have_powershell_analyzer() {
@@ -188,10 +180,10 @@ else
   skip_check "TOML" "taplo is not installed"
 fi
 
-if have luac; then
-  run_check "Lua syntax" check_lua_syntax
+if have selene; then
+  run_check "Lua" check_lua
 else
-  skip_check "Lua syntax" "luac is not installed"
+  skip_check "Lua" "selene is not installed"
 fi
 
 if ! have pwsh; then

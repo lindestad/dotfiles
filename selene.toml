@@ -1,0 +1,14 @@
+std = "dotfiles"
+# These Yazi plugins are package-managed third-party sources. The locally
+# maintained smart-enter plugin remains included.
+exclude = [
+  "config/yazi/plugins/full-border.yazi/**",
+  "config/yazi/plugins/git.yazi/**",
+  "config/yazi/plugins/mime-ext.yazi/**",
+]
+
+[lints]
+# Lazy.nvim plugin specs intentionally combine array and dictionary fields.
+mixed_table = "allow"
+# Short callback bodies are kept inline when they remain readable.
+multiple_statements = "allow"

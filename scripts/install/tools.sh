@@ -91,6 +91,16 @@ ensure_cargo_tool() {
   cargo install --locked "$crate_name"
 }
 
+ensure_selene() {
+  if have selene; then
+    return
+  fi
+
+  ensure_rust_toolchain
+  echo "==> Installing selene with cargo..."
+  cargo install --locked --no-default-features selene
+}
+
 ensure_zsh_patina() {
   if have zsh-patina; then
     return
@@ -431,6 +441,7 @@ ensure_modern_cli_cargo_tools() {
   ensure_cargo_tool procs procs
   ensure_cargo_tool broot broot
   ensure_cargo_tool gitui gitui
+  ensure_selene
 }
 
 ensure_neovim_release() {

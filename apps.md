@@ -43,6 +43,7 @@ These are the main package and tool installs managed by the platform installers.
 | ripgrep | `ripgrep` | `ripgrep` | `ripgrep` | `ripgrep` | `BurntSushi.ripgrep.MSVC` |
 | rustup/cargo | install script | install script | install script | install script | `Rustlang.Rustup` |
 | sd | `sd` | `sd` or cargo fallback | cargo fallback | `sd` or cargo fallback | `chmln.sd` |
+| Selene | cargo install | cargo install | cargo install | cargo install | cargo install |
 | ShellCheck | `shellcheck` | `shellcheck` | `ShellCheck` | `shellcheck` | `koalaman.shellcheck` |
 | shfmt | `shfmt` | `shfmt` or release fallback | `shfmt` | `shfmt` or release fallback | `mvdan.shfmt` |
 | starship | cargo fallback | cargo fallback | cargo fallback | cargo fallback | `Starship.Starship` |
