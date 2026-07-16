@@ -47,6 +47,7 @@ These are the main package and tool installs managed by the platform installers.
 | ShellCheck | `shellcheck` | `shellcheck` | `ShellCheck` | `shellcheck` | `koalaman.shellcheck` |
 | shfmt | `shfmt` | `shfmt` or release fallback | `shfmt` | `shfmt` or release fallback | `mvdan.shfmt` |
 | starship | cargo fallback | cargo fallback | cargo fallback | cargo fallback | `Starship.Starship` |
+| StyLua | cargo install | cargo install | cargo install | cargo install | cargo install |
 | tealdeer/tldr | cargo install | cargo install | cargo install | cargo install | `dbrgn.tealdeer` |
 | Typst CLI | `typst` | cargo fallback | cargo fallback | cargo fallback | `Typst.Typst` |
 | uutils coreutils | `uutils-coreutils` | `uutils-coreutils` (optional) | `uutils-coreutils` (optional) | not installed | `uutils.coreutils` |

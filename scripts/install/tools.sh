@@ -442,6 +442,7 @@ ensure_modern_cli_cargo_tools() {
   ensure_cargo_tool broot broot
   ensure_cargo_tool gitui gitui
   ensure_selene
+  ensure_cargo_tool stylua stylua StyLua
 }
 
 ensure_neovim_release() {

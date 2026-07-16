@@ -118,9 +118,14 @@ check_toml() {
   taplo lint --no-auto-config "${toml_files[@]}"
 }
 
-check_lua() {
+check_lua_lint() {
   (cd config/nvim && selene .) || return
   (cd config/yazi && selene .)
+}
+
+check_lua_format() {
+  (cd config/nvim && stylua --check .) || return
+  (cd config/yazi && stylua --check .)
 }
 
 have_powershell_analyzer() {
@@ -182,9 +187,15 @@ else
 fi
 
 if have selene; then
-  run_check "Lua" check_lua
+  run_check "Lua lint" check_lua_lint
 else
-  skip_check "Lua" "selene is not installed"
+  skip_check "Lua lint" "selene is not installed"
+fi
+
+if have stylua; then
+  run_check "Lua format" check_lua_format
+else
+  skip_check "Lua format" "stylua is not installed"
 fi
 
 if ! have pwsh; then

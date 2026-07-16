@@ -438,6 +438,32 @@ function Install-Selene {
     $env:Path = "$cargoBin;$env:Path"
 }
 
+function Install-StyLua {
+    param(
+        [Parameter(Mandatory)] [string]$UserHome
+    )
+
+    if (Get-Command "stylua" -ErrorAction SilentlyContinue) { return }
+
+    $cargo = Get-Command "cargo" -ErrorAction SilentlyContinue
+    $cargoExe = if ($cargo) { $cargo.Source } else { Join-Path $UserHome ".cargo\bin\cargo.exe" }
+    if (-not (Test-Path $cargoExe)) {
+        Write-Warning "cargo is not available yet. Start a new shell and run: cargo install --locked stylua"
+        return
+    }
+
+    Write-Status ""
+    Write-Status "==> Installing StyLua with cargo"
+    & $cargoExe install --locked stylua
+    if ($LASTEXITCODE -ne 0) {
+        Write-Warning "StyLua installation exited with code $LASTEXITCODE"
+        return
+    }
+
+    $cargoBin = Join-Path $UserHome ".cargo\bin"
+    $env:Path = "$cargoBin;$env:Path"
+}
+
 function Install-Watchexec {
     param(
         [Parameter(Mandatory)] [string]$UserHome
@@ -1137,6 +1163,7 @@ Install-NodeLtsVersion
 Install-Pipx
 Install-PSScriptAnalyzer
 Install-Selene -UserHome $UserHome
+Install-StyLua -UserHome $UserHome
 Install-Watchexec -UserHome $UserHome
 Install-UserFont -FontDir (Join-Path $Dotfiles "fonts")
 Enable-UserLocalBinPowerShellProfile

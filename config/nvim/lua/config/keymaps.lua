@@ -5,9 +5,7 @@ vim.keymap.set({ "n", "i" }, "<C-s>", function()
 end, { desc = "Save file" })
 
 -- Save without formatting: Ctrl-Shift-s
-vim.keymap.set({ "n", "i" }, "<C-S-s>", function()
-  vim.cmd("noautocmd write")
-end, { desc = "Save without formatting" })
+vim.keymap.set({ "n", "i" }, "<C-S-s>", function() vim.cmd("noautocmd write") end, { desc = "Save without formatting" })
 
 -- Quit with Shift-Tab
 vim.keymap.set({ "n", "i" }, "<S-Tab>", function()
@@ -59,8 +57,6 @@ vim.keymap.set("i", "<C-BS>", "<C-w>", { desc = "Delete previous word" })
 -- Shift-U: redo (reverse undo). Default U (restore line) is rarely useful.
 vim.keymap.set("n", "U", "<C-r>", { desc = "Redo" })
 
-local function root_terminal()
-  Snacks.terminal.focus(nil, { cwd = LazyVim.root() })
-end
+local function root_terminal() Snacks.terminal.focus(nil, { cwd = LazyVim.root() }) end
 
 vim.keymap.set({ "n", "t" }, "<C-;>", root_terminal, { desc = "Terminal (Root Dir)" })
