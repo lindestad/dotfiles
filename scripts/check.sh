@@ -1,19 +1,68 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$DOTFILES_DIR"
+cd "$DOTFILES_DIR" || exit
 
 have() {
   command -v "$1" >/dev/null 2>&1
 }
 
-step() {
-  printf '\n==> %s\n' "$*"
+red=""
+green=""
+yellow=""
+reset=""
+if [[ -t 1 && ${TERM:-dumb} != dumb && -z ${NO_COLOR+x} ]]; then
+  red=$'\e[31m'
+  green=$'\e[32m'
+  yellow=$'\e[33m'
+  reset=$'\e[0m'
+fi
+
+passed=0
+failed=0
+skipped=0
+check_index=0
+check_tmp_dir="$(mktemp -d -t dotfiles-check.XXXXXX)"
+trap 'rm -rf -- "$check_tmp_dir"' EXIT
+
+status_line() {
+  local color=$1
+  local status=$2
+  local label=$3
+  printf '%s%s %s%s\n' "$color" "$status" "$label" "$reset"
 }
 
-skip() {
-  printf '>> skipping %s: %s\n' "$1" "$2"
+run_check() {
+  local label=$1
+  shift
+
+  local output="$check_tmp_dir/$check_index.log"
+  ((check_index += 1))
+
+  local exit_status
+  "$@" >"$output" 2>&1
+  exit_status=$?
+
+  if ((exit_status == 0)); then
+    ((passed += 1))
+    status_line "$green" PASS "$label"
+    return
+  fi
+
+  ((failed += 1))
+  status_line "$red" FAIL "$label"
+  if [[ -s $output ]]; then
+    sed 's/^/  /' "$output"
+  fi
+  printf '  exit status: %d\n' "$exit_status"
+}
+
+skip_check() {
+  local label=$1
+  local reason=$2
+  ((skipped += 1))
+  status_line "$yellow" SKIP "$label — $reason"
 }
 
 shell_files=()
@@ -26,79 +75,73 @@ done < <(
   } | sort -zu
 )
 
-step "ShellCheck"
-if have shellcheck; then
-  shellcheck -x "${shell_files[@]}"
+check_shellcheck() {
+  if ! have shellcheck; then
+    echo "shellcheck is required for shell linting"
+    return 127
+  fi
+
+  shellcheck -x "${shell_files[@]}" || return
   shellcheck --shell=bash --exclude=SC1091 shells/.bashrc
-else
-  echo "!! shellcheck is required for shell linting."
-  exit 1
-fi
+}
 
-step "shell syntax"
-for file in "${shell_files[@]}"; do
-  bash -n "$file"
-done
-bash -n shells/.bashrc
-if have zsh; then
-  zsh -n shells/.zshrc
+check_bash_syntax() {
+  local file
+  for file in "${shell_files[@]}"; do
+    bash -n "$file" || return
+  done
+  bash -n shells/.bashrc
+}
+
+check_zsh_syntax() {
+  zsh -n shells/.zshrc || return
   zsh -n shells/.zprofile
-else
-  skip "zsh syntax" "zsh is not installed"
-fi
-if have fish; then
+}
+
+check_fish_syntax() {
   fish --no-execute shells/config.fish
-else
-  skip "fish syntax" "fish is not installed"
-fi
+}
 
-step "justfile"
-if have just; then
-  just --summary >/dev/null
-else
-  skip "justfile parse" "just is not installed"
-fi
+check_justfile() {
+  just --summary
+}
 
-step "niri config"
-if have niri; then
+check_niri_config() {
   niri validate -c config/niri/config.kdl
-else
-  skip "niri validate" "niri is not installed"
-fi
+}
 
-step "TOML"
-if have taplo; then
-  toml_files=()
+check_toml() {
+  local toml_files=()
   while IFS= read -r -d '' file; do
     toml_files+=("$file")
   done < <(find . -type f -name '*.toml' -print0 | sort -z)
   taplo lint --no-auto-config "${toml_files[@]}"
-else
-  skip "taplo lint" "taplo is not installed"
-fi
+}
 
-step "Lua syntax"
-if have luac; then
-  lua_files=()
+check_lua_syntax() {
+  local lua_files=()
   while IFS= read -r -d '' file; do
     lua_files+=("$file")
   done < <(find config/nvim config/yazi -type f -name '*.lua' -print0 | sort -z)
-  for file in "${lua_files[@]}"; do
-    luac -p "$file"
-  done
-else
-  skip "luac -p" "luac is not installed"
-fi
 
-step "PowerShell"
-if have pwsh; then
-  # shellcheck disable=SC2016
+  local file
+  for file in "${lua_files[@]}"; do
+    luac -p "$file" || return
+  done
+}
+
+have_powershell_analyzer() {
   TERM=dumb pwsh -NoLogo -NoProfile -NonInteractive -Command '
-    $module = Get-Module -ListAvailable -Name PSScriptAnalyzer | Select-Object -First 1
-    if (-not $module) {
-      Write-Host ">> skipping PSScriptAnalyzer: module is not installed"
+    if (Get-Module -ListAvailable -Name PSScriptAnalyzer | Select-Object -First 1) {
       exit 0
     }
+    exit 1
+  ' >/dev/null 2>&1
+}
+
+check_powershell() {
+  # shellcheck disable=SC2016
+  TERM=dumb pwsh -NoLogo -NoProfile -NonInteractive -Command '
     $files = Get-ChildItem -Path . -Recurse -File -Filter *.ps1
     $results = @(
       foreach ($file in $files) {
@@ -110,8 +153,59 @@ if have pwsh; then
       exit 1
     }
   '
+}
+
+run_check "ShellCheck" check_shellcheck
+run_check "Bash syntax" check_bash_syntax
+
+if have zsh; then
+  run_check "Zsh syntax" check_zsh_syntax
 else
-  skip "PSScriptAnalyzer" "pwsh is not installed"
+  skip_check "Zsh syntax" "zsh is not installed"
 fi
 
-printf '\n==> check passed\n'
+if have fish; then
+  run_check "Fish syntax" check_fish_syntax
+else
+  skip_check "Fish syntax" "fish is not installed"
+fi
+
+if have just; then
+  run_check "Justfile" check_justfile
+else
+  skip_check "Justfile" "just is not installed"
+fi
+
+if have niri; then
+  run_check "Niri config" check_niri_config
+else
+  skip_check "Niri config" "niri is not installed"
+fi
+
+if have taplo; then
+  run_check "TOML" check_toml
+else
+  skip_check "TOML" "taplo is not installed"
+fi
+
+if have luac; then
+  run_check "Lua syntax" check_lua_syntax
+else
+  skip_check "Lua syntax" "luac is not installed"
+fi
+
+if ! have pwsh; then
+  skip_check "PowerShell" "pwsh is not installed"
+elif ! have_powershell_analyzer; then
+  skip_check "PowerShell" "PSScriptAnalyzer is not installed"
+else
+  run_check "PowerShell" check_powershell
+fi
+
+printf '\n'
+if ((failed > 0)); then
+  status_line "$red" FAIL "$passed passed, $failed failed, $skipped skipped"
+  exit 1
+fi
+
+status_line "$green" PASS "$passed checks, $skipped skipped"
