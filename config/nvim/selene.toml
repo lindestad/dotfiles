@@ -1,0 +1,7 @@
+std = "neovim"
+
+[lints]
+# Lazy.nvim plugin specs intentionally combine array and dictionary fields.
+mixed_table = "allow"
+# Short callback bodies are kept inline when they remain readable.
+multiple_statements = "allow"

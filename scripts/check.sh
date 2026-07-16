@@ -119,7 +119,8 @@ check_toml() {
 }
 
 check_lua() {
-  selene config/nvim config/yazi
+  (cd config/nvim && selene .) || return
+  (cd config/yazi && selene .)
 }
 
 have_powershell_analyzer() {

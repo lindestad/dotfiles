@@ -1,0 +1,11 @@
+base: lua51
+# Globals provided by Yazi's plugin runtime.
+globals:
+  th:
+    any: true
+  ui:
+    any: true
+  cx:
+    any: true
+  ya:
+    any: true

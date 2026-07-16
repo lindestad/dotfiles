@@ -1,0 +1,8 @@
+std = "yazi-runtime"
+# These plugins are package-managed third-party sources. The locally maintained
+# smart-enter plugin remains included.
+exclude = [
+  "plugins/full-border.yazi/**",
+  "plugins/git.yazi/**",
+  "plugins/mime-ext.yazi/**",
+]

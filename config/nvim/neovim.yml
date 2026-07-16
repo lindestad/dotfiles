@@ -1,0 +1,9 @@
+base: lua51
+# Globals provided at runtime by Neovim and LazyVim.
+globals:
+  vim:
+    any: true
+  LazyVim:
+    any: true
+  Snacks:
+    any: true
