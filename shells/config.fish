@@ -50,6 +50,22 @@ end
 set -g fish_greeting
 set -g fish_key_bindings fish_default_key_bindings
 
+# Match zsh-patina's Tokyo Night palette using Fish's native highlighting.
+set -g fish_color_normal --reset
+set -g fish_color_command 7dcfff
+set -g fish_color_keyword 7aa2f7
+set -g fish_color_quote 9ece6a
+set -g fish_color_redirection 7aa2f7
+set -g fish_color_end 7aa2f7
+set -g fish_color_error f7768e
+set -g fish_color_param --reset
+set -g fish_color_option bb9af7
+set -g fish_color_comment 9ca3b3
+set -g fish_color_operator 7aa2f7
+set -g fish_color_escape e6c384
+set -g fish_color_autosuggestion 686868
+set -g fish_color_valid_path --underline
+
 # Fish has no global `noclobber` mode. Use `>?file` when a redirection must fail
 # rather than overwrite an existing file.
 
