@@ -238,6 +238,9 @@ bind ctrl-backspace backward-kill-word
 bind ctrl-k up-or-search
 bind ctrl-j down-or-search
 
+# Accept the full gray autosuggestion while leaving Tab completion unchanged.
+bind shift-tab accept-autosuggestion
+
 ####--------------------------------------------------
 #### Completion (native Fish)
 ####--------------------------------------------------
