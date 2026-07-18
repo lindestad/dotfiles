@@ -60,6 +60,7 @@ NIRI_APT_PKGS=(
   bluez
   network-manager-gnome
   pavucontrol
+  loupe
   power-profiles-daemon
   upower
   wlsunset

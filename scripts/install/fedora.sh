@@ -101,6 +101,7 @@ NIRI_DNF_PKGS=(
   network-manager-applet
   pavucontrol
   qalculate-qt
+  loupe
   niri
   fuzzel
   swayidle

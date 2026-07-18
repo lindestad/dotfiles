@@ -70,6 +70,7 @@ NIRI_PACMAN_PKGS=(
   network-manager-applet
   pavucontrol
   qalculate-qt
+  loupe
   niri
   fuzzel
   grim

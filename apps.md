@@ -116,6 +116,7 @@ These are installed when the Linux installer runs with `--niri`.
 | cliphist | `cliphist` | `cliphist` | `cliphist` |
 | Flatpak | `flatpak` | `flatpak` | `flatpak` |
 | fuzzel | `fuzzel` | `fuzzel` | `fuzzel` |
+| Loupe | `loupe` | `loupe` | `loupe` |
 | network applet | `network-manager-applet` | `network-manager-gnome` | `NetworkManager-applet` |
 | niri | `niri` | `niri` | `niri` |
 | niri-zvim | `main` source checkout + complete installer | `main` source checkout + complete installer | `main` source checkout + complete installer |
