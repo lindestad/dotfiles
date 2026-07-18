@@ -118,6 +118,7 @@ These are installed when the Linux installer runs with `--niri`.
 | fuzzel | `fuzzel` | `fuzzel` | `fuzzel` |
 | network applet | `network-manager-applet` | `network-manager-gnome` | `NetworkManager-applet` |
 | niri | `niri` | `niri` | `niri` |
+| niri-zvim | `main` source checkout + complete installer | `main` source checkout + complete installer | `main` source checkout + complete installer |
 | Noctalia Shell | `noctalia-shell` when provided by the distro, otherwise AUR | Noctalia APT repo: `noctalia-shell` where supported | `noctalia-shell` |
 | pavucontrol | `pavucontrol` | `pavucontrol` | `pavucontrol` |
 | polkit auth agent | not installed | not installed | `xfce-polkit` |
@@ -172,6 +173,7 @@ These are not package installs, but the installers manage them alongside the too
 | Helix | symlinked | linked/copied |
 | Fish | `config.fish` symlinked; package/default shell unchanged | not linked |
 | Neovim | symlinked | linked/copied |
+| niri-zvim config | optional with `--niri` | not managed |
 | Noctalia color scheme | optional with `--niri` | not managed |
 | Kanata | optional | optional |
 | Starship | symlinked | linked/copied |

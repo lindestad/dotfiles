@@ -52,8 +52,14 @@ The installer prompts for optional components when no flags are provided. Use fl
 
 Optional components:
 
-- `--niri` installs and links the Niri + Noctalia desktop stack: niri, noctalia-shell, NiriMod, Zen Browser, fuzzel, swayidle, and related Wayland utilities.
+- `--niri` installs and links the Niri + Noctalia desktop stack: niri, niri-zvim, noctalia-shell, NiriMod, Zen Browser, fuzzel, swayidle, and related Wayland utilities.
 - `--kanata` installs or links Kanata keyboard remapping config where supported.
+
+The Niri path keeps a clean `main` checkout of niri-zvim under
+`~/.local/share/niri-zvim/source` and runs its complete installer for the
+client, daemon, Zellij adapter, Neovim adapter, config, and systemd user
+service. Neovim enables the adapter when it is installed. Zellij asks for its
+four plugin permissions on first use; the dotfiles do not preapprove them.
 
 The CachyOS/Limine Plymouth LUKS prompt theme is documented in [docs/plymouth-luks-theme.md](./docs/plymouth-luks-theme.md).
 The CachyOS/Limine Secure Boot workflow is documented in [docs/secureboot-limine-signing.md](./docs/secureboot-limine-signing.md).

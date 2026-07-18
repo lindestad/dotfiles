@@ -340,6 +340,7 @@ check_niri() {
   check_managed_link "$DOTFILES_DIR/config/niri/config.kdl" "$config" "niri config"
   check_managed_link "$DOTFILES_DIR/config/niri/keybinds.kdl" "$HOME/.config/niri/keybinds.kdl" "niri keybinds"
   check_managed_link "$DOTFILES_DIR/config/niri/local.example.kdl" "$HOME/.config/niri/local.example.kdl" "niri local example"
+  check_managed_link "$DOTFILES_DIR/config/niri-zvim/config.json" "$HOME/.config/niri-zvim/config.json" "niri-zvim config"
   check_managed_link "$DOTFILES_DIR/config/hypr/hyprlock.conf" "$HOME/.config/hypr/hyprlock.conf" "hyprlock config"
   check_managed_link "$DOTFILES_DIR/config/xkb/symbols/usno" "$HOME/.config/xkb/symbols/usno" "xkb usno layout"
   check_managed_link "$DOTFILES_DIR/config/fuzzel/fuzzel.ini" "$HOME/.config/fuzzel/fuzzel.ini" "fuzzel config"
@@ -371,6 +372,16 @@ check_niri() {
     warn "niri is installed, but ~/.config/niri/config.kdl is missing"
   else
     info "niri is not installed; skipping niri validation"
+  fi
+
+  if have niri-zvim; then
+    if niri-zvim doctor >/dev/null 2>&1; then
+      ok "niri-zvim installation"
+    else
+      warn "niri-zvim doctor reported a problem; run: niri-zvim doctor"
+    fi
+  else
+    warn "niri-zvim is not installed; rerun ./install.sh --niri"
   fi
 }
 

@@ -110,6 +110,15 @@ check_niri_config() {
   niri validate -c config/niri/config.kdl
 }
 
+check_niri_zvim_config() {
+  if have niri-zvim; then
+    NIRI_ZVIM_CONFIG="$DOTFILES_DIR/config/niri-zvim/config.json" \
+      niri-zvim config check
+  else
+    jq --exit-status 'type == "object"' config/niri-zvim/config.json >/dev/null
+  fi
+}
+
 check_toml() {
   local toml_files=()
   while IFS= read -r -d '' file; do
@@ -178,6 +187,12 @@ if have niri; then
   run_check "Niri config" check_niri_config
 else
   skip_check "Niri config" "niri is not installed"
+fi
+
+if have niri-zvim || have jq; then
+  run_check "niri-zvim config" check_niri_zvim_config
+else
+  skip_check "niri-zvim config" "niri-zvim and jq are not installed"
 fi
 
 if have taplo; then

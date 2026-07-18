@@ -13,11 +13,75 @@ add_wayland_desktop_links() {
     "$DOTFILES_DIR/config/niri/config.kdl|$HOME/.config/niri/config.kdl"
     "$DOTFILES_DIR/config/niri/keybinds.kdl|$HOME/.config/niri/keybinds.kdl"
     "$DOTFILES_DIR/config/niri/local.example.kdl|$HOME/.config/niri/local.example.kdl"
+    "$DOTFILES_DIR/config/niri-zvim/config.json|$HOME/.config/niri-zvim/config.json"
     "$DOTFILES_DIR/config/hypr/hyprlock.conf|$HOME/.config/hypr/hyprlock.conf"
     "$DOTFILES_DIR/config/xkb/symbols/usno|$HOME/.config/xkb/symbols/usno"
     "$DOTFILES_DIR/config/fuzzel/fuzzel.ini|$HOME/.config/fuzzel/fuzzel.ini"
     "$DOTFILES_DIR/config/noctalia/monochrome-strong.json|$HOME/.config/noctalia/colorschemes/monochrome-strong/monochrome-strong.json"
   )
+}
+
+update_niri_zvim_checkout() {
+  local source_dir="$1"
+  local branch before after
+
+  branch="$(git -C "$source_dir" symbolic-ref --quiet --short HEAD 2>/dev/null || true)"
+  if [[ "$branch" != "main" ]]; then
+    echo ">> niri-zvim is on '${branch:-a detached HEAD}', not main; using the existing checkout."
+    return
+  fi
+  if [[ -n "$(git -C "$source_dir" status --porcelain 2>/dev/null)" ]]; then
+    echo ">> niri-zvim has local changes; using the existing checkout: $source_dir"
+    return
+  fi
+
+  before="$(git -C "$source_dir" rev-parse HEAD 2>/dev/null || true)"
+  echo "==> Checking niri-zvim for updates..."
+  if ! git -C "$source_dir" fetch --quiet origin main; then
+    echo ">> Could not fetch niri-zvim updates; using the existing checkout."
+    return
+  fi
+  if ! git -C "$source_dir" merge --ff-only --quiet FETCH_HEAD; then
+    echo ">> niri-zvim has diverged from origin/main; using the existing checkout."
+    return
+  fi
+
+  after="$(git -C "$source_dir" rev-parse HEAD 2>/dev/null || true)"
+  if [[ "$before" == "$after" ]]; then
+    echo "-> niri-zvim is already up to date (${after:0:8})."
+  else
+    echo "-> Updated niri-zvim: ${before:0:8} -> ${after:0:8}"
+  fi
+}
+
+ensure_niri_zvim() {
+  local data_home="${XDG_DATA_HOME:-$HOME/.local/share}"
+  local source_dir="${NIRI_ZVIM_SOURCE_DIR:-$data_home/niri-zvim/source}"
+  local repository="https://github.com/lindestad/niri-zvim.git"
+
+  if ! have git; then
+    echo "!! Git is required to install niri-zvim."
+    return 1
+  fi
+
+  if [[ -d "$source_dir/.git" ]]; then
+    update_niri_zvim_checkout "$source_dir"
+  elif [[ -e "$source_dir" ]]; then
+    echo "!! Refusing to replace non-repository niri-zvim source path: $source_dir"
+    return 1
+  else
+    echo "==> Cloning niri-zvim..."
+    mkdir -p "$(dirname "$source_dir")"
+    git clone --branch main --single-branch "$repository" "$source_dir"
+  fi
+
+  if [[ ! -x "$source_dir/scripts/install" ]]; then
+    echo "!! niri-zvim installer is missing: $source_dir/scripts/install"
+    return 1
+  fi
+
+  echo "==> Installing niri-zvim binaries, adapters, config, and user service..."
+  "$source_dir/scripts/install"
 }
 
 ensure_noctalia_fedora() {
