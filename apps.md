@@ -68,6 +68,7 @@ These are installed only by the Linux/WSL shell installers.
 
 | Tool | Arch | Ubuntu | Fedora | WSL |
 | --- | --- | --- | --- | --- |
+| bc | `bc` | `bc` | `bc` | `bc` |
 | browser automation | not installed | not installed | `chromium`, `chromium-headless`, `chromedriver`, `xorg-x11-server-Xvfb` | not installed |
 | build tools | not installed | `build-essential`, `cmake` | `gcc`, `gcc-c++`, `make`, `cmake` | `build-essential`, `cmake` |
 | ca-certificates | not installed | `ca-certificates` | not installed | `ca-certificates` |

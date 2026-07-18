@@ -12,6 +12,7 @@ start_install_log
 PACMAN_PKGS=(
   fish
   zsh
+  bc
   curl
   unzip
   fontconfig

@@ -12,6 +12,7 @@ start_install_log
 DNF_PKGS=(
   fish
   zsh
+  bc
   curl
   wget
   unzip

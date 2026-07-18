@@ -12,6 +12,7 @@ start_install_log
 APT_PKGS_COMMON=(
   fish
   zsh
+  bc
   curl
   unzip
   ca-certificates
