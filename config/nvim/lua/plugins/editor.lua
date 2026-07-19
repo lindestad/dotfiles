@@ -1,5 +1,38 @@
 return {
   {
+    "folke/flash.nvim",
+    keys = {
+      { "s", false, mode = { "n", "x", "o" } },
+      {
+        -- Intentionally replaces Neovim's built-in `z` command prefix.
+        "z",
+        mode = { "n", "x", "o" },
+        function() require("flash").jump() end,
+        desc = "Flash",
+      },
+    },
+  },
+  {
+    "nvim-mini/mini.surround",
+    keys = {
+      { "s", "<Nop>", mode = { "n", "x" }, desc = "Surround" },
+      -- Treat bare word motions as the current word instead of moving forward.
+      { "saw", "saiw", remap = true, desc = "Surround current word" },
+      { "saW", "saiW", remap = true, desc = "Surround current WORD" },
+    },
+    opts = {
+      mappings = {
+        add = "sa",
+        delete = "sd",
+        find = "sf",
+        find_left = "sF",
+        highlight = "sh",
+        replace = "sr",
+        update_n_lines = "sn",
+      },
+    },
+  },
+  {
     "jake-stewart/multicursor.nvim",
     event = "BufReadPost",
     config = function()
