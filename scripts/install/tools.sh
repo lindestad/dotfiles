@@ -15,8 +15,20 @@ load_cargo_env() {
 }
 
 ensure_rust_toolchain() {
+  if [[ "${RUST_TOOLCHAIN_READY:-no}" == "yes" ]]; then
+    return
+  fi
+
+  if command -v rustup >/dev/null 2>&1; then
+    echo "==> Updating Rust toolchain..."
+    rustup update || return
+    RUST_TOOLCHAIN_READY="yes"
+    return
+  fi
+
   if have cargo; then
     load_cargo_env
+    RUST_TOOLCHAIN_READY="yes"
     return
   fi
 
@@ -28,6 +40,7 @@ ensure_rust_toolchain() {
   echo "==> Installing Rust toolchain (rustup)..."
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
   load_cargo_env
+  RUST_TOOLCHAIN_READY="yes"
 }
 
 ensure_starship() {

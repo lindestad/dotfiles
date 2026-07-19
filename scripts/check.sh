@@ -127,6 +127,27 @@ check_toml() {
   taplo lint --no-auto-config "${toml_files[@]}"
 }
 
+check_rust_toolchain_update() {
+  local fixture_dir="$check_tmp_dir/rust-toolchain"
+  mkdir -p "$fixture_dir/bin"
+
+  cat > "$fixture_dir/bin/cargo" <<'EOF'
+#!/usr/bin/env sh
+exit 0
+EOF
+  cat > "$fixture_dir/bin/rustup" <<'EOF'
+#!/usr/bin/env sh
+printf '%s\n' "$*" >> "$RUSTUP_LOG"
+EOF
+  chmod +x "$fixture_dir/bin/cargo" "$fixture_dir/bin/rustup"
+
+  PATH="$fixture_dir/bin:/usr/bin" \
+    RUSTUP_LOG="$fixture_dir/rustup.log" \
+    /usr/bin/bash -c 'source "$1/scripts/install/tools.sh"; ensure_rust_toolchain; ensure_rust_toolchain' _ "$DOTFILES_DIR"
+  grep -Fx "" "$fixture_dir/rustup.log"
+  [[ $(wc -l < "$fixture_dir/rustup.log") -eq 1 ]]
+}
+
 check_lua_lint() {
   (cd config/nvim && selene .) || return
   (cd config/yazi && selene .)
@@ -164,6 +185,7 @@ check_powershell() {
 
 run_check "ShellCheck" check_shellcheck
 run_check "Bash syntax" check_bash_syntax
+run_check "Rust toolchain update" check_rust_toolchain_update
 
 if have zsh; then
   run_check "Zsh syntax" check_zsh_syntax
