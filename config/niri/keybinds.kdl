@@ -34,14 +34,14 @@ binds {
     // Focus
     Mod+O repeat=false { toggle-overview; }
     Mod+Q repeat=false { close-window; }
-    Mod+Left  { spawn "niri-zvim" "left"; }
-    Mod+Down  { spawn "niri-zvim" "down"; }
-    Mod+Up    { spawn "niri-zvim" "up"; }
-    Mod+Right { spawn "niri-zvim" "right"; }
-    Mod+H     { focus-column-or-monitor-left; }
-    Mod+J     { focus-window-or-workspace-down; }
-    Mod+K     { focus-window-or-workspace-up; }
-    Mod+L     { focus-column-or-monitor-right; }
+    Mod+Left  { focus-column-or-monitor-left; }
+    Mod+Down  { focus-window-or-workspace-down; }
+    Mod+Up    { focus-window-or-workspace-up; }
+    Mod+Right { focus-column-or-monitor-right; }
+    Mod+H     { spawn "niri-zvim" "left"; }
+    Mod+J     { spawn "niri-zvim" "down"; }
+    Mod+K     { spawn "niri-zvim" "up"; }
+    Mod+L     { spawn "niri-zvim" "right"; }
     Mod+Home  { focus-column-first; }
     Mod+End   { focus-column-last; }
     Mod+Tab   { focus-window-previous; }
