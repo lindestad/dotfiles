@@ -35,6 +35,8 @@ vim.keymap.set("n", "<leader>bn", "<cmd>enew<cr>", { desc = "New buffer" })
 -- Line navigation
 vim.keymap.set({ "n", "v" }, "gh", "^", { desc = "Start of line" })
 vim.keymap.set({ "n", "v" }, "gl", "$", { desc = "End of line" })
+vim.keymap.set({ "n", "x" }, "h", "<BS>", { desc = "Left with line wrap" })
+vim.keymap.set({ "n", "x" }, "l", "<Space>", { desc = "Right with line wrap" })
 
 -- Indent in visual mode (re-select after)
 vim.keymap.set("x", "<Tab>", ">gv", { desc = "Indent right" })
