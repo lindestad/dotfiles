@@ -60,8 +60,9 @@ layout {
     struts
 }
 
-// Noctalia v4 shell.
-spawn-sh-at-startup "gsettings set org.gnome.desktop.interface color-scheme prefer-dark && exec qs -c noctalia-shell"
+// Noctalia v4 shell. Keep its fallback locker on Fedora's password-only PAM stack;
+// Hyprlock handles fingerprint authentication separately.
+spawn-sh-at-startup "gsettings set org.gnome.desktop.interface color-scheme prefer-dark && exec env NOCTALIA_PAM_SERVICE=password-auth qs -c noctalia-shell"
 
 // Lightweight polkit auth agent for GUI elevation prompts.
 spawn-at-startup "/usr/libexec/xfce-polkit"

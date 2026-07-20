@@ -347,6 +347,7 @@ check_niri() {
   check_managed_link "$DOTFILES_DIR/config/noctalia/monochrome-strong.json" "$HOME/.config/noctalia/colorschemes/monochrome-strong/monochrome-strong.json" "Noctalia color scheme"
 
   check_helper niri-focus-workspace-all
+  check_helper niri-lock-and-suspend
   check_helper niri-lock-screen
   check_helper niri-move-window-or-workspace
   check_helper niri-screenshot-region

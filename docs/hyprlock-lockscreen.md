@@ -11,7 +11,9 @@ Hyprlock is a better fit for this machine because it supports password and finge
 ## Files
 
 - `config/hypr/hyprlock.conf`: synced Hyprlock appearance and auth config.
-- `bin/niri-lock-screen`: portable lock wrapper used by Niri.
+- `bin/niri-lock-screen`: portable lock wrapper used by Niri and Noctalia's lock action.
+- `bin/niri-lock-and-suspend`: starts the lock wrapper, waits for Niri to confirm
+  the session is fully locked through logind's `LockedHint`, and only then suspends.
 - `config/niri/keybinds.kdl`: binds `Super+Alt+L` to the wrapper.
 - `scripts/install/desktop-niri.sh`: links the Hyprlock config and installs the wrapper when the Niri desktop option is selected.
 
@@ -24,6 +26,15 @@ The wrapper checks lock options in this order:
 3. If neither is available, ask `loginctl` to lock the session.
 
 The wrapper also uses a non-blocking `flock` lock when available, so accidental repeated hotkey presses do not start multiple lockers.
+
+Noctalia's session-menu lock action should call `niri-lock-screen`, and its suspend
+action should call `niri-lock-and-suspend` with `general.lockOnSuspend` disabled.
+The suspend helper performs the lock itself and will fail closed instead of
+suspending if Niri does not confirm the session lock within ten seconds.
+
+Noctalia itself is launched with `NOCTALIA_PAM_SERVICE=password-auth` as a fallback
+guardrail on Fedora. This keeps fingerprint authentication out of Noctalia's PAM
+conversation; Hyprlock continues to handle password and fingerprint separately.
 
 ## Hyprlock details
 
@@ -43,6 +54,12 @@ Use the wrapper from an existing session:
 
 ```sh
 ~/.local/bin/niri-lock-screen
+```
+
+To exercise the coordinated suspend path:
+
+```sh
+~/.local/bin/niri-lock-and-suspend
 ```
 
 If you need verbose Hyprlock logs while testing:

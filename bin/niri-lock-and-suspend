@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! command -v loginctl >/dev/null 2>&1; then
+  echo "niri-lock-and-suspend: loginctl is required to confirm the session is locked" >&2
+  exit 1
+fi
+
+if command -v flock >/dev/null 2>&1; then
+  exec 9>"${XDG_RUNTIME_DIR:-/tmp}/niri-lock-and-suspend.lock"
+  flock -n 9 || exit 0
+fi
+
+session_id="${XDG_SESSION_ID:-}"
+if [[ -z "$session_id" ]]; then
+  session_id="$(loginctl show-user "$USER" --property=Display --value 2>/dev/null || true)"
+fi
+
+if [[ -z "$session_id" ]]; then
+  echo "niri-lock-and-suspend: could not determine the current logind session" >&2
+  exit 1
+fi
+
+session_is_locked() {
+  [[ "$(loginctl show-session "$session_id" --property=LockedHint --value 2>/dev/null || true)" == "yes" ]]
+}
+
+suspend_system() {
+  if command -v systemctl >/dev/null 2>&1; then
+    exec systemctl suspend
+  fi
+
+  exec loginctl suspend
+}
+
+if session_is_locked; then
+  suspend_system
+fi
+
+lock_helper="$(command -v niri-lock-screen 2>/dev/null || true)"
+if [[ -z "$lock_helper" && -x "$(dirname "$0")/niri-lock-screen" ]]; then
+  lock_helper="$(dirname "$0")/niri-lock-screen"
+fi
+
+if [[ -z "$lock_helper" ]]; then
+  echo "niri-lock-and-suspend: niri-lock-screen is not installed" >&2
+  exit 1
+fi
+
+"$lock_helper" &
+lock_request_pid=$!
+
+# Niri sets logind's LockedHint only after all session-lock surfaces are ready.
+# Wait for that confirmation rather than racing the locker with system suspend.
+deadline=$((SECONDS + 10))
+while ((SECONDS < deadline)); do
+  if session_is_locked; then
+    suspend_system
+  fi
+  sleep 0.05
+done
+
+if kill -0 "$lock_request_pid" 2>/dev/null; then
+  echo "niri-lock-and-suspend: timed out waiting for Niri to confirm the lock; refusing to suspend" >&2
+elif wait "$lock_request_pid"; then
+  echo "niri-lock-and-suspend: lock request exited before Niri confirmed the lock" >&2
+else
+  echo "niri-lock-and-suspend: lock request failed before Niri confirmed the lock" >&2
+fi
+exit 1

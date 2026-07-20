@@ -30,7 +30,19 @@ Noctalia still has internal lock paths:
 - Idle lock action.
 - Lock-before-suspend action when `general.lockOnSuspend` is enabled.
 
-Noctalia's session menu supports custom commands per action. Its idle lock path, however, currently executes the configured idle lock command and then still activates the Noctalia lock panel. Because of that, globally replacing every Noctalia lock path should be a deliberate separate change instead of hidden inside the Niri hotkey fix.
+The live session-menu configuration routes lock to `niri-lock-screen` and suspend
+to `niri-lock-and-suspend`. `general.lockOnSuspend` is disabled because the suspend
+wrapper owns both operations and waits for Niri's fully-locked signal before sleep.
+
+Noctalia's idle lock path currently executes the configured idle lock command and
+then still activates the Noctalia lock panel. Idle handling remains disabled in
+the live configuration.
+
+As a fallback guardrail, Niri launches Noctalia with
+`NOCTALIA_PAM_SERVICE=password-auth`, and Noctalia's
+`general.allowPasswordWithFprintd` setting is disabled. This prevents its internal
+locker from combining Fedora's fingerprint PAM module with password entry or
+spawning the `fprintd-verify` sensor-occupancy workaround.
 
 ## Auth model
 
