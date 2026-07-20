@@ -30,11 +30,14 @@ The wrapper also uses a non-blocking `flock` lock when available, so accidental 
 Noctalia's session-menu lock action should call `niri-lock-screen`, and its suspend
 action should call `niri-lock-and-suspend` with `general.lockOnSuspend` disabled.
 The suspend helper performs the lock itself and will fail closed instead of
-suspending if Niri does not confirm the session lock within ten seconds.
+suspending if Niri does not confirm the session lock within ten seconds. It uses
+the same portable lock wrapper, so systems without Hyprlock retain Noctalia's
+fallback locker.
 
-Noctalia itself is launched with `NOCTALIA_PAM_SERVICE=password-auth` as a fallback
-guardrail on Fedora. This keeps fingerprint authentication out of Noctalia's PAM
-conversation; Hyprlock continues to handle password and fingerprint separately.
+On this Fedora laptop, ignored `config/niri/local.kdl` sets
+`NOCTALIA_PAM_SERVICE=password-auth` after verifying that it is a password-only
+stack. The shared config does not set a PAM service because other hosts may have a
+different PAM layout.
 
 ## Hyprlock details
 

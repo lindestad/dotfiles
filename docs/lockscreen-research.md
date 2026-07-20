@@ -38,11 +38,11 @@ Noctalia's idle lock path currently executes the configured idle lock command an
 then still activates the Noctalia lock panel. Idle handling remains disabled in
 the live configuration.
 
-As a fallback guardrail, Niri launches Noctalia with
-`NOCTALIA_PAM_SERVICE=password-auth`, and Noctalia's
+As a fallback guardrail on this Fedora laptop, ignored `config/niri/local.kdl`
+sets `NOCTALIA_PAM_SERVICE=password-auth`, and Noctalia's
 `general.allowPasswordWithFprintd` setting is disabled. This prevents its internal
-locker from combining Fedora's fingerprint PAM module with password entry or
-spawning the `fprintd-verify` sensor-occupancy workaround.
+locker from spawning the `fprintd-verify` sensor-occupancy workaround. The shared
+config makes no PAM-service assumption for other hosts.
 
 ## Auth model
 

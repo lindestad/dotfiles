@@ -14,3 +14,8 @@
 //     // Diagnostic/performance workaround only; can add pointer latency.
 //     wait-for-frame-completion-before-queueing
 // }
+
+// Only set this after verifying the host has a password-only PAM stack by this name.
+// environment {
+//     NOCTALIA_PAM_SERVICE "password-auth"
+// }
