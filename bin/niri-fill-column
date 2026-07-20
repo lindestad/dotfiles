@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+windows="$(niri msg -j windows)"
+focused="$(jq -c '.[] | select(.is_focused == true)' <<<"$windows")"
+
+focused_id="$(jq -r '.id // empty' <<<"$focused")"
+workspace_id="$(jq -r '.workspace_id // empty' <<<"$focused")"
+focused_column="$(jq -r '.layout.pos_in_scrolling_layout[0] // empty' <<<"$focused")"
+
+if [[ -z "$focused_id" || -z "$workspace_id" || -z "$focused_column" || "$focused_column" -le 1 ]]; then
+  exit 0
+fi
+
+left_width="$(
+  jq -r --argjson workspace_id "$workspace_id" --argjson column "$((focused_column - 1))" '
+    [ .[]
+      | select(.workspace_id == $workspace_id)
+      | select(.layout.pos_in_scrolling_layout[0] == $column)
+      | .layout.tile_size[0]
+    ][0] // empty
+  ' <<<"$windows"
+)"
+output_width="$(niri msg -j focused-output | jq -r '.logical.width')"
+
+if [[ -z "$left_width" || -z "$output_width" ]]; then
+  exit 0
+fi
+
+# A proportional column occupies (working width - gap) * proportion - gap.
+# Infer the left column's proportion, then give the focused column the rest.
+target_percent="$(
+  jq -nr --argjson left "$left_width" --argjson output "$output_width" '
+    100 * (1 - (($left + 8) / ($output - 8)))
+  '
+)"
+
+niri msg action focus-window --id "$focused_id" >/dev/null
+niri msg action set-column-width "${target_percent}%" >/dev/null
+niri msg action focus-column "$((focused_column - 1))" >/dev/null
+exec niri msg action focus-column "$focused_column"

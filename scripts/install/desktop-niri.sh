@@ -512,6 +512,7 @@ install_niri_helpers() {
 
   local helper
   local helpers=(
+    niri-fill-column
     niri-focus-workspace-all
     niri-lock-screen
     niri-move-window-or-workspace

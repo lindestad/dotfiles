@@ -136,6 +136,7 @@ binds {
     Mod+Shift+F { fullscreen-window; }
     Mod+M { maximize-column; }
     Mod+Ctrl+F { expand-column-to-available-width; }
+    Mod+Ctrl+M hotkey-overlay-title="Fill Width Beside Left Column" { spawn-sh "$HOME/.local/bin/niri-fill-column"; }
     Mod+C { center-column; }
     Mod+Ctrl+C { center-visible-columns; }
     Mod+Minus { set-column-width "-10%"; }
