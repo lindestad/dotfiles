@@ -16,6 +16,8 @@ return {
     "nvim-mini/mini.surround",
     keys = {
       { "s", "<Nop>", mode = { "n", "x" }, desc = "Surround" },
+      -- Keep LazyVim's usual `gs` prefix as an alias for the shorter `s` prefix.
+      { "gs", "s", mode = { "n", "x" }, remap = true, desc = "Surround" },
       -- Treat bare word motions as the current word instead of moving forward.
       { "saw", "saiw", remap = true, desc = "Surround current word" },
       { "saW", "saiW", remap = true, desc = "Surround current WORD" },
