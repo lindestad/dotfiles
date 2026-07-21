@@ -126,31 +126,51 @@ zen_browser_available() {
   have zen-browser || have zen
 }
 
-ensure_zen_browser() {
-  if zen_browser_available; then
-    echo "== Zen Browser is already installed."
+ensure_flathub_app() {
+  local label="$1" app_id="$2"
+
+  if have flatpak && flatpak info "$app_id" >/dev/null 2>&1; then
+    echo "== $label is already installed."
     return
   fi
 
   if ! have flatpak; then
-    echo ">> Flatpak is not installed; skipping Zen Browser installation."
+    echo ">> Flatpak is not installed; skipping $label installation."
     return
   fi
 
   echo "==> Enabling Flathub for the current user..."
   if ! flatpak remote-add --user --if-not-exists \
     flathub https://flathub.org/repo/flathub.flatpakrepo; then
-    echo ">> Could not enable Flathub; skipping Zen Browser installation."
+    echo ">> Could not enable Flathub; skipping $label installation."
     return
   fi
 
-  echo "==> Installing Zen Browser from Flathub..."
-  if ! flatpak install --user --noninteractive flathub app.zen_browser.zen; then
-    echo ">> Could not install Zen Browser from Flathub."
+  echo "==> Installing $label from Flathub..."
+  if ! flatpak install --user --noninteractive flathub "$app_id"; then
+    echo ">> Could not install $label from Flathub."
     return
   fi
 
-  echo "-> Installed Zen Browser from Flathub."
+  echo "-> Installed $label from Flathub."
+}
+
+ensure_zen_browser() {
+  if zen_browser_available; then
+    echo "== Zen Browser is already installed."
+    return
+  fi
+
+  ensure_flathub_app "Zen Browser" app.zen_browser.zen
+}
+
+ensure_mission_center() {
+  if have missioncenter; then
+    echo "== Mission Center is already installed."
+    return
+  fi
+
+  ensure_flathub_app "Mission Center" io.missioncenter.MissionCenter
 }
 
 install_zen_browser_url_handler() {

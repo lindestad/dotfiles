@@ -52,7 +52,7 @@ The installer prompts for optional components when no flags are provided. Use fl
 
 Optional components:
 
-- `--niri` installs and links the Niri + Noctalia desktop stack: niri, niri-zvim, noctalia-shell, NiriMod, Zen Browser, fuzzel, swayidle, and related Wayland utilities.
+- `--niri` installs and links the Niri + Noctalia desktop stack: niri, niri-zvim, noctalia-shell, NiriMod, Mission Center, Zen Browser, fuzzel, swayidle, and related Wayland utilities.
 - `--kanata` installs or links Kanata keyboard remapping config where supported.
 
 The Niri path keeps a clean `main` checkout of niri-zvim under
