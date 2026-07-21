@@ -379,6 +379,7 @@ abbr --add nn 'nvim --cmd "let g:skip_startup_explorer = 1"'
 
 abbr --add rg 'rg --hidden --glob "!.git"'
 abbr --add fd 'fd --hidden --exclude .git'
+alias loc tokei
 
 function svenv --description 'Activate the current Python virtual environment'
     source .venv/bin/activate.fish

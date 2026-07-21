@@ -454,6 +454,7 @@ ensure_modern_cli_cargo_tools() {
   ensure_cargo_tool procs procs
   ensure_cargo_tool broot broot
   ensure_cargo_tool gitui gitui
+  ensure_cargo_tool tokei tokei Tokei
   ensure_selene
   ensure_cargo_tool stylua stylua StyLua
 }

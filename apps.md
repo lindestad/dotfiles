@@ -49,6 +49,7 @@ These are the main package and tool installs managed by the platform installers.
 | starship | cargo fallback | cargo fallback | cargo fallback | cargo fallback | `Starship.Starship` |
 | StyLua | cargo install | cargo install | cargo install | cargo install | cargo install |
 | tealdeer/tldr | cargo install | cargo install | cargo install | cargo install | `dbrgn.tealdeer` |
+| tokei | `tokei` | `tokei` or cargo fallback | `tokei` | `tokei` or cargo fallback | `XAMPPRocky.tokei` |
 | Typst CLI | `typst` | cargo fallback | cargo fallback | cargo fallback | `Typst.Typst` |
 | uutils coreutils | `uutils-coreutils` | `uutils-coreutils` (optional) | `uutils-coreutils` (optional) | not installed | `uutils.coreutils` |
 | uv | `uv` | standalone installer | `uv` with standalone fallback | standalone installer | `astral-sh.uv` |
@@ -85,7 +86,7 @@ These are installed only by the Linux/WSL shell installers.
 | resvg | cargo fallback | cargo fallback | cargo fallback | cargo fallback |
 | unzip | `unzip` | `unzip` | `unzip` | `unzip` |
 | user fonts | bundled fonts copied to `~/.local/share/fonts` | same | same | same |
-| Fedora workflow extras | not installed | not installed | `entr`, `git-lfs`, `tokei`, `tree` | not installed |
+| Fedora workflow extras | not installed | not installed | `entr`, `git-lfs`, `tree` | not installed |
 | zsh | `zsh` | `zsh` | `zsh` | `zsh` |
 | zsh-patina | cargo install with `target-cpu=native` | same | same | same |
 

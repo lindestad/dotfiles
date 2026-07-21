@@ -348,6 +348,7 @@ alias n='nvim'
 # ripgrep, fd common flags (optional)
 alias rg='rg --hidden --glob "!.git"'
 alias fd='fd --hidden --exclude .git'
+alias loc='tokei'
 alias svenv='source .venv/bin/activate'
 alias ..='cd ..'
 alias ...='cd ../..'

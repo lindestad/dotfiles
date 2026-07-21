@@ -55,6 +55,7 @@ PACMAN_PKGS=(
   broot
   lazygit
   gitui
+  tokei
   python
   python-pipx
   typst

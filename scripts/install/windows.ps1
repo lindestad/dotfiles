@@ -173,6 +173,7 @@ $apps = @(
     "astral-sh.uv",
     "jftuga.less",
     "dandavison.delta",
+    "XAMPPRocky.tokei",
     "Wilfred.difftastic",
     "Microsoft.PowerShell",
     "Rustlang.Rustup",
@@ -308,6 +309,10 @@ function Enable-StarshipPowerShellProfile {
 
 function Enable-AtuinPowerShellProfile {
     Add-PowerShellProfileLine -Line "if (Get-Command atuin -ErrorAction SilentlyContinue) { atuin init powershell | Out-String | Invoke-Expression }" -Pattern 'atuin init powershell'
+}
+
+function Enable-TokeiPowerShellProfile {
+    Add-PowerShellProfileLine -Line "if (Get-Command tokei -ErrorAction SilentlyContinue) { Set-Alias -Name loc -Value tokei }" -Pattern 'Set-Alias -Name loc -Value tokei'
 }
 
 function Enable-UserLocalBinPowerShellProfile {
@@ -1169,6 +1174,7 @@ Install-UserFont -FontDir (Join-Path $Dotfiles "fonts")
 Enable-UserLocalBinPowerShellProfile
 Enable-StarshipPowerShellProfile
 Enable-AtuinPowerShellProfile
+Enable-TokeiPowerShellProfile
 
 Write-InstallProgress -Current 3 -Total 5 -Label "Optional components"
 if ($choices.InstallUsNoLayout) {

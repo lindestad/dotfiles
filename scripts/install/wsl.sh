@@ -64,6 +64,7 @@ APT_PKGS_OPTIONAL=(
   broot
   lazygit
   gitui
+  tokei
 )
 
 LINKS=()
