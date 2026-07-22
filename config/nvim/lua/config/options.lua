@@ -3,7 +3,6 @@
 -- Add any additional options here
 
 vim.opt.wrap = true
-vim.opt.shell = "/usr/bin/fish"
 vim.opt.timeoutlen = 2000
 
 -- Use ty as LazyVim's Python language server.

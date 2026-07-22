@@ -63,14 +63,6 @@ return {
       vim.keymap.set("x", "A", function() mc.appendVisual() end, { desc = "Cursor at end of each line" })
       vim.keymap.set("x", "M", function() mc.matchCursors() end, { desc = "Cursor at regex matches in selection" })
 
-      -- Escape clears all extra cursors.
-      vim.keymap.set("n", "<Esc>", function()
-        if not mc.hasCursors() then
-          return "<Esc>"
-        end
-        mc.clearCursors()
-      end, { expr = true, desc = "Clear cursors / Escape" })
-
       -- Highlight groups to make cursors visible.
       vim.api.nvim_set_hl(0, "MultiCursorCursor", { link = "Cursor" })
       vim.api.nvim_set_hl(0, "MultiCursorVisual", { link = "Visual" })
