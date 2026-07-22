@@ -1,5 +1,3 @@
-local config = vim.fn.stdpath("config") .. "/.markdownlint.jsonc"
-
 return {
   {
     "mfussenegger/nvim-lint",
@@ -10,12 +8,18 @@ return {
   },
   {
     "stevearc/conform.nvim",
-    opts = {
-      formatters = {
-        ["markdownlint-cli2"] = {
-          prepend_args = { "--config", config },
-        },
-      },
-    },
+    opts = function(_, opts)
+      opts.formatters_by_ft.markdown = { "prettier", "markdown-toc" }
+      opts.formatters_by_ft["markdown.mdx"] = { "prettier", "markdown-toc" }
+    end,
+  },
+  {
+    "mason-org/mason.nvim",
+    opts = function(_, opts)
+      opts.ensure_installed = vim.tbl_filter(
+        function(tool) return tool ~= "markdownlint-cli2" end,
+        opts.ensure_installed or {}
+      )
+    end,
   },
 }
