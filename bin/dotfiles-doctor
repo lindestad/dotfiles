@@ -266,12 +266,17 @@ codex_root_value() {
   ' "$file"
 }
 
-codex_tui_value() {
-  local file="$1" key="$2"
-  awk -v key="$key" '
-    /^\[tui\][[:space:]]*$/ { in_tui = 1; next }
-    /^\[/ { in_tui = 0 }
-    in_tui && $0 ~ "^[[:space:]]*" key "[[:space:]]*=" {
+codex_table_value() {
+  local file="$1" table="$2" key="$3"
+  awk -v table="$table" -v key="$key" '
+    {
+      line = $0
+      sub(/^[[:space:]]*/, "", line)
+      sub(/[[:space:]]*$/, "", line)
+    }
+    line == "[" table "]" { in_table = 1; next }
+    line ~ /^\[/ { in_table = 0 }
+    in_table && $0 ~ "^[[:space:]]*" key "[[:space:]]*=" {
       sub("^[[:space:]]*" key "[[:space:]]*=[[:space:]]*", "")
       print
       exit
@@ -301,7 +306,7 @@ approval_policy|"never"
 EOF
 
   while IFS='|' read -r key expected; do
-    actual="$(codex_tui_value "$file" "$key")"
+    actual="$(codex_table_value "$file" "tui" "$key")"
     if [[ "$actual" != "$expected" ]]; then
       warn "Codex [tui] wants $key = $expected, found ${actual:-missing}"
       had_issue="yes"
@@ -311,6 +316,17 @@ vim_mode_default|true
 status_line|["model-with-reasoning", "current-dir", "context-used", "five-hour-limit", "weekly-limit"]
 status_line_use_colors|true
 theme|"monokai-extended"
+EOF
+
+  while IFS='|' read -r key expected; do
+    actual="$(codex_table_value "$file" "tui.keymap.pager" "$key")"
+    if [[ "$actual" != "$expected" ]]; then
+      warn "Codex [tui.keymap.pager] wants $key = $expected, found ${actual:-missing}"
+      had_issue="yes"
+    fi
+  done <<'EOF'
+half_page_down|"d"
+half_page_up|"u"
 EOF
 
   [[ "$had_issue" == "yes" ]] || ok "Codex config"

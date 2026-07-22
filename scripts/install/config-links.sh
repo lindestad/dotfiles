@@ -188,16 +188,22 @@ ensure_codex_root_config() {
   echo "-> Added Codex config $key"
 }
 
-ensure_codex_tui_config() {
+ensure_codex_table_config() {
   local dst="$1"
-  local key="$2"
-  local value="$3"
+  local table="$2"
+  local key="$3"
+  local value="$4"
 
   local existing
-  existing="$(awk -v key="$key" '
-    /^\[tui\][[:space:]]*$/ { in_tui = 1; next }
-    /^\[/ { in_tui = 0 }
-    in_tui && $0 ~ "^[[:space:]]*" key "[[:space:]]*=" {
+  existing="$(awk -v table="$table" -v key="$key" '
+    {
+      line = $0
+      sub(/^[[:space:]]*/, "", line)
+      sub(/[[:space:]]*$/, "", line)
+    }
+    line == "[" table "]" { in_table = 1; next }
+    line ~ /^\[/ { in_table = 0 }
+    in_table && $0 ~ "^[[:space:]]*" key "[[:space:]]*=" {
       sub("^[[:space:]]*" key "[[:space:]]*=[[:space:]]*", "")
       print
       exit
@@ -207,10 +213,15 @@ ensure_codex_tui_config() {
     if [[ "$existing" != "$value" ]]; then
       local tmp
       tmp="$(mktemp)"
-      awk -v key="$key" -v value="$value" '
-        /^\[tui\][[:space:]]*$/ { in_tui = 1; print; next }
-        /^\[/ { in_tui = 0 }
-        in_tui && $0 ~ "^[[:space:]]*" key "[[:space:]]*=" {
+      awk -v table="$table" -v key="$key" -v value="$value" '
+        {
+          line = $0
+          sub(/^[[:space:]]*/, "", line)
+          sub(/[[:space:]]*$/, "", line)
+        }
+        line == "[" table "]" { in_table = 1; print; next }
+        line ~ /^\[/ { in_table = 0 }
+        in_table && $0 ~ "^[[:space:]]*" key "[[:space:]]*=" {
           print key " = " value
           next
         }
@@ -218,16 +229,21 @@ ensure_codex_tui_config() {
       ' "$dst" >"$tmp"
       cp "$tmp" "$dst"
       rm -f "$tmp"
-      echo "-> Updated Codex TUI config $key"
+      echo "-> Updated Codex [$table] config $key"
     fi
     return
   fi
 
   local tmp
   tmp="$(mktemp)"
-  awk -v key="$key" -v value="$value" '
+  awk -v table="$table" -v key="$key" -v value="$value" '
     BEGIN { inserted = 0 }
-    /^\[tui\][[:space:]]*$/ {
+    {
+      line = $0
+      sub(/^[[:space:]]*/, "", line)
+      sub(/[[:space:]]*$/, "", line)
+    }
+    line == "[" table "]" {
       print
       print key " = " value
       inserted = 1
@@ -237,14 +253,14 @@ ensure_codex_tui_config() {
     END {
       if (!inserted) {
         print ""
-        print "[tui]"
+        print "[" table "]"
         print key " = " value
       }
     }
   ' "$dst" >"$tmp"
   cp "$tmp" "$dst"
   rm -f "$tmp"
-  echo "-> Added Codex TUI config $key"
+  echo "-> Added Codex [$table] config $key"
 }
 
 ensure_codex_config() {
@@ -255,8 +271,10 @@ ensure_codex_config() {
 
   ensure_codex_root_config "$dst" "sandbox_mode" '"danger-full-access"'
   ensure_codex_root_config "$dst" "approval_policy" '"never"'
-  ensure_codex_tui_config "$dst" "vim_mode_default" "true"
-  ensure_codex_tui_config "$dst" "status_line" '["model-with-reasoning", "current-dir", "context-used", "five-hour-limit", "weekly-limit"]'
-  ensure_codex_tui_config "$dst" "status_line_use_colors" "true"
-  ensure_codex_tui_config "$dst" "theme" '"monokai-extended"'
+  ensure_codex_table_config "$dst" "tui" "vim_mode_default" "true"
+  ensure_codex_table_config "$dst" "tui" "status_line" '["model-with-reasoning", "current-dir", "context-used", "five-hour-limit", "weekly-limit"]'
+  ensure_codex_table_config "$dst" "tui" "status_line_use_colors" "true"
+  ensure_codex_table_config "$dst" "tui" "theme" '"monokai-extended"'
+  ensure_codex_table_config "$dst" "tui.keymap.pager" "half_page_down" '"d"'
+  ensure_codex_table_config "$dst" "tui.keymap.pager" "half_page_up" '"u"'
 }

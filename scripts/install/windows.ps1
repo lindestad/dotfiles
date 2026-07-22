@@ -966,6 +966,8 @@ function Set-CodexConfig {
     $content = Get-TomlTableValueContent -Content $content -Table "tui" -Key "status_line" -Value '["model-with-reasoning", "current-dir", "context-used", "five-hour-limit", "weekly-limit"]'
     $content = Get-TomlTableValueContent -Content $content -Table "tui" -Key "status_line_use_colors" -Value "true"
     $content = Get-TomlTableValueContent -Content $content -Table "tui" -Key "theme" -Value '"monokai-extended"'
+    $content = Get-TomlTableValueContent -Content $content -Table "tui.keymap.pager" -Key "half_page_down" -Value '"d"'
+    $content = Get-TomlTableValueContent -Content $content -Table "tui.keymap.pager" -Key "half_page_up" -Value '"u"'
 
     [System.IO.File]::WriteAllText($Dst, $content, $utf8NoBom)
 }
