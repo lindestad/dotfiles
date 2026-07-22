@@ -3,13 +3,10 @@ local config = vim.fn.stdpath("config") .. "/.markdownlint.jsonc"
 return {
   {
     "mfussenegger/nvim-lint",
-    opts = {
-      linters = {
-        ["markdownlint-cli2"] = {
-          args = { "--config", config, "-" },
-        },
-      },
-    },
+    opts = function(_, opts)
+      opts.linters_by_ft.markdown = {}
+      opts.linters_by_ft["markdown.mdx"] = {}
+    end,
   },
   {
     "stevearc/conform.nvim",
