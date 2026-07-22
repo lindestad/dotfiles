@@ -165,6 +165,7 @@ alias oc='opencode'
 # alias ocr='opencode resume' ->TODO Need to PR a fix, there is --continue but does not put you into the picker like codex
 alias cx='codex'
 alias cxr='codex resume'
+alias cxz='codex resume'
 alias ff='fastfetch'
 
 # helix

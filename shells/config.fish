@@ -368,6 +368,7 @@ end
 abbr --add oc opencode
 abbr --add cx codex
 abbr --add cxr 'codex resume'
+abbr --add cxz 'codex resume' # avoid disgusting sfb
 abbr --add ff fastfetch
 
 if command -q helix
