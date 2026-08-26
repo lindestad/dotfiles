@@ -47,10 +47,15 @@ return {
       vim.keymap.set({ "n", "x" }, "<C-p>", function() mc.matchAddCursor(-1) end, { desc = "Cursor at prev match" })
 
       -- Skip the next match without adding a cursor (like helix's `s` skip).
-      vim.keymap.set({ "n", "x" }, "<C-x>", function() mc.matchSkipCursor(1) end, { desc = "Skip next match" })
+      vim.keymap.set({ "n", "x" }, "<leader>ms", function() mc.matchSkipCursor(1) end, { desc = "Skip next match" })
 
       -- Add cursors to every match in the file in one shot.
-      vim.keymap.set({ "n", "x" }, "<C-a>", function() mc.matchAllAddCursors() end, { desc = "Cursor at all matches" })
+      vim.keymap.set(
+        { "n", "x" },
+        "<leader>ma",
+        function() mc.matchAllAddCursors() end,
+        { desc = "Cursor at all matches" }
+      )
 
       -- Add cursors above/below the current line.
       vim.keymap.set({ "n", "x" }, "<M-up>", function() mc.lineAddCursor(-1) end, { desc = "Cursor line above" })
