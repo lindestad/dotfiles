@@ -2,8 +2,13 @@
 show_hidden = true
 
 [[plugin.prepend_fetchers]]
-id   = "mime"
-url  = "*"
+url   = "local://*"
+run   = "mime-ext.local"
+prio  = "high"
 group = "mime"
-run  = "mime-ext"
-prio = "high"
+
+[[plugin.prepend_fetchers]]
+url   = "remote://*"
+run   = "mime-ext.remote"
+prio  = "high"
+group = "mime"
