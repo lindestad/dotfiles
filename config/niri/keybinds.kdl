@@ -30,6 +30,8 @@ binds {
     XF86AudioNext allow-when-locked=true { spawn-sh "playerctl next"; }
     XF86MonBrightnessUp allow-when-locked=true { spawn "brightnessctl" "--class=backlight" "set" "+10%"; }
     XF86MonBrightnessDown allow-when-locked=true { spawn "brightnessctl" "--class=backlight" "set" "10%-"; }
+    Super+Alt+Equal allow-when-locked=true { spawn "brightnessctl" "--class=backlight" "set" "+10%"; }
+    Super+Alt+Minus allow-when-locked=true { spawn "brightnessctl" "--class=backlight" "set" "10%-"; }
 
     // Focus
     Mod+O repeat=false { toggle-overview; }
