@@ -75,6 +75,19 @@ vim.keymap.set("i", "<C-BS>", "<C-w>", { desc = "Delete previous word" })
 -- Shift-U: redo (reverse undo). Default U (restore line) is rarely useful.
 vim.keymap.set("n", "U", "<C-r>", { desc = "Redo" })
 
+local function close_floating_preview()
+  local current_win = vim.api.nvim_get_current_win()
+  if vim.w[current_win].lsp_floating_bufnr then
+    vim.api.nvim_win_close(current_win, true)
+    return
+  end
+
+  local preview_win = vim.b.lsp_floating_preview
+  if preview_win and vim.api.nvim_win_is_valid(preview_win) then
+    vim.api.nvim_win_close(preview_win, true)
+  end
+end
+
 -- Preserve LazyVim's Escape cleanup while giving multicursor first refusal.
 vim.keymap.set("n", "<Esc>", function()
   local mc = package.loaded["multicursor-nvim"]
@@ -83,10 +96,11 @@ vim.keymap.set("n", "<Esc>", function()
     return ""
   end
 
+  close_floating_preview()
   vim.cmd("nohlsearch")
   LazyVim.cmp.actions.snippet_stop()
   return "<Esc>"
-end, { expr = true, desc = "Clear cursors / Escape" })
+end, { expr = true, desc = "Clear cursors / close preview / Escape" })
 
 local function root_terminal() Snacks.terminal.focus(nil, { cwd = LazyVim.root() }) end
 
