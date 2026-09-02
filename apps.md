@@ -123,6 +123,7 @@ These are installed when the Linux installer runs with `--niri`.
 | network applet | `network-manager-applet` | `network-manager-gnome` | `NetworkManager-applet` |
 | niri | `niri` | `niri` | `niri` |
 | niri-zvim | `main` source checkout + complete installer | `main` source checkout + complete installer | `main` source checkout + complete installer |
+| NiriMod GTK runtime | `python-gobject`, `gtk4`, `libadwaita` | `python3-gi`, `gir1.2-gtk-4.0`, `gir1.2-adw-1` | `python3-gobject`, `gtk4`, `libadwaita` |
 | Noctalia Shell | `noctalia-shell` when provided by the distro, otherwise AUR | Noctalia APT repo: `noctalia-shell` where supported | `noctalia-shell` |
 | pavucontrol | `pavucontrol` | `pavucontrol` | `pavucontrol` |
 | polkit auth agent | not installed | not installed | `xfce-polkit` |

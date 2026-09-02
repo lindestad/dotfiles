@@ -74,6 +74,9 @@ NIRI_PACMAN_PKGS=(
   qalculate-qt
   loupe
   niri
+  python-gobject
+  gtk4
+  libadwaita
   fuzzel
   grim
   slurp

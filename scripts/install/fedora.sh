@@ -104,6 +104,9 @@ NIRI_DNF_PKGS=(
   qalculate-qt
   loupe
   niri
+  python3-gobject
+  gtk4
+  libadwaita
   fuzzel
   swayidle
   wl-clipboard
