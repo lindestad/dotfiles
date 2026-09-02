@@ -177,6 +177,7 @@ These are not package installs, but the installers manage them alongside the too
 | Helix | symlinked | linked/copied |
 | Fish | `config.fish` symlinked; package/default shell unchanged | not linked |
 | Neovim | symlinked | linked/copied |
+| Niri desktop compatibility | optional with `--niri` | not managed |
 | niri-zvim config | optional with `--niri` | not managed |
 | Noctalia color scheme | optional with `--niri` | not managed |
 | Kanata | optional | optional |

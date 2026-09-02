@@ -13,6 +13,7 @@ add_wayland_desktop_links() {
     "$DOTFILES_DIR/config/niri/config.kdl|$HOME/.config/niri/config.kdl"
     "$DOTFILES_DIR/config/niri/keybinds.kdl|$HOME/.config/niri/keybinds.kdl"
     "$DOTFILES_DIR/config/niri/local.example.kdl|$HOME/.config/niri/local.example.kdl"
+    "$DOTFILES_DIR/config/systemd/user/niri.service.d/desktop-compat.conf|$HOME/.config/systemd/user/niri.service.d/desktop-compat.conf"
     "$DOTFILES_DIR/config/niri-zvim/config.json|$HOME/.config/niri-zvim/config.json"
     "$DOTFILES_DIR/config/hypr/hyprlock.conf|$HOME/.config/hypr/hyprlock.conf"
     "$DOTFILES_DIR/config/xkb/symbols/usno|$HOME/.config/xkb/symbols/usno"

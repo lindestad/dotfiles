@@ -356,6 +356,7 @@ check_niri() {
   check_managed_link "$DOTFILES_DIR/config/niri/config.kdl" "$config" "niri config"
   check_managed_link "$DOTFILES_DIR/config/niri/keybinds.kdl" "$HOME/.config/niri/keybinds.kdl" "niri keybinds"
   check_managed_link "$DOTFILES_DIR/config/niri/local.example.kdl" "$HOME/.config/niri/local.example.kdl" "niri local example"
+  check_managed_link "$DOTFILES_DIR/config/systemd/user/niri.service.d/desktop-compat.conf" "$HOME/.config/systemd/user/niri.service.d/desktop-compat.conf" "niri desktop compatibility"
   check_managed_link "$DOTFILES_DIR/config/niri-zvim/config.json" "$HOME/.config/niri-zvim/config.json" "niri-zvim config"
   check_managed_link "$DOTFILES_DIR/config/hypr/hyprlock.conf" "$HOME/.config/hypr/hyprlock.conf" "hyprlock config"
   check_managed_link "$DOTFILES_DIR/config/xkb/symbols/usno" "$HOME/.config/xkb/symbols/usno" "xkb usno layout"
