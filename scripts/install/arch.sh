@@ -60,6 +60,9 @@ PACMAN_PKGS=(
   python-pipx
   typst
   uv
+  docker
+  docker-buildx
+  docker-compose
 )
 
 NIRI_PACMAN_PKGS=(
@@ -118,6 +121,7 @@ request_sudo_access
 install_progress 1 5 "System packages"
 echo "==> Installing pacman packages..."
 install_pacman "${PACMAN_PKGS[@]}"
+setup_docker
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
   echo "==> Installing Niri + Noctalia desktop packages..."
   install_pacman "${NIRI_PACMAN_PKGS[@]}"

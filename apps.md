@@ -73,7 +73,7 @@ These are installed only by the Linux/WSL shell installers.
 | browser automation | not installed | not installed | `chromium`, `chromium-headless`, `chromedriver`, `xorg-x11-server-Xvfb` | not installed |
 | build tools | not installed | `build-essential`, `cmake` | `gcc`, `gcc-c++`, `make`, `cmake` | `build-essential`, `cmake` |
 | ca-certificates | not installed | `ca-certificates` | not installed | `ca-certificates` |
-| containers | not installed | not installed | `podman`, `podman-compose`, `buildah` | not installed |
+| containers | `docker`, `docker-buildx`, `docker-compose`; service enabled; user added to `docker` group | not installed | `podman`, `podman-compose`, `buildah` | not installed |
 | curl | `curl` | `curl` | `curl` | `curl` |
 | database clients/headers | not installed | not installed | `sqlite`, `sqlite-devel`, `postgresql`, `postgresql-devel` | not installed |
 | desktop capture/input | not installed | not installed | `grim`, `slurp`, `wl-clipboard`, `xclip`, `xdotool`, `wtype` | not installed |

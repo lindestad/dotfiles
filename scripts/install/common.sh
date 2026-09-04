@@ -337,6 +337,28 @@ install_pacman() {
   sudo pacman -Syu --needed --noconfirm "$@"
 }
 
+setup_docker() {
+  local docker_user
+  docker_user="${USER:-$(id -un)}"
+
+  if ! getent group docker >/dev/null; then
+    echo "==> Creating Docker group..."
+    sudo groupadd --system docker
+  fi
+
+  if id -nG "$docker_user" | tr ' ' '\n' | grep -Fxq docker; then
+    echo "== $docker_user is already in the Docker group."
+  else
+    echo "==> Adding $docker_user to the Docker group..."
+    sudo usermod -aG docker "$docker_user"
+    echo ">> Log out and back in before using Docker without sudo."
+  fi
+
+  echo "==> Enabling and starting Docker..."
+  sudo systemctl enable --now docker.service
+  echo "== Docker service enabled and started."
+}
+
 aur_helper() {
   if have yay; then echo yay; return 0; fi
   if have paru; then echo paru; return 0; fi

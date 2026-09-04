@@ -148,6 +148,52 @@ EOF
   [[ $(wc -l < "$fixture_dir/rustup.log") -eq 1 ]]
 }
 
+check_docker_setup() {
+  local fixture_dir="$check_tmp_dir/docker-setup"
+  mkdir -p "$fixture_dir/bin"
+
+  cat > "$fixture_dir/bin/getent" <<'EOF'
+#!/usr/bin/env sh
+if [ "$1" = "group" ] && [ "$2" = "docker" ] && [ -f "$DOCKER_GROUP_STATE" ]; then
+  printf '%s\n' 'docker:x:999:'
+  exit 0
+fi
+exit 2
+EOF
+  cat > "$fixture_dir/bin/id" <<'EOF'
+#!/usr/bin/env sh
+if [ "$1" = "-nG" ]; then
+  printf '%s' "$2"
+  if [ -f "$DOCKER_MEMBER_STATE" ]; then
+    printf '%s' ' docker'
+  fi
+  printf '\n'
+  exit 0
+fi
+exit 2
+EOF
+  cat > "$fixture_dir/bin/sudo" <<'EOF'
+#!/usr/bin/env sh
+printf '%s\n' "$*" >> "$DOCKER_SUDO_LOG"
+case "$1" in
+  groupadd) : > "$DOCKER_GROUP_STATE" ;;
+  usermod) : > "$DOCKER_MEMBER_STATE" ;;
+esac
+EOF
+  chmod +x "$fixture_dir/bin/getent" "$fixture_dir/bin/id" "$fixture_dir/bin/sudo"
+
+  PATH="$fixture_dir/bin:/usr/bin" \
+    USER=testuser \
+    DOCKER_GROUP_STATE="$fixture_dir/group" \
+    DOCKER_MEMBER_STATE="$fixture_dir/member" \
+    DOCKER_SUDO_LOG="$fixture_dir/sudo.log" \
+    /usr/bin/bash -c 'source "$1/scripts/install/common.sh"; setup_docker; setup_docker' _ "$DOTFILES_DIR"
+
+  [[ $(grep -Fxc 'groupadd --system docker' "$fixture_dir/sudo.log") -eq 1 ]]
+  [[ $(grep -Fxc 'usermod -aG docker testuser' "$fixture_dir/sudo.log") -eq 1 ]]
+  [[ $(grep -Fxc 'systemctl enable --now docker.service' "$fixture_dir/sudo.log") -eq 2 ]]
+}
+
 check_lua_lint() {
   (cd config/nvim && selene .) || return
   (cd config/yazi && selene .)
@@ -186,6 +232,7 @@ check_powershell() {
 run_check "ShellCheck" check_shellcheck
 run_check "Bash syntax" check_bash_syntax
 run_check "Rust toolchain update" check_rust_toolchain_update
+run_check "Docker setup" check_docker_setup
 
 if have zsh; then
   run_check "Zsh syntax" check_zsh_syntax
