@@ -21,6 +21,11 @@ input {
     trackpoint
 }
 
+environment {
+    // Shelly only reads GNOME's dark-mode preference on a GNOME-compatible desktop.
+    XDG_CURRENT_DESKTOP "niri:GNOME"
+}
+
 layout {
     gaps 8
 
