@@ -77,6 +77,7 @@ cd $HOME\.dotfiles
 
 On Windows, the installer can optionally install and enable the tracked US+NO keyboard layout for `RightAlt` Norwegian characters.
 It collects optional-component choices before requesting elevation and writes a transcript to `logs/`.
+Neovim configuration is linked to `%LOCALAPPDATA%\nvim` (or `%XDG_CONFIG_HOME%\nvim` when set).
 Use flags for repeatable installs:
 
 ```powershell

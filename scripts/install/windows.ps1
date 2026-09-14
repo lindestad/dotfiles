@@ -1161,6 +1161,7 @@ if (Request-Administrator `
 
 $UserHome = [Environment]::GetFolderPath('UserProfile')
 $Roaming = [Environment]::GetFolderPath('ApplicationData')
+$nvimConfigRoot = if ($env:XDG_CONFIG_HOME) { $env:XDG_CONFIG_HOME } else { [Environment]::GetFolderPath('LocalApplicationData') }
 
 Write-InstallProgress -Current 1 -Total 5 -Label "System packages"
 Invoke-WinGetImport -Packages $apps | Out-Null
@@ -1209,7 +1210,7 @@ New-SafeLink -Src (Join-Path $Dotfiles "config/copilot/copilot-instructions.md")
 New-SafeLink -Src (Join-Path $Dotfiles "config/git/ignore") -Dst (Join-Path $UserHome ".config/git/ignore")
 New-SafeLink -Src (Join-Path $Dotfiles "config/helix/config.toml") -Dst (Join-Path $Roaming "helix/config.toml")
 New-SafeLink -Src (Join-Path $Dotfiles "config/helix/languages.toml") -Dst (Join-Path $Roaming "helix/languages.toml")
-New-SafeLink -Src (Join-Path $Dotfiles "config/nvim") -Dst (Join-Path $UserHome ".config/nvim")
+New-SafeLink -Src (Join-Path $Dotfiles "config/nvim") -Dst (Join-Path $nvimConfigRoot "nvim")
 New-SafeLink -Src (Join-Path $Dotfiles "shells/.bashrc") -Dst (Join-Path $UserHome ".bashrc")
 Set-GitBashProfile -UserHome $UserHome
 New-SafeLink -Src (Join-Path $Dotfiles "config/starship/windows/starship.toml") -Dst (Join-Path $UserHome ".config/starship.toml")
