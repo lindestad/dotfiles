@@ -242,7 +242,7 @@ function Invoke-WinGetImport {
             --ignore-versions `
             --accept-source-agreements `
             --accept-package-agreements `
-            --disable-interactivity
+            --disable-interactivity | Out-Host
         $exitCode = $LASTEXITCODE
 
         if ($exitCode -eq 0) {
