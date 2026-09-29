@@ -1101,10 +1101,14 @@ function Get-TealdeerConfigPath {
     $tldr = Get-WinGetLinkedCommand -Name "tldr"
     if (-not $tldr) { return $null }
 
-    $configLine = & $tldr --show-paths 2>$null |
+    # Let the native command finish before selecting a line so LASTEXITCODE is set.
+    $paths = & $tldr --show-paths 2>$null
+    if ($LASTEXITCODE -ne 0) { return $null }
+
+    $configLine = $paths |
         Where-Object { $_ -match '^Config path:' } |
         Select-Object -First 1
-    if ($LASTEXITCODE -ne 0 -or -not $configLine) { return $null }
+    if (-not $configLine) { return $null }
 
     $match = [regex]::Match($configLine, '^Config path:\s+(.+?)(?:\s+\([^)]+\))?$')
     if (-not $match.Success) { return $null }
