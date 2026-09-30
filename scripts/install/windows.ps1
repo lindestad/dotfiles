@@ -1101,10 +1101,14 @@ function Get-TealdeerConfigPath {
     $tldr = Get-WinGetLinkedCommand -Name "tldr"
     if (-not $tldr) { return $null }
 
-    $configLine = & $tldr --show-paths 2>$null |
+    # Let the native command finish before selecting a line so LASTEXITCODE is set.
+    $paths = & $tldr --show-paths 2>$null
+    if ($LASTEXITCODE -ne 0) { return $null }
+
+    $configLine = $paths |
         Where-Object { $_ -match '^Config path:' } |
         Select-Object -First 1
-    if ($LASTEXITCODE -ne 0 -or -not $configLine) { return $null }
+    if (-not $configLine) { return $null }
 
     $match = [regex]::Match($configLine, '^Config path:\s+(.+?)(?:\s+\([^)]+\))?$')
     if (-not $match.Success) { return $null }
@@ -1117,8 +1121,11 @@ function Install-WindowsKanata {
     )
 
     winget install --id "jtroo.kanata_gui" --accept-source-agreements --accept-package-agreements --disable-interactivity -e
-    if ($LASTEXITCODE -ne 0) {
-        Write-Status "!! Kanata installation failed with winget exit code $LASTEXITCODE"
+    $exitCode = $LASTEXITCODE
+    # WinGet reports an up-to-date installation as UPDATE_NOT_APPLICABLE (0x8A15002B).
+    # Still repair config and startup shortcuts, especially after a manual upgrade.
+    if ($exitCode -ne 0 -and $exitCode -ne -1978335189) {
+        Write-Status "!! Kanata installation failed with winget exit code $exitCode"
         return
     }
 
