@@ -1121,8 +1121,11 @@ function Install-WindowsKanata {
     )
 
     winget install --id "jtroo.kanata_gui" --accept-source-agreements --accept-package-agreements --disable-interactivity -e
-    if ($LASTEXITCODE -ne 0) {
-        Write-Status "!! Kanata installation failed with winget exit code $LASTEXITCODE"
+    $exitCode = $LASTEXITCODE
+    # WinGet reports an up-to-date installation as UPDATE_NOT_APPLICABLE (0x8A15002B).
+    # Still repair config and startup shortcuts, especially after a manual upgrade.
+    if ($exitCode -ne 0 -and $exitCode -ne -1978335189) {
+        Write-Status "!! Kanata installation failed with winget exit code $exitCode"
         return
     }
 
