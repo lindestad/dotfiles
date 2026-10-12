@@ -1,0 +1,121 @@
+# Noctalia v5 base settings; GUI changes live in ~/.local/state/noctalia/settings.toml.
+[shell]
+font_family = "Adwaita Sans"
+polkit_agent = false
+telemetry_enabled = false
+setup_wizard_enabled = false
+
+[theme]
+mode = "dark"
+source = "custom"
+custom_palette = "monochrome-strong"
+
+[bar.default]
+position = "top"
+background_opacity = 1.0
+margin_edge = 0
+margin_ends = 0
+margin_opposite_edge = 0
+radius = 0
+radius_top_left = 0
+radius_top_right = 0
+radius_bottom_left = 0
+radius_bottom_right = 0
+shadow = false
+padding = 8
+widget_spacing = 6
+start = ["launcher", "clock", "cpu", "temp", "gpu-temp", "ram", "active_window", "media"]
+center = ["workspaces"]
+end = ["tray", "notifications", "battery", "volume", "brightness", "control-center"]
+
+[widget.clock]
+format = "{:%H:%M %a, %b %d}"
+tooltip_format = "{:%H:%M %a, %b %d}"
+
+[widget.workspaces]
+label_source = "id"
+max_label_chars = 2
+labels_only_when_occupied = true
+show_icons = false
+pill_scale = 0.6
+
+[widget.cpu]
+type = "sysmon"
+stat = "cpu_usage"
+visualization = "none"
+
+[widget.temp]
+type = "sysmon"
+stat = "cpu_temp"
+visualization = "none"
+
+[widget.gpu-temp]
+type = "sysmon"
+stat = "gpu_temp"
+visualization = "none"
+
+[widget.ram]
+type = "sysmon"
+stat = "ram_used"
+visualization = "none"
+
+[widget.active_window]
+max_length = 145
+title_scroll = "on_hover"
+
+[widget.media]
+max_length = 145
+artist_first = true
+title_scroll = "on_hover"
+hide_when_no_media = true
+
+[dock]
+enabled = false
+
+[wallpaper]
+directory = "~/Pictures/Wallpapers"
+fill_mode = "crop"
+
+[idle]
+pre_action_fade_seconds = 5
+
+[idle.behavior.lock]
+action = "command"
+command = "$HOME/.local/bin/niri-lock-screen"
+enabled = true
+timeout = 660
+
+[idle.behavior.screen-off]
+action = "screen_off"
+enabled = true
+timeout = 300
+
+[idle.behavior.lock-and-suspend]
+action = "command"
+command = "$HOME/.local/bin/niri-lock-and-suspend"
+enabled = true
+timeout = 36000
+
+# Use the same lock and suspend helpers as the keyboard shortcuts.
+[[shell.session.actions]]
+action = "lock"
+command = "$HOME/.local/bin/niri-lock-screen"
+shortcut = "1"
+
+[[shell.session.actions]]
+action = "logout"
+shortcut = "2"
+
+[[shell.session.actions]]
+action = "lock_and_suspend"
+command = "$HOME/.local/bin/niri-lock-and-suspend"
+shortcut = "3"
+
+[[shell.session.actions]]
+action = "reboot"
+shortcut = "4"
+
+[[shell.session.actions]]
+action = "shutdown"
+shortcut = "5"
+variant = "destructive"

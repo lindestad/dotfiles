@@ -217,8 +217,8 @@ collect_ubuntu_repository_choices() {
     ALLOW_GHOSTTY_INSTALLER="$(prompt_yes_no "Allow the community Ghostty .deb installer if needed?")"
   fi
   if [[ "$INSTALL_NIRI" == "yes" && "$ASSUME_YES" != "yes" ]] && \
-    ! dpkg-query -W -f='${Status}' noctalia-shell 2>/dev/null | grep -q "install ok installed" && \
-    ! apt-cache show noctalia-shell >/dev/null 2>&1 && suite="$(noctalia_apt_suite)"; then
+    ! dpkg-query -W -f='${Status}' noctalia 2>/dev/null | grep -q "install ok installed" && \
+    ! apt-cache show noctalia >/dev/null 2>&1 && suite="$(noctalia_apt_suite)"; then
     ALLOW_NOCTALIA_REPO="$(prompt_yes_no "Allow the Noctalia APT repository for $suite if needed?")"
   fi
 }

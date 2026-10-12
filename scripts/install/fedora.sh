@@ -240,7 +240,6 @@ fi
 collect_fedora_repository_choices() {
   ALLOW_GHOSTTY_COPR="no"
   ALLOW_WEZTERM_COPR="no"
-  ALLOW_NOCTALIA_REPO="no"
 
   if [[ "$ASSUME_YES" != "yes" ]] && ! have ghostty && \
     ! dnf -q list --available ghostty >/dev/null 2>&1; then
@@ -249,11 +248,6 @@ collect_fedora_repository_choices() {
   if [[ "$ASSUME_YES" != "yes" ]] && ! have wezterm && \
     ! dnf -q list --available wezterm >/dev/null 2>&1; then
     ALLOW_WEZTERM_COPR="$(prompt_yes_no "Allow the official WezTerm nightly COPR if needed?")"
-  fi
-  if [[ "$INSTALL_NIRI" == "yes" && "$ASSUME_YES" != "yes" ]] && \
-    ! rpm -q noctalia-shell >/dev/null 2>&1 && ! rpm -q noctalia-shell-legacy >/dev/null 2>&1 && \
-    ! dnf -q list --available noctalia-shell >/dev/null 2>&1; then
-    ALLOW_NOCTALIA_REPO="$(prompt_yes_no "Allow the Terra repository for Noctalia if needed?")"
   fi
 }
 

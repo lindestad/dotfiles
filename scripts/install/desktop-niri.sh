@@ -19,6 +19,8 @@ add_wayland_desktop_links() {
     "$DOTFILES_DIR/config/xkb/symbols/usno|$HOME/.config/xkb/symbols/usno"
     "$DOTFILES_DIR/config/fuzzel/fuzzel.ini|$HOME/.config/fuzzel/fuzzel.ini"
     "$DOTFILES_DIR/config/noctalia/monochrome-strong.json|$HOME/.config/noctalia/colorschemes/monochrome-strong/monochrome-strong.json"
+    "$DOTFILES_DIR/config/noctalia/config.toml|$HOME/.config/noctalia/config.toml"
+    "$DOTFILES_DIR/config/noctalia/monochrome-strong.json|$HOME/.config/noctalia/palettes/monochrome-strong.json"
   )
 }
 
@@ -86,32 +88,12 @@ ensure_niri_zvim() {
 }
 
 ensure_noctalia_fedora() {
-  if rpm -q noctalia-shell >/dev/null 2>&1 || rpm -q noctalia-shell-legacy >/dev/null 2>&1; then
+  if rpm -q noctalia >/dev/null 2>&1; then
     return
   fi
 
-  if dnf -q list --available noctalia-shell >/dev/null 2>&1; then
-    install_dnf noctalia-shell
-    return
-  fi
-
-  echo ">> Noctalia Shell is not available from the configured Fedora repositories."
-  if [[ "${ALLOW_NOCTALIA_REPO:-}" == "no" || "$ASSUME_YES" == "yes" ]]; then
-    echo ">> Skipping Terra repository setup in non-interactive mode."
-    return
-  fi
-  if [[ "${ALLOW_NOCTALIA_REPO:-}" != "yes" ]] && \
-    [[ "$(prompt_yes_no "Install Terra repository and Noctalia Shell?")" != "yes" ]]; then
-    return
-  fi
-
-  echo "==> Installing Terra repository..."
-  sudo dnf install -y --nogpgcheck \
-    --repofrompath "terra,https://repos.fyralabs.com/terra\$releasever" \
-    terra-release
-  # shellcheck disable=SC2034
-  DNF_MAKECACHE_DONE="no"
-  install_dnf noctalia-shell
+  # Fedora 44+ ships stable Noctalia v5 in its default repositories.
+  install_dnf noctalia
 }
 
 ensure_power_profiles_fedora() {
@@ -230,8 +212,11 @@ noctalia_apt_suite() {
   fi
 
   case "$codename" in
-    trixie|sid|plucky|questing)
+    trixie|resolute)
       printf '%s\n' "$codename"
+      ;;
+    sid)
+      printf '%s\n' unstable
       ;;
     *)
       return 1
@@ -240,20 +225,20 @@ noctalia_apt_suite() {
 }
 
 ensure_noctalia_ubuntu() {
-  local suite key_file
+  local suite key_file source_file
 
-  if dpkg-query -W -f='${Status}' noctalia-shell 2>/dev/null | grep -q "install ok installed"; then
+  if dpkg-query -W -f='${Status}' noctalia 2>/dev/null | grep -q "install ok installed"; then
     return
   fi
 
-  if apt-cache show noctalia-shell >/dev/null 2>&1; then
-    install_apt noctalia-shell
+  if apt-cache show noctalia >/dev/null 2>&1; then
+    install_apt noctalia
     return
   fi
 
   if ! suite="$(noctalia_apt_suite)"; then
-    echo ">> Noctalia Shell APT packages are only configured for Debian trixie/sid and Ubuntu plucky/questing."
-    echo ">> Skipping Noctalia Shell package setup for this distro release."
+    echo ">> Noctalia v5 APT packages are only configured for Debian trixie/sid and Ubuntu resolute (26.04)."
+    echo ">> Skipping Noctalia v5 package setup for this distro release."
     return
   fi
 
@@ -262,19 +247,20 @@ ensure_noctalia_ubuntu() {
     return
   fi
   if [[ "${ALLOW_NOCTALIA_REPO:-}" != "yes" ]] && \
-    [[ "$(prompt_yes_no "Add Noctalia APT repository for $suite and install Noctalia Shell?")" != "yes" ]]; then
+    [[ "$(prompt_yes_no "Add Noctalia APT repository for $suite and install Noctalia v5?")" != "yes" ]]; then
     return
   fi
 
   echo "==> Adding Noctalia APT repository..."
   sudo install -d -m 0755 /etc/apt/keyrings
-  key_file="$(mktemp)"
-  curl -fsSL https://pkg.noctalia.dev/gpg.key -o "$key_file"
-  sudo gpg --yes --dearmor -o /etc/apt/keyrings/noctalia.gpg "$key_file"
-  rm -f "$key_file"
-  echo "deb [signed-by=/etc/apt/keyrings/noctalia.gpg] https://pkg.noctalia.dev/apt $suite main" \
-    | sudo tee /etc/apt/sources.list.d/noctalia.list >/dev/null
-  install_apt noctalia-shell
+  key_file="$(mktemp --suffix=.deb)"
+  source_file="$(mktemp)"
+  curl -fsSL https://pkg.noctalia.dev/deb/nickh-archive-keyring.deb -o "$key_file"
+  curl -fsSL "https://pkg.noctalia.dev/deb/noctalia-$suite.sources" -o "$source_file"
+  sudo dpkg -i "$key_file"
+  sudo install -m 0644 "$source_file" "/etc/apt/sources.list.d/noctalia-$suite.sources"
+  rm -f "$key_file" "$source_file"
+  install_apt noctalia
 }
 
 extract_niri_local_config() {

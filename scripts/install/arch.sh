@@ -125,10 +125,10 @@ setup_docker
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
   echo "==> Installing Niri + Noctalia desktop packages..."
   install_pacman "${NIRI_PACMAN_PKGS[@]}"
-  if pacman -Si noctalia-shell >/dev/null 2>&1; then
-    install_pacman noctalia-shell
+  if pacman -Si noctalia >/dev/null 2>&1; then
+    install_pacman noctalia
   else
-    NIRI_AUR_PKGS+=(noctalia-shell)
+    NIRI_AUR_PKGS+=(noctalia)
   fi
 fi
 

@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# v5 provides the action directly; keep the v4 path for older hosts.
+if command -v noctalia >/dev/null 2>&1; then
+  exec noctalia msg notification-invoke-latest
+fi
+
 die() {
   echo "noctalia-activate-notification: $*" >&2
   exit 1

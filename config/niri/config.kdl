@@ -65,8 +65,8 @@ layout {
     struts
 }
 
-// Noctalia v4 shell.
-spawn-sh-at-startup "gsettings set org.gnome.desktop.interface color-scheme prefer-dark && exec qs -c noctalia-shell"
+// Noctalia v5 shell.
+spawn-sh-at-startup "gsettings set org.gnome.desktop.interface color-scheme prefer-dark && exec noctalia"
 
 // Lightweight polkit auth agent for GUI elevation prompts.
 spawn-at-startup "/usr/libexec/xfce-polkit"
@@ -124,6 +124,14 @@ layer-rule {
     background-effect {
         xray false
     }
+}
+
+// Keep Noctalia's settings window floating.
+window-rule {
+    match app-id="dev.noctalia.Noctalia"
+    open-floating true
+    default-column-width { fixed 1080; }
+    default-window-height { fixed 920; }
 }
 
 // Work around WezTerm's initial configure bug.

@@ -22,13 +22,14 @@ Hyprlock is a better fit for this machine because it supports password and finge
 The wrapper checks lock options in this order:
 
 1. If `hyprlock` exists, run `hyprlock --immediate-render --no-fade-in`.
-2. If Hyprlock is missing but Quickshell exists, call Noctalia's `lockScreen lock` IPC method.
-3. If neither is available, ask `loginctl` to lock the session.
+2. If Hyprlock is missing, call Noctalia v5 with `noctalia msg session lock`.
+3. On older hosts with only Quickshell, use the v4 `lockScreen lock` IPC method.
+4. If neither is available, ask `loginctl` to lock the session.
 
 The wrapper also uses a non-blocking `flock` lock when available, so accidental repeated hotkey presses do not start multiple lockers.
 
 Noctalia's session-menu lock action should call `niri-lock-screen`, and its suspend
-action should call `niri-lock-and-suspend` with `general.lockOnSuspend` disabled.
+action should call `niri-lock-and-suspend` through the command overrides in `config/noctalia/config.toml`.
 The suspend helper performs the lock itself and will fail closed instead of
 suspending if Niri does not confirm the session lock within ten seconds. It uses
 the same portable lock wrapper, so systems without Hyprlock retain Noctalia's
