@@ -68,8 +68,8 @@ layout {
 // Noctalia v5 shell.
 spawn-sh-at-startup "gsettings set org.gnome.desktop.interface color-scheme prefer-dark && exec noctalia"
 
-// Lightweight polkit auth agent for GUI elevation prompts.
-spawn-at-startup "/usr/libexec/xfce-polkit"
+// Polkit auth agent for GUI elevation prompts.
+spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 
 hotkey-overlay {
     skip-at-startup
