@@ -129,11 +129,9 @@ title = { fg = "#575653", bold = true } # tx-3
 hovered = { bg = "#1C1B1A" } # bg-2
 
 [help]
-on = { fg = "#4385BE" } # bl
-run = { fg = "#3AA99F" } # cy
-desc = { fg = "#575653", italic = true } # tx-3
+chord = { fg = "#4385BE" } # bl
+action = { fg = "#3AA99F" } # cy
 hovered = { bg = "#1C1B1A" } # bg-2
-footer = { fg = "#CECDC3", bg = "#282726", bold = true } # tx, ui
 
 [filetype]
 rules = [
