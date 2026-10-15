@@ -1,4 +1,4 @@
-# Codex Working Agreements
+# Agent Working Agreements
 
 ## General
 
