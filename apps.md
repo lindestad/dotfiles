@@ -128,6 +128,7 @@ These are installed when the Linux installer runs with `--niri`.
 | NiriMod GTK runtime | `python-gobject`, `gtk4`, `libadwaita` | `python3-gi`, `gir1.2-gtk-4.0`, `gir1.2-adw-1` | `python3-gobject`, `gtk4`, `libadwaita` |
 | Noctalia v5 | `noctalia` | Noctalia APT repo: `noctalia` (Debian trixie/sid, Ubuntu 26.04) | `noctalia` (Fedora 44+) |
 | pavucontrol | `pavucontrol` | `pavucontrol` | `pavucontrol` |
+| playerctl | `playerctl` | `playerctl` | `playerctl` |
 | polkit auth agent | not installed | not installed | `xfce-polkit` |
 | power profiles | `power-profiles-daemon` | `power-profiles-daemon` | `power-profiles-daemon` unless `tuned-ppd` is installed |
 | Qalculate! | `qalculate-qt` | not installed | `qalculate-qt` |

@@ -75,6 +75,7 @@ NIRI_PACMAN_PKGS=(
   bluez-utils
   network-manager-applet
   pavucontrol
+  playerctl
   qalculate-qt
   loupe
   niri

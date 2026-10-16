@@ -62,6 +62,7 @@ NIRI_APT_PKGS=(
   bluez
   network-manager-gnome
   pavucontrol
+  playerctl
   loupe
   python3-gi
   gir1.2-gtk-4.0

@@ -102,6 +102,7 @@ NIRI_DNF_PKGS=(
   bluez-tools
   network-manager-applet
   pavucontrol
+  playerctl
   qalculate-qt
   loupe
   niri
