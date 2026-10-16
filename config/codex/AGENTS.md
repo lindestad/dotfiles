@@ -23,6 +23,11 @@
 - Avoid excessive headings and boilerplate.
 - For PR reviews, lead with bugs, risks, regressions, and missing tests.
 
+## Writing
+
+- Apply the `humanizer` skill to all external-facing text: PR bodies and titles, commit messages, issue and PR comments, release notes, changelogs, docs prose, articles, and blog posts. Use its embedded mode, which runs the audit silently and outputs only the final text.
+- Do not apply `humanizer` to chat replies to the user, planning notes, code or code comments, configuration, or quoted material from others.
+
 # Privileged Commands
 
 - You do not have `sudo` access, but you may, and are encouraged to, ask the user to run the commands for you when that is the appropriate action. Do not try to find an unusual work-around, instead ask the user.
