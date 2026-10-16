@@ -67,6 +67,7 @@ The CachyOS/Limine Plymouth LUKS prompt theme is documented in [docs/plymouth-lu
 The CachyOS/Limine Secure Boot workflow is documented in [docs/secureboot-limine-signing.md](./docs/secureboot-limine-signing.md).
 SDDM autologin using the cached LUKS passphrase is documented in [docs/sddm-luks-autologin.md](./docs/sddm-luks-autologin.md).
 Keeping VRAM headroom on the NVIDIA/AMD hybrid 5080 machines is documented in [docs/gpu-vram-offload.md](./docs/gpu-vram-offload.md).
+The Discord sizing workaround for the 0.85-scaled side monitor, and when agents should retire it, is documented in [docs/discord-wayland-fractional-scale.md](./docs/discord-wayland-fractional-scale.md).
 
 ### Windows (PowerShell)
 
