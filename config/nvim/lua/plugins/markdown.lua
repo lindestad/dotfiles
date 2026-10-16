@@ -1,6 +1,7 @@
 return {
   {
-    "saadndm/mathlive.nvim",
+    "lindestad/mathlive.nvim",
+    branch = "fix/wrapped-math",
     lazy = false,
   },
   {
