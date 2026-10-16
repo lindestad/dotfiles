@@ -27,9 +27,9 @@ recovered on the order of 1 GiB.
 
 ## Jagex launcher and RuneLite
 
-The Jagex launcher `.desktop` entries (both
-`~/.local/share/applications/jagex-launcher*.desktop`) carry an `env` prefix on
-their `Exec=` line; the launcher passes its environment on to the RuneLite
+The Jagex launcher `.desktop` entry
+(`~/.local/share/applications/jagex-launcher.desktop`) carries an `env` prefix
+on its `Exec=` line; the launcher passes its environment on to the RuneLite
 child process:
 
 ```ini
