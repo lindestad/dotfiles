@@ -338,18 +338,35 @@ install_pacman() {
 }
 
 remove_legacy_noctalia_quickshell() {
-  local pkg
-  local legacy_pkgs=()
+  local pkg dependent dependents outside=() legacy_pkgs=()
   for pkg in noctalia-shell noctalia-qs quickshell; do
-    if pacman -Q "$pkg" >/dev/null 2>&1; then
+    # pacman -Q alone also matches virtual provides (quickshell is provided by
+    # noctalia-qs), so require an exact installed package name.
+    if pacman -Q "$pkg" 2>/dev/null | grep -q "^$pkg "; then
       legacy_pkgs+=("$pkg")
     fi
   done
-  if ((${#legacy_pkgs[@]})); then
-    echo "==> Removing legacy Noctalia QuickShell packages..."
-    sudo pacman -Rns --noconfirm "${legacy_pkgs[@]}" ||
-      echo "!! Could not remove ${legacy_pkgs[*]}; something still depends on them."
+  if ((${#legacy_pkgs[@]} == 0)); then
+    return 0
   fi
+
+  # Only remove them when nothing outside the set depends on them; -Rns in a
+  # single transaction still honours dependencies between the set members.
+  for pkg in "${legacy_pkgs[@]}"; do
+    read -r -a dependents <<<"$(pacman -Qi "$pkg" 2>/dev/null | sed -n 's/^Required By *: //p')"
+    for dependent in "${dependents[@]}"; do
+      if [[ "$dependent" != "None" ]] && [[ " ${legacy_pkgs[*]} " != *" $dependent "* ]]; then
+        outside+=("$dependent")
+      fi
+    done
+  done
+  if ((${#outside[@]})); then
+    echo "!! Keeping legacy Noctalia packages; still required by: ${outside[*]}"
+    return 0
+  fi
+
+  echo "==> Removing legacy Noctalia QuickShell packages..."
+  sudo pacman -Rns --noconfirm "${legacy_pkgs[@]}"
 }
 
 setup_docker() {
