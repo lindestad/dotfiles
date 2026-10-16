@@ -152,6 +152,38 @@ update_nirimod_checkout() {
   fi
 }
 
+ensure_nirimod_environment() (
+  local install_dir="$1"
+  local bindings='import gi; gi.require_version("Gtk", "4.0"); gi.require_version("Adw", "1"); from gi.repository import Gtk, Adw'
+
+  if ! have uv || ! have python3; then
+    echo "!! Python and uv are required to check the NiriMod environment."
+    return 1
+  fi
+
+  cd "$install_dir" || return 1
+  local system_python
+  system_python="$(command -v python3)"
+  if uv run --no-dev --python "$system_python" python3 -c "$bindings" >/dev/null 2>&1; then
+    echo "-> NiriMod Python environment is ready."
+    return
+  fi
+
+  if ! "$system_python" -c "$bindings" >/dev/null 2>&1; then
+    echo "!! NiriMod requires system PyGObject, GTK4, and libadwaita packages."
+    return 1
+  fi
+
+  echo "==> Repairing NiriMod Python environment with system packages..."
+  if ! uv venv --allow-existing --system-site-packages --python "$system_python" .venv ||
+     ! uv sync --no-dev --python "$system_python" ||
+     ! uv run --no-sync --python "$system_python" python3 -c "$bindings"; then
+    echo "!! Could not repair the NiriMod Python environment."
+    return 1
+  fi
+  echo "-> NiriMod Python environment is ready."
+)
+
 ensure_nirimod() {
   if have nirimod; then
     local command_path install_dir
@@ -159,6 +191,7 @@ ensure_nirimod() {
     install_dir="$HOME/.local/share/nirimod"
     if [[ "$command_path" == "$HOME/.local/bin/nirimod" && -d "$install_dir/.git" ]]; then
       update_nirimod_checkout "$install_dir"
+      ensure_nirimod_environment "$install_dir"
     else
       echo "-> NiriMod already installed: $command_path"
     fi
