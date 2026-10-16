@@ -400,6 +400,45 @@ prepare_niri_config_dir() {
   fi
 }
 
+prepare_hyprlock_local_config() {
+  local local_config="$HOME/.config/hypr/hyprlock.local.conf"
+  local candidate pam_module=""
+
+  [[ -e "$local_config" ]] && return 0
+
+  # The shared config's pam.module only fits Fedora; pick the host's own
+  # password-only stack. Keep the order in sync with
+  # docs/hyprlock-lockscreen.md.
+  for candidate in password-auth system-login system-auth login; do
+    if [[ -f "/etc/pam.d/$candidate" ]]; then
+      pam_module="$candidate"
+      break
+    fi
+  done
+
+  if [[ -z "$pam_module" ]]; then
+    echo ">> No known PAM stack found; skipping Hyprlock local config."
+    return 0
+  fi
+
+  mkdir -p "$HOME/.config/hypr"
+  cat >"$local_config" <<EOF
+# Per-host Hyprlock overrides created by the dotfiles installer.
+# niri-lock-screen passes this file to hyprlock with --config when it exists,
+# so shared settings stay in the linked hyprlock.conf and only host-specific
+# values live here. Safe to edit; the installer never overwrites this file.
+
+source = hyprlock.conf
+
+auth {
+    pam {
+        module = $pam_module
+    }
+}
+EOF
+  echo "-> Created Hyprlock local config with pam.module = $pam_module: $local_config"
+}
+
 validate_migrated_niri_local_config() {
   local niri_config="$HOME/.config/niri/config.kdl"
   local local_config="$HOME/.config/niri/local.kdl"

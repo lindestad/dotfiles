@@ -304,6 +304,7 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
 fi
 link_pairs "${LINKS[@]}"
 if [[ "$INSTALL_NIRI" == "yes" ]]; then
+  prepare_hyprlock_local_config
   validate_migrated_niri_local_config
   activate_niri_usno_layout
   ensure_niri_zvim

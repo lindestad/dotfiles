@@ -7,6 +7,12 @@ if command -v flock >/dev/null 2>&1; then
 fi
 
 if command -v hyprlock >/dev/null 2>&1; then
+  # Per-host overrides (pam.module etc.) live in an untracked local config
+  # that sources the shared one; see docs/hyprlock-lockscreen.md.
+  hyprlock_local="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprlock.local.conf"
+  if [[ -f "$hyprlock_local" ]]; then
+    exec hyprlock --config "$hyprlock_local" --immediate-render --no-fade-in
+  fi
   exec hyprlock --immediate-render --no-fade-in
 fi
 

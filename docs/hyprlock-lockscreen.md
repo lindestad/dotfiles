@@ -11,6 +11,8 @@ Hyprlock is a better fit for this machine because it supports password and finge
 ## Files
 
 - `config/hypr/hyprlock.conf`: synced Hyprlock appearance and auth config.
+- `~/.config/hypr/hyprlock.local.conf`: untracked per-host overrides, created
+  once by the installer; `niri-lock-screen` selects it with `--config`.
 - `bin/niri-lock-screen`: portable lock wrapper used by Niri and Noctalia's lock action.
 - `bin/niri-lock-and-suspend`: starts the lock wrapper, waits for Niri to confirm
   the session is fully locked through logind's `LockedHint`, and only then suspends.
@@ -21,9 +23,11 @@ Hyprlock is a better fit for this machine because it supports password and finge
 
 The wrapper checks lock options in this order:
 
-1. If `hyprlock` exists, run `hyprlock --immediate-render --no-fade-in`.
-2. If Hyprlock is missing, call Noctalia v5 with `noctalia msg session lock`.
-3. If neither is available, ask `loginctl` to lock the session.
+1. If `hyprlock` exists and `~/.config/hypr/hyprlock.local.conf` is present,
+   run `hyprlock --config <that file> --immediate-render --no-fade-in`.
+2. If Hyprlock exists but has no local config, run `hyprlock --immediate-render --no-fade-in`.
+3. If Hyprlock is missing, call Noctalia v5 with `noctalia msg session lock`.
+4. If neither is available, ask `loginctl` to lock the session.
 
 The wrapper also uses a non-blocking `flock` lock when available, so accidental repeated hotkey presses do not start multiple lockers.
 
@@ -50,6 +54,24 @@ The config uses:
 - Hyprlock's native fingerprint block for fprintd.
 
 The config intentionally avoids weather, media, and long-running shell widgets. A lock screen should be reliable first.
+
+## Per-host PAM tweak
+
+`password-auth` is Fedora naming and does not exist on Arch/CachyOS, so the
+shared `pam.module` would break password unlocks on other distros. On first run
+the installer creates `~/.config/hypr/hyprlock.local.conf`: it sources the
+shared config and then reopens `auth { pam { module = ... } }` with the first
+stack found in `/etc/pam.d/` — `password-auth` (Fedora), `system-login`
+(Arch/CachyOS), `system-auth`, or `login`. The lock wrapper passes that file to
+hyprlock with `--config`, so the host value wins by being assigned after the
+sourced one. The file is host-specific and the installer never overwrites it;
+delete it to have it regenerated.
+
+The override direction matters: hyprlock's `source =` keyword errors when the
+target file does not exist (even for non-matching globs), so the optional
+per-host file sources the always-present shared config, and the wrapper opts
+in only when the local file exists. Never put an unconditional `source =` of a
+per-host file into the shared config.
 
 ## Testing
 
