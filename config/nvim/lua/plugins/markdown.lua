@@ -1,5 +1,24 @@
 return {
   {
+    "saadndm/mathlive.nvim",
+    lazy = false,
+  },
+  {
+    "MeanderingProgrammer/render-markdown.nvim",
+    opts = {
+      latex = { enabled = false },
+      win_options = {
+        concealcursor = { rendered = "nvic" },
+      },
+    },
+  },
+  {
+    "nvim-treesitter/nvim-treesitter",
+    opts = {
+      ensure_installed = { "markdown", "markdown_inline", "latex" },
+    },
+  },
+  {
     "mfussenegger/nvim-lint",
     opts = function(_, opts)
       opts.linters_by_ft.markdown = {}
