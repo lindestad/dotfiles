@@ -2,9 +2,10 @@
 
 The shared Niri configuration starts `noctalia` and uses its `noctalia msg`
 commands. Install the `noctalia` package, rather than the legacy
-`noctalia-shell` package. The installer uses the Arch/CachyOS repositories,
-Fedora 44+ repositories, or the Noctalia APT repository on Debian trixie/sid
-and Ubuntu 26.04.
+`noctalia-shell` package, and remove the legacy QuickShell stack if it is still
+present (`noctalia-shell`, `noctalia-qs`, `quickshell`). The installer uses the
+Arch/CachyOS repositories, Fedora 44+ repositories, or the Noctalia APT
+repository on Debian trixie/sid and Ubuntu 26.04.
 
 `config/noctalia/config.toml` supplies the solid, edge-aligned grayscale bar,
 widgets, idle timers, and session actions. The palette is linked into

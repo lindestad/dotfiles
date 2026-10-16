@@ -337,6 +337,21 @@ install_pacman() {
   sudo pacman -Syu --needed --noconfirm "$@"
 }
 
+remove_legacy_noctalia_quickshell() {
+  local pkg
+  local legacy_pkgs=()
+  for pkg in noctalia-shell noctalia-qs quickshell; do
+    if pacman -Q "$pkg" >/dev/null 2>&1; then
+      legacy_pkgs+=("$pkg")
+    fi
+  done
+  if ((${#legacy_pkgs[@]})); then
+    echo "==> Removing legacy Noctalia QuickShell packages..."
+    sudo pacman -Rns --noconfirm "${legacy_pkgs[@]}" ||
+      echo "!! Could not remove ${legacy_pkgs[*]}; something still depends on them."
+  fi
+}
+
 setup_docker() {
   local docker_user
   docker_user="${USER:-$(id -un)}"

@@ -23,8 +23,7 @@ The wrapper checks lock options in this order:
 
 1. If `hyprlock` exists, run `hyprlock --immediate-render --no-fade-in`.
 2. If Hyprlock is missing, call Noctalia v5 with `noctalia msg session lock`.
-3. On older hosts with only Quickshell, use the v4 `lockScreen lock` IPC method.
-4. If neither is available, ask `loginctl` to lock the session.
+3. If neither is available, ask `loginctl` to lock the session.
 
 The wrapper also uses a non-blocking `flock` lock when available, so accidental repeated hotkey presses do not start multiple lockers.
 

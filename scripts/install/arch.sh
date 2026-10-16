@@ -130,6 +130,7 @@ if [[ "$INSTALL_NIRI" == "yes" ]]; then
   else
     NIRI_AUR_PKGS+=(noctalia)
   fi
+  remove_legacy_noctalia_quickshell
 fi
 
 install_progress 2 5 "Command-line tools"

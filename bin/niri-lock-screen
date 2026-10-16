@@ -14,10 +14,6 @@ if command -v noctalia >/dev/null 2>&1; then
   exec noctalia msg session lock
 fi
 
-if command -v qs >/dev/null 2>&1; then
-  exec qs -c noctalia-shell ipc call lockScreen lock
-fi
-
 if command -v loginctl >/dev/null 2>&1; then
   exec loginctl lock-session
 fi
