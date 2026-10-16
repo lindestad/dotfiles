@@ -134,6 +134,13 @@ window-rule {
     default-window-height { fixed 920; }
 }
 
+// Open the Jagex Launcher as a normal window instead of a floating overlay.
+window-rule {
+    match app-id="jagex-launcher"
+    open-floating false
+    default-window-height { proportion 0.85; }
+}
+
 // Work around WezTerm's initial configure bug.
 window-rule {
     match app-id=r"^org\.wezfurlong\.wezterm$"
