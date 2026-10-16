@@ -61,6 +61,10 @@ keybind = ctrl+alt+u=scroll_page_fractional:-0.5
 keybind = ctrl+alt+d=scroll_page_fractional:0.5
 keybind = ctrl+alt+b=scroll_page_up
 keybind = ctrl+alt+f=scroll_page_down
+# Ghostty 1.3 defaults ctrl+enter to toggle_fullscreen, which steals the key
+# opencode uses to queue a message. Drop it; fullscreen stays on niri's
+# Mod+Shift+F.
+keybind = ctrl+enter=unbind
 
 # Color scheme
 palette = 0=#101317
