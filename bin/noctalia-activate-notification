@@ -1,10 +1,36 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Noctalia v5 provides the action directly.
-if command -v noctalia >/dev/null 2>&1; then
+if ! command -v noctalia >/dev/null 2>&1; then
+  echo "noctalia-activate-notification: noctalia v5 is required" >&2
+  exit 1
+fi
+
+# noctalia msg notification-invoke-latest only reaches notifications that are
+# still on screen; expired ones are silently ignored. Check the on-disk
+# history and fall back to the notification history panel, matching the
+# behavior of the pre-v5 quickshell helper.
+history="${XDG_STATE_HOME:-$HOME/.local/state}/noctalia/notification_history.json"
+if ! command -v jq >/dev/null 2>&1 || [[ ! -r "$history" ]]; then
   exec noctalia msg notification-invoke-latest
 fi
 
-echo "noctalia-activate-notification: noctalia v5 is required" >&2
-exit 1
+state="$(jq -r --argjson now "$(( $(date +%s) * 1000 ))" '
+  (.entries // []) | last
+  | if . == null then "none"
+    elif (.active == true) and ((.notification.expiry_wall_ms // 0) > $now) then "active"
+    else "expired"
+    end
+' "$history")"
+
+case "$state" in
+  active)
+    exec noctalia msg notification-invoke-latest
+    ;;
+  expired)
+    exec noctalia msg panel-toggle control-center notifications
+    ;;
+  *)
+    exec noctalia msg notification-invoke-latest
+    ;;
+esac
