@@ -87,6 +87,10 @@ ensure_niri_zvim() {
   "$source_dir/scripts/install"
 }
 
+ensure_expensive() {
+  ensure_cargo_tool expensive expensive "expensive (OpenCode token tracker)"
+}
+
 ensure_noctalia_fedora() {
   if rpm -q noctalia >/dev/null 2>&1; then
     return

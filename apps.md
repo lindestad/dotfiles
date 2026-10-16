@@ -116,6 +116,7 @@ These are installed when the Linux installer runs with `--niri`.
 | BlueZ | `bluez`, `bluez-utils` | `bluez` | `bluez`, `bluez-tools` |
 | brightnessctl | `brightnessctl` | `brightnessctl` | `brightnessctl` |
 | cliphist | `cliphist` | `cliphist` | `cliphist` |
+| expensive (OpenCode token tracker) | cargo crate `expensive` | cargo crate `expensive` | cargo crate `expensive` |
 | Flatpak | `flatpak` | `flatpak` | `flatpak` |
 | fuzzel | `fuzzel` | `fuzzel` | `fuzzel` |
 | Loupe | `loupe` | `loupe` | `loupe` |
