@@ -28,10 +28,12 @@ binds {
     XF86AudioStop allow-when-locked=true { spawn-sh "playerctl stop"; }
     XF86AudioPrev allow-when-locked=true { spawn-sh "playerctl previous"; }
     XF86AudioNext allow-when-locked=true { spawn-sh "playerctl next"; }
-    XF86MonBrightnessUp allow-when-locked=true { spawn "brightnessctl" "--class=backlight" "set" "+10%"; }
-    XF86MonBrightnessDown allow-when-locked=true { spawn "brightnessctl" "--class=backlight" "set" "10%-"; }
-    Super+Alt+Equal allow-when-locked=true { spawn "brightnessctl" "--class=backlight" "set" "+10%"; }
-    Super+Alt+Minus allow-when-locked=true { spawn "brightnessctl" "--class=backlight" "set" "10%-"; }
+    // Brightness goes through Noctalia so the same keys drive a laptop panel
+    // (kernel backlight) and external monitors (DDC/CI), and get its OSD.
+    XF86MonBrightnessUp allow-when-locked=true { spawn "noctalia" "msg" "brightness-up"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "noctalia" "msg" "brightness-down"; }
+    Super+Alt+Equal allow-when-locked=true { spawn "noctalia" "msg" "brightness-up"; }
+    Super+Alt+Minus allow-when-locked=true { spawn "noctalia" "msg" "brightness-down"; }
 
     // Focus
     Mod+O repeat=false { toggle-overview; }

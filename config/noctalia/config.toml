@@ -69,6 +69,12 @@ artist_first = true
 title_scroll = "on_hover"
 hide_when_no_media = true
 
+# External monitors are reached over DDC/CI, which needs the ddcutil package.
+# Keep a floor so a stray keypress cannot take a panel to black.
+[brightness]
+enable_ddcutil = true
+minimum_brightness = 0.05
+
 [dock]
 enabled = false
 

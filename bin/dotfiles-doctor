@@ -404,6 +404,57 @@ check_niri() {
   else
     warn "niri-zvim is not installed; rerun ./install.sh --niri"
   fi
+
+  check_niri_keybind_binaries
+  check_noctalia_brightness
+}
+
+# A keybind that spawns a missing binary fails silently, so check the tools the
+# shared keybinds name before blaming the shortcut.
+check_niri_keybind_binaries() {
+  local keybinds="$HOME/.config/niri/keybinds.kdl"
+  local cmd
+  local missing=()
+
+  if [[ ! -f "$keybinds" ]]; then
+    return 0
+  fi
+
+  while IFS= read -r cmd; do
+    if [[ -n "$cmd" ]] && ! have "$cmd"; then
+      missing+=("$cmd")
+    fi
+  done < <(sed -n 's/.*spawn "\([^"]*\)".*/\1/p' "$keybinds" | sort -u)
+
+  if ((${#missing[@]})); then
+    warn "niri keybinds spawn missing commands: ${missing[*]}"
+  else
+    ok "niri keybind commands present"
+  fi
+}
+
+check_noctalia_brightness() {
+  if ! have noctalia; then
+    return 0
+  fi
+
+  local enabled
+  enabled="$(noctalia config export 2>/dev/null | sed -n 's/^enable_ddcutil = \(.*\)$/\1/p' | head -1)"
+  case "$enabled" in
+    true)
+      if have ddcutil; then
+        ok "Noctalia DDC/CI brightness backend is on"
+      else
+        fail "Noctalia enables DDC/CI brightness, but ddcutil is not installed; rerun: ./install.sh --niri"
+      fi
+      ;;
+    false)
+      warn "Noctalia DDC/CI brightness backend is off; external monitors cannot change brightness"
+      ;;
+    *)
+      warn "could not read the Noctalia brightness backend; run: noctalia config export"
+      ;;
+  esac
 }
 
 check_zen_url_handler() {

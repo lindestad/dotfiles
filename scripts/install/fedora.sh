@@ -95,6 +95,7 @@ DNF_PKGS=(
 NIRI_DNF_PKGS=(
   lm_sensors
   brightnessctl
+  ddcutil
   flatpak
   cliphist
   bluez

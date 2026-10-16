@@ -58,6 +58,7 @@ NIRI_APT_PKGS=(
   cliphist
   lm-sensors
   brightnessctl
+  ddcutil
   bluez
   network-manager-gnome
   pavucontrol

@@ -350,8 +350,8 @@ remove_legacy_noctalia_quickshell() {
     return 0
   fi
 
-  # Only remove them when nothing outside the set depends on them; -Rns in a
-  # single transaction still honours dependencies between the set members.
+  # Only remove them when nothing outside the set depends on them; removing the
+  # set in a single transaction still honours dependencies between its members.
   for pkg in "${legacy_pkgs[@]}"; do
     read -r -a dependents <<<"$(pacman -Qi "$pkg" 2>/dev/null | sed -n 's/^Required By *: //p')"
     for dependent in "${dependents[@]}"; do
@@ -366,7 +366,26 @@ remove_legacy_noctalia_quickshell() {
   fi
 
   echo "==> Removing legacy Noctalia QuickShell packages..."
-  sudo pacman -Rns --noconfirm "${legacy_pkgs[@]}"
+  # -Rn, not -Rns: the -s flag also drops the old shell's dependencies, which
+  # silently takes brightnessctl and wlr-randr away from the Niri stack.
+  sudo pacman -Rn --noconfirm "${legacy_pkgs[@]}"
+  mark_pacman_explicit brightnessctl ddcutil
+}
+
+# Tools the Niri stack calls directly should not sit in the dependency-only
+# bucket, where an orphan cleanup is free to remove them.
+mark_pacman_explicit() {
+  local pkg
+  for pkg in "$@"; do
+    if ! pacman -Q "$pkg" >/dev/null 2>&1; then
+      continue
+    fi
+    if pacman -Qi "$pkg" 2>/dev/null | grep -q '^Install Reason  *: Explicitly installed'; then
+      continue
+    fi
+    echo "==> Marking $pkg as explicitly installed..."
+    sudo pacman -D --asexplicit "$pkg"
+  done
 }
 
 setup_docker() {

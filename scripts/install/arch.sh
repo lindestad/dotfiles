@@ -68,6 +68,7 @@ PACMAN_PKGS=(
 NIRI_PACMAN_PKGS=(
   lm_sensors
   brightnessctl
+  ddcutil
   flatpak
   cliphist
   bluez
