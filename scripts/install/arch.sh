@@ -10,6 +10,7 @@ ensure_not_root
 start_install_log
 
 PACMAN_PKGS=(
+  base-devel
   fish
   zsh
   bc
