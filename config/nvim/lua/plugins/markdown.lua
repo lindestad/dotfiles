@@ -16,6 +16,7 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     opts = {
+      install_dir = vim.fn.stdpath("data") .. "/site",
       ensure_installed = { "markdown", "markdown_inline", "latex" },
     },
   },
