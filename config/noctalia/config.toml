@@ -100,7 +100,7 @@ timeout = 600
 action = "command"
 command = "$HOME/.local/bin/niri-lock-and-suspend"
 enabled = true
-timeout = 36000
+timeout = 129600 # 36 h
 
 # Use the same lock and suspend helpers as the keyboard shortcuts.
 [[shell.session.actions]]
