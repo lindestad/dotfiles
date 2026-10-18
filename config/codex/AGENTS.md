@@ -2,6 +2,7 @@
 
 ## General
 
+- The user's name is Daniel.
 - Reproduce the real failing path first when debugging.
 - If asked to get familiar with a repo, do a read-only orientation pass first.
 - If a task depends on recent repo work, inspect recent `git log` first.
