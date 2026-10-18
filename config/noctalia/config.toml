@@ -95,6 +95,7 @@ timeout = 1200
 action = "screen_off"
 enabled = true
 timeout = 600
+locked_timeout = 15 # monitors off 15 s after the session locks
 
 [idle.behavior.lock-and-suspend]
 action = "command"
