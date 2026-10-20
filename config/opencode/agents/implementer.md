@@ -5,6 +5,24 @@ permissions:
   - action: subagent
     resource: "*"
     effect: deny
+  # A subagent cannot answer a prompt, so any `ask` that fires here stalls the run
+  # until the session dies. Deny the commands the global config asks for instead:
+  # the agent gets an instant error and can pick another way (git clean -fd, a fresh
+  # path, or plain rm). Pushing stays off limits either way.
+  - action: shell
+    resource: "rm -rf *"
+    effect: deny
+  - action: shell
+    resource: "rm -rf /tmp/opencode/*"
+    effect: allow
+  - action: shell
+    resource: "git push *"
+    effect: deny
+  # Only the human can answer a question, and they have none of the agent's
+  # context. Put open questions in the final report instead.
+  - action: question
+    resource: "*"
+    effect: deny
 ---
 
 You are a capable engineer handling a well-scoped coding task handed to you by
