@@ -24,6 +24,10 @@ input {
 environment {
     // Shelly only reads GNOME's dark-mode preference on a GNOME-compatible desktop.
     XDG_CURRENT_DESKTOP "niri:GNOME"
+
+    // Niri never reparents X11 windows; without this Java AWT/Swing apps
+    // (Ghidra, IntelliJ, ...) assume it does and paint blank.
+    _JAVA_AWT_WM_NONREPARENTING "1"
 }
 
 layout {
